@@ -1,0 +1,6 @@
+@PubHub.API_HostAddress = http://localhost:5270
+
+GET {{PubHub.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
