@@ -4,11 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
-using System.Reflection.Emit;
 
 namespace PubHub.API.Domain
 {
-    public sealed class PubHubContext : IdentityDbContext<Account, IdentityRole<int>, int>
+    public class PubHubContext : IdentityDbContext<Account, IdentityRole<int>, int>
     {
         private readonly string? _connectionString;
 
@@ -18,6 +17,9 @@ namespace PubHub.API.Domain
         }
 
         public PubHubContext(DbContextOptions<PubHubContext> options) : base(options) { }
+
+        public virtual DbSet<PubHubUser> PubHubUsers { get; set; }
+        public virtual DbSet<UserBook> UserBooks { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -136,7 +138,7 @@ namespace PubHub.API.Domain
                 publisher.TypeToPluralTableName();
             });
 
-            builder.Entity<User>(user =>
+            builder.Entity<PubHubUser>(user =>
             {
                 user.ConfigureId();
 

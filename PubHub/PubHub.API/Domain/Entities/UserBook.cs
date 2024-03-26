@@ -10,7 +10,7 @@
 
         #region Navs
         public required Book Book { get; set; }
-        public required User User { get; set; }
+        public required PubHubUser User { get; set; }
         public required AccessType AccessType { get; set; }
         #endregion
     }

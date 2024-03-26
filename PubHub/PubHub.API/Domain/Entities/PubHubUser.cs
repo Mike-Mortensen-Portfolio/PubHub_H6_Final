@@ -2,7 +2,7 @@
 
 namespace PubHub.API.Domain.Entities
 {
-    public sealed class User
+    public sealed class PubHubUser
     {
         public int Id { get; set; }
         public int? AccountId { get; set; }
