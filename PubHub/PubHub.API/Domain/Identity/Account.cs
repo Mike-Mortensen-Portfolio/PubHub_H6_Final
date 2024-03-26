@@ -7,7 +7,7 @@ namespace PubHub.API.Domain.Identity
     {
         private readonly UpperInvariantLookupNormalizer _normalizer = new();
 
-        public int AccountTypeId { get; set; }
+        public required int AccountTypeId { get; set; }
         /// <summary>
         /// Gets or sets the email for this user.
         /// <br/>
@@ -63,9 +63,10 @@ namespace PubHub.API.Domain.Identity
             }
         }
         public required DateTime LastSignIn { get; set; }
+        public bool IsDeleted { get; set; }
 
         #region Navs
-        public required AccountType AccountType { get; set; }
+        public AccountType? AccountType { get; set; }
         #endregion
     }
 }
