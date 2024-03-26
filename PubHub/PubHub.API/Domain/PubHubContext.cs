@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
+using System.Reflection.Emit;
 
 namespace PubHub.API.Domain
 {
@@ -38,11 +39,47 @@ namespace PubHub.API.Domain
             builder.Entity<Account>(account =>
             {
                 account.ConfigureId();
-                
+
                 account.HasOne(a => a.AccountType)
                     .WithMany();
 
-                account.ToTable(nameof(Account));
+                account.TypeToPluralTableName();
+            });
+
+            builder.Entity<IdentityUserRole<int>>(accountRole =>
+            {
+                accountRole.ToTable("AccountRoles");
+            });
+
+            builder.Entity<IdentityRole<int>>(role =>
+            {
+                role.ToTable("Roles");
+            });
+
+            builder.Entity<IdentityRoleClaim<int>>(roleClaim =>
+            {
+                roleClaim.ToTable("RoleClaims");
+            });
+
+            builder.Entity<IdentityUserClaim<int>>(accountClaim =>
+            {
+                accountClaim.ToTable("AccountClaims");
+            });
+
+            builder.Entity<IdentityUserLogin<int>>(accountLogin =>
+            {
+                accountLogin.Property(al => al.UserId)
+                .HasColumnName("AccountId");
+
+                accountLogin.ToTable("AccountLogins");
+            });
+
+            builder.Entity<IdentityUserToken<int>>(accountToken =>
+            {
+                accountToken.Property(at => at.UserId)
+                .HasColumnName("AccountId");
+
+                accountToken.ToTable("AccountTokens");
             });
             #endregion
 
@@ -51,7 +88,7 @@ namespace PubHub.API.Domain
             {
                 accountType.ConfigureId();
 
-                accountType.ToTable(nameof(AccountType));
+                accountType.TypeToPluralTableName();
             });
 
             builder.Entity<Author>(author =>
@@ -59,35 +96,24 @@ namespace PubHub.API.Domain
                 author.ConfigureId();
 
                 author.HasMany(a => a.Books)
-                    .WithMany();
+                    .WithMany(b => b.Authors)
+                    .UsingEntity(ab => ab.ToTable("AuthorBooks"));
 
-                author.ToTable(nameof(Author));
+                author.TypeToPluralTableName();
             });
 
             builder.Entity<Book>(book =>
             {
                 book.ConfigureId();
-
-                book.HasOne(b => b.Authors)
-                    .WithMany();
                 book.HasOne(b => b.Publisher)
+                    .WithMany(p => p.Books);
+                book.HasOne(b => b.ContentType)
                     .WithMany();
+                book.HasMany(b => b.Genres)
+                    .WithMany(g => g.Books)
+                    .UsingEntity(bg => bg.ToTable("BookGenres"));
 
-                book.ToTable(nameof(Book));
-            });
-
-            builder.Entity<ContentType>(book =>
-            {
-                book.ConfigureId();
-
-                book.ToTable(nameof(ContentType));
-            });
-
-            builder.Entity<Genre>(book =>
-            {
-                book.ConfigureId();
-
-                book.ToTable(nameof(Genre));
+                book.TypeToPluralTableName();
             });
 
             builder.Entity<Operator>(@operator =>
@@ -95,9 +121,9 @@ namespace PubHub.API.Domain
                 @operator.ConfigureId();
 
                 @operator.HasOne(o => o.Account)
-                    .WithMany();
+                    .WithOne();
 
-                @operator.ToTable(nameof(Operator));
+                @operator.TypeToPluralTableName();
             });
 
             builder.Entity<Publisher>(publisher =>
@@ -105,9 +131,9 @@ namespace PubHub.API.Domain
                 publisher.ConfigureId();
 
                 publisher.HasOne(p => p.Account)
-                    .WithMany();
+                    .WithOne();
 
-                publisher.ToTable(nameof(Publisher));
+                publisher.TypeToPluralTableName();
             });
 
             builder.Entity<User>(user =>
@@ -115,11 +141,44 @@ namespace PubHub.API.Domain
                 user.ConfigureId();
 
                 user.HasOne(u => u.Account)
-                    .WithMany();
-                user.HasMany(u => u.Books)
+                    .WithOne();
+
+                user.TypeToPluralTableName();
+            });
+
+            builder.Entity<UserBook>(userBook =>
+            {
+                userBook.HasKey(ub => new { ub.BookId, ub.UserId, ub.AccessTypeId });
+
+                userBook.HasOne(ub => ub.User)
+                    .WithMany(u => u.UserBooks);
+                userBook.HasOne(ub => ub.Book)
+                    .WithMany(b => b.UserBooks);
+                userBook.HasOne(ub => ub.AccessType)
                     .WithMany();
 
-                user.ToTable(nameof(User));
+                userBook.TypeToPluralTableName();
+            });
+
+            builder.Entity<ContentType>(book =>
+            {
+                book.ConfigureId();
+
+                book.TypeToPluralTableName();
+            });
+
+            builder.Entity<Genre>(book =>
+            {
+                book.ConfigureId();
+
+                book.TypeToPluralTableName();
+            });
+
+            builder.Entity<AccessType>(accesstype =>
+            {
+                accesstype.ConfigureId();
+
+                accesstype.TypeToPluralTableName();
             });
             #endregion
         }

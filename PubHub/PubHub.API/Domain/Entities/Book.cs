@@ -3,18 +3,18 @@
     public class Book
     {
         public int Id { get; set; }
-        public int? AccountId { get; set; }
         public required string Title { get; set; }
-        public required Genre Genre { get; set; }
         public byte[]? CoverImage { get; set; }
-        public required Stream Content { get; set; }
+        public required byte[] BookContent { get; set; }
         public required ContentType ContentType { get; set; }
-        public DateTime PublicationYear { get; set; }
+        public DateOnly PublicationDate { get; set; }
         public double Length { get; set; }
-        public bool IsDeleted { get; set; }
+        public bool IsHidden { get; set; }
 
         #region Navs
-        public required IList<Author> Authors { get; set; }
+        public IList<Author> Authors { get; set; } = [];
+        public IList<UserBook> UserBooks { get; set; } = [];
+        public IList<Genre> Genres { get; set; } = [];
         public required Publisher Publisher { get; set; }
         #endregion
     }
