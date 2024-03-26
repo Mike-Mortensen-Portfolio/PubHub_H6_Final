@@ -1,6 +1,4 @@
-﻿using PubHub.API.Domain.Identity;
-
-namespace PubHub.API.Domain.Entities
+﻿namespace PubHub.API.Domain.Entities
 {
     public class Genre
     {

@@ -11,7 +11,7 @@ namespace PubHub.API.Domain.Entities
         public bool IsDeleted { get; set; }
         
         #region Navs
-        public Account? Account { get; set; }
+        public required Account Account { get; set; }
         #endregion
     }
 }

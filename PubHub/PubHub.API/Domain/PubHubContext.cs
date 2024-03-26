@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
 
 namespace PubHub.API.Domain
@@ -33,43 +34,94 @@ namespace PubHub.API.Domain
         {
             base.OnModelCreating(builder);
 
+            #region Identity
             builder.Entity<Account>(account =>
             {
-                account.Property(a => a.Id)
-                .HasColumnName("AccountId");
-
-                account.HasKey(a => a.Id);
+                account.ConfigureId();
+                
                 account.HasOne(a => a.AccountType)
-                .WithMany();
+                    .WithMany();
 
-                account.ToTable("Account");
+                account.ToTable(nameof(Account));
             });
+            #endregion
 
+            #region Entities
             builder.Entity<AccountType>(accountType =>
             {
-                accountType.Property(a => a.Id)
-                .HasColumnName("AccountTypeId");
+                accountType.ConfigureId();
 
-                accountType.ToTable("AccountType");
+                accountType.ToTable(nameof(AccountType));
             });
 
             builder.Entity<Author>(author =>
             {
-                author.Property(a => a.Id)
-                .HasColumnName("AuthorId");
+                author.ConfigureId();
 
-                author.ToTable("Author");
+                author.HasMany(a => a.Books)
+                    .WithMany();
+
+                author.ToTable(nameof(Author));
             });
 
             builder.Entity<Book>(book =>
             {
-                book.Property(b => b.Id)
-                .HasColumnName("BookId");
+                book.ConfigureId();
 
+                book.HasOne(b => b.Authors)
+                    .WithMany();
+                book.HasOne(b => b.Publisher)
+                    .WithMany();
 
-
-                book.ToTable("Book");
+                book.ToTable(nameof(Book));
             });
+
+            builder.Entity<ContentType>(book =>
+            {
+                book.ConfigureId();
+
+                book.ToTable(nameof(ContentType));
+            });
+
+            builder.Entity<Genre>(book =>
+            {
+                book.ConfigureId();
+
+                book.ToTable(nameof(Genre));
+            });
+
+            builder.Entity<Operator>(@operator =>
+            {
+                @operator.ConfigureId();
+
+                @operator.HasOne(o => o.Account)
+                    .WithMany();
+
+                @operator.ToTable(nameof(Operator));
+            });
+
+            builder.Entity<Publisher>(publisher =>
+            {
+                publisher.ConfigureId();
+
+                publisher.HasOne(p => p.Account)
+                    .WithMany();
+
+                publisher.ToTable(nameof(Publisher));
+            });
+
+            builder.Entity<User>(user =>
+            {
+                user.ConfigureId();
+
+                user.HasOne(u => u.Account)
+                    .WithMany();
+                user.HasMany(u => u.Books)
+                    .WithMany();
+
+                user.ToTable(nameof(User));
+            });
+            #endregion
         }
     }
 }

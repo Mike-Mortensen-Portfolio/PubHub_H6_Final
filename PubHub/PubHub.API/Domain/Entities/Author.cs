@@ -1,6 +1,4 @@
-﻿using PubHub.API.Domain.Identity;
-
-namespace PubHub.API.Domain.Entities
+﻿namespace PubHub.API.Domain.Entities
 {
     public class Author
     {
@@ -10,7 +8,6 @@ namespace PubHub.API.Domain.Entities
         public bool IsDeleted { get; set; }
 
         #region Navs
-        public Account? Account { get; set; }
         public IList<Book> Books { get; set; } = new List<Book>();
         #endregion 
     }
