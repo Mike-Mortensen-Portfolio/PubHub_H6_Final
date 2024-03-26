@@ -1,15 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PubHub.API;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection;
 
-internal static class EntityTypeBuilderExtensions
+namespace PubHub.API.Domain.Extensions
 {
-    public static EntityTypeBuilder<T> ConfigureId<T>(this EntityTypeBuilder<T> entityTypeBuilder) where T : class
+    internal static class EntityTypeBuilderExtensions
     {
-        if(entityTypeBuilder.GetType().GetProperty("Id") != null)
+        public static EntityTypeBuilder<T> ConfigureId<T>(this EntityTypeBuilder<T> entityTypeBuilder) where T : class
         {
-
+            if(typeof(T).GetProperty("Id") is PropertyInfo propertyInfo)
+            {
+                entityTypeBuilder.Property(propertyInfo.PropertyType, propertyInfo.Name)
+                    .HasColumnName($"{nameof(T)}Id");
+                entityTypeBuilder.HasKey(propertyInfo.Name);
+            }
+    
+            return entityTypeBuilder;
         }
-
-        return entityTypeBuilder;
     }
 }
