@@ -2,7 +2,7 @@
 {
     public class AccessType
     {
-        public int AccessTypeId { get; set; }
+        public int Id { get; set; }
         public required string Name { get; set; }
     }
 }
