@@ -13,7 +13,7 @@ namespace PubHub.API
 {
     public static class ServiceExtensions
     {
-        //  IServiceCollection extensions
+        // IServiceCollection extensions
         public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration, string connectionId)
         {
             return services.AddDbContext<PubHubContext>(options =>
@@ -22,6 +22,7 @@ namespace PubHub.API
               .UseSqlServer(configuration.GetConnectionString(connectionId));
             });
         }
+
         public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
         {
             services.AddIdentity<Account, IdentityRole<int>>(options =>
@@ -39,6 +40,7 @@ namespace PubHub.API
 
             return services;
         }
+
         public static IServiceCollection ConfigureCors(this IServiceCollection services)
         {
             return services.AddCors(options =>
@@ -50,6 +52,7 @@ namespace PubHub.API
                     .AllowAnyHeader());
             });
         }
+
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services, params OpenApiInfo[] docs)
         {
             return services.AddSwaggerGen(options =>
@@ -86,11 +89,12 @@ namespace PubHub.API
                     options.SwaggerDoc(doc.Version, doc);
                 }
 
-                //  Uncommment to include XML documentation (Remember to add XML Doc file in Properties > Build > Output > Documentation File)
+                // Uncommment to include XML documentation (Remember to add XML Doc file in Properties > Build > Output > Documentation File)
                 //var xmlDocPath = Path.Combine(AppContext.BaseDirectory, "PubHub.API.xml");
                 //options.IncludeXmlComments(xmlDocPath);
             });
         }
+
         public static IServiceCollection ConfigureVersioning(this IServiceCollection services)
         {
             services.AddApiVersioning(options =>
@@ -137,6 +141,7 @@ namespace PubHub.API
                 });
             });
         }
+
         public static IApplicationBuilder ConfigureSwaggerUI(this IApplicationBuilder app)
         {
             var apiVersionDescriptionProvider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
