@@ -1,3 +1,5 @@
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -10,11 +12,15 @@ a, .btn-link {
     color: #0071c1;
 }
 
-a.navbar-brand {
-    white-space: normal;
-    text-align: center;
-    word-break: break-all;
-}
+    a.navbar-brand {
+        white-space: normal;
+        text-align: center;
+        word-break: break-all;
+    }
+
+    a.nav-link:hover {
+        background-color: #a9a7fa !important;
+    }
 
 .header-template {
     box-shadow: 0px 3px 0px 0px rgb(232,232,232,0.5);
@@ -38,8 +44,8 @@ a.navbar-brand {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-    background-color: #5856D6;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #5856D6;
+    background-color: #a9a7fa;
 }
 
 .content {
