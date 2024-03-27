@@ -12,7 +12,7 @@ namespace PubHub.API.Domain.Entities
 
         #region Navs
         public Account Account { get; set; } = null!;
-        public required IList<UserBook> UserBooks { get; set; }
+        public IList<UserBook> UserBooks { get; set; }
         #endregion
     }
 }

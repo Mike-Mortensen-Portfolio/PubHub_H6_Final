@@ -1,6 +1,6 @@
 ﻿namespace PubHub.Common.Models
 {
-    public class UserModel
+    public class UserInfoModel
     {
         public required int Id { get; init; }
         public required string Email { get; set; }

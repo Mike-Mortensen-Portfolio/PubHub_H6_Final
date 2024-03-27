@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
+using PubHub.Common;
 using PubHub.Common.Models;
 
 namespace PubHub.API.Controllers
@@ -29,7 +30,7 @@ namespace PubHub.API.Controllers
             var userModel = _context.Set<User>()
                 .Include(u => u.Account)
                 .ThenInclude(a => a!.AccountType)
-                .Select(u => new UserModel()
+                .Select(u => new UserInfoModel()
                 {
                     Id = u.Id,
                     Email = u.Account.Email,
@@ -73,7 +74,7 @@ namespace PubHub.API.Controllers
             // Retreive all books.
             var bookModels = await _context.Set<UserBook>()
                 .Where(b => b.UserId == id)
-                .Select(b => new BookModel()
+                .Select(b => new BookInfoModel()
                 {
                     Title = b.Book.Title,
                     PublicationDate = b.Book.PublicationDate
@@ -87,8 +88,9 @@ namespace PubHub.API.Controllers
         /// Update information of a specific user.
         /// </summary>
         /// <param name="id">ID of user.</param>
-        /// <param name="userUpdateModel">Information to update the existing record with.</param>
+        /// <param name="userUpdateModel">Information to update the existing user with.</param>
         /// <response code="200">Success. The user was updated.</response>
+        /// <response code="400">Invalid model data or format.</response>
         /// <response code="404">The user wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
         [HttpPut("{id}", Name = "UpdateUser")]
@@ -111,7 +113,7 @@ namespace PubHub.API.Controllers
             }
 
             // Update entry with new data.
-            user.Account.Email = userUpdateModel.Email;
+            user.Account.Email = userUpdateModel.Account.Email;
             user.Name = userUpdateModel.Name;
             user.Surname = userUpdateModel.Surname;
             user.Birthday = userUpdateModel.Birthday;
@@ -145,7 +147,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();
-            if (accountId == default)
+            if (accountId == 0)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
@@ -187,18 +189,16 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IResult> SuspendUserAsync(int id)
         {
-            const string accountTypeName = "suspended";
-
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(accountTypeName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(a => a.Name.Equals(Constants.SUSPENDED_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-            if (accountTypeId == default)
+            if (accountTypeId == 0)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to find account type: '{accountTypeName}'");
+                    detail: $"Unable to find account type: '{Constants.SUSPENDED_ACCOUNT_TYPE}'");
             }
 
             // Get account ID.
@@ -206,7 +206,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();
-            if (accountId == default)
+            if (accountId == 0)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,

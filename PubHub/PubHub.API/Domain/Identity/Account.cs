@@ -62,7 +62,7 @@ namespace PubHub.API.Domain.Identity
                 return base.NormalizedUserName;
             }
         }
-        public required DateTime LastSignIn { get; set; }
+        public DateTime? LastSignIn { get; set; }
         public bool IsDeleted { get; set; }
 
         #region Navs
