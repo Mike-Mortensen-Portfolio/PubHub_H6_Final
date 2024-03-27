@@ -16,7 +16,7 @@
                         <span class="oi oi-plus" aria-hidden="true"></span> Book search
                     </NavLink>
                 </li>
-                @* TODO: Only add if a user is logged in (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
+                @* TODO (JBN): Only add if a user is logged in (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
                 @if (true)
                 {
                     <li class="nav-item p-2">
@@ -30,7 +30,7 @@
         <div class="navbar-collapse justify-content-end">
             <ul class="navbar-nav">
                 <li class="nav-item p-2">
-                    @* TODO: Add check if user is logged in (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
+                    @* TODO (JBN): Add check if user is logged in (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
                     @if (true)
                     {
                         <NavLink class="nav-link text-dark" href="signin" Match="NavLinkMatch.All">
