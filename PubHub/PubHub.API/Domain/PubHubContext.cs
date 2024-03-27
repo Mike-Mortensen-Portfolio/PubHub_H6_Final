@@ -7,7 +7,7 @@ using PubHub.API.Domain.Identity;
 
 namespace PubHub.API.Domain
 {
-    public class PubHubContext : IdentityDbContext<Account, IdentityRole<int>, int>
+    public sealed class PubHubContext : IdentityDbContext<Account, IdentityRole<int>, int>
     {
         private readonly string? _connectionString;
 

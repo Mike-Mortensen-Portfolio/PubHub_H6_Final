@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Identity;
 using PubHub.Common.Models;
 
 namespace PubHub.API.Controllers
@@ -23,7 +24,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult GetUser(int id)
+        public IResult GetUser(int id)
         {
             var userModel = _context.Set<User>()
                 .Include(u => u.Account)
@@ -41,12 +42,12 @@ namespace PubHub.API.Controllers
                 .SingleOrDefault(u => u.Id == id);
             if (userModel == null)
             {
-                return Problem(
+                return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     detail: $"No user with ID: {id}");
             }
 
-            return Ok(userModel);
+            return Results.Ok(userModel);
         }
 
         /// <summary>
@@ -60,12 +61,12 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBooksAsync(int id)
+        public async Task<IResult> GetBooksAsync(int id)
         {
             // Check if user exists.
             if (!await _context.Set<User>().AnyAsync(u => u.Id == id))
             {
-                return Problem(
+                return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     detail: $"No user with ID: {id}");
             }
@@ -80,7 +81,7 @@ namespace PubHub.API.Controllers
                 })
                 .ToListAsync();
             
-            return Ok(bookModels);
+            return Results.Ok(bookModels);
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateUserAsync(int id, [FromBody] UserUpdateModel userUpdateModel)
+        public async Task<IResult> UpdateUserAsync(int id, [FromBody] UserUpdateModel userUpdateModel)
         {
             // TODO (SIA): Validate model.
 
@@ -105,7 +106,7 @@ namespace PubHub.API.Controllers
                 .SingleOrDefault(u => u.Id == id);
             if (user == null)
             {
-                return Problem(
+                return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     detail: $"No user with ID: {id}");
             }
@@ -119,7 +120,7 @@ namespace PubHub.API.Controllers
             _context.Set<User>().Update(user);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Results.Ok();
         }
 
         /// <summary>
@@ -133,7 +134,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteUserAsync(int id)
+        public async Task<IResult> DeleteUserAsync(int id)
         {
             // Get account ID.
             var accountId = await _context.Set<User>()
@@ -142,23 +143,91 @@ namespace PubHub.API.Controllers
                 .SingleOrDefaultAsync();
             if (accountId == default)
             {
-                return Problem(
+                return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     detail: $"No user with ID: {id}");
             }
 
             // Delete account.
-            int updatedRows = await _context.Users
+            int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
                 .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
             if (updatedRows > 0)
             {
-                return Ok();
+                return Results.Ok();
             }
 
-            return Problem(
+            // Unable to delete; report back.
+            Dictionary<string, object?> extensions = new()
+            {
+                ["UserId"] = id,
+                ["AccountId"] = accountId
+            };
+
+            return Results.Problem(
                 statusCode: StatusCodes.Status500InternalServerError,
-                detail: $"Unable to delete account with ID: {id}");
+                detail: $"Unable to delete account (ID: {accountId}) of user (ID: {id}).",
+                extensions: extensions);
+        }
+
+        /// <summary>
+        /// Suspend the account of a specific user.
+        /// </summary>
+        /// <param name="id">ID of user.</param>
+        /// <response code="200">Success. The user was suspended.</response>
+        /// <response code="404">The user wasn't found.</response>
+        /// <response code="500">Unexpected error.</response>
+        [HttpDelete(Name = "SuspendUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IResult> SuspendUserAsync(int id)
+        {
+            const string accountTypeName = "suspended";
+
+            // Get account type ID.
+            var accountTypeId = await _context.Set<AccountType>()
+                .FirstOrDefaultAsync(a => a.Name.Equals(accountTypeName, StringComparison.InvariantCultureIgnoreCase));
+            if (accountTypeId == default)
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to find account type: '{accountTypeName}'");
+            }
+
+            // Get account ID.
+            var accountId = await _context.Set<User>()
+                .Where(u => u.Id == id)
+                .Select(u => u.AccountId)
+                .SingleOrDefaultAsync();
+            if (accountId == default)
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    detail: $"No user with ID: {id}");
+            }
+
+            // Set account type.
+            int updatedRows = await _context.Set<Account>()
+                .Where(u => u.Id == accountId)
+                .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
+            if (updatedRows > 0)
+            {
+                return Results.Ok();
+            }
+
+            // Unable to suspend; report back.
+            Dictionary<string, object?> extensions = new()
+            {
+                ["UserId"] = id,
+                ["AccountId"] = accountId,
+                ["AccountTypeId"] = accountTypeId
+            };
+
+            return Results.Problem(
+                statusCode: StatusCodes.Status500InternalServerError,
+                detail: $"Unable to suspend account (ID: {accountId}) of user (ID: {id}).",
+                extensions: extensions);
         }
     }
 }

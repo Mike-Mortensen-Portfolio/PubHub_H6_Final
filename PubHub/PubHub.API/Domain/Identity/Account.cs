@@ -66,7 +66,7 @@ namespace PubHub.API.Domain.Identity
         public bool IsDeleted { get; set; }
 
         #region Navs
-        public AccountType? AccountType { get; set; }
+        public AccountType AccountType { get; set; } = null!;
         #endregion
     }
 }
