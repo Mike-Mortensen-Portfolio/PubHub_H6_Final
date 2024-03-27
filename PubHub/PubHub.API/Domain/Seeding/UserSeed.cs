@@ -13,6 +13,11 @@ namespace PubHub.API.Domain.Seeding
             _accountSeed = accountSeed;
         }
 
+        /// <summary>
+        /// Find the <see cref="User"/> where the email of the <see cref="Identity.Account"/> matches <paramref name="key"/>
+        /// </summary>
+        /// <param name="key">The email of <see cref="Identity.Account"/> associated with the <see cref="User"/> to find</param>
+        /// <returns><inheritdoc/></returns>
         public override User this[string key] => Seeds.First(u => _accountSeed[key].Id == u.AccountId);
 
         public override void Configure(EntityTypeBuilder<User> builder)

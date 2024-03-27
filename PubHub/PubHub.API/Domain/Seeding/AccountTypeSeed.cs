@@ -6,6 +6,11 @@ namespace PubHub.API.Domain.Seeding
 {
     public class AccountTypeSeed : SeedBase<AccountType, string>
     {
+        /// <summary>
+        /// Find the <see cref="AccountType"/> where the name matches <paramref name="key"/>
+        /// </summary>
+        /// <param name="key">The name to search for</param>
+        /// <returns><inheritdoc/></returns>
         public override AccountType this[string key]
         {
             get

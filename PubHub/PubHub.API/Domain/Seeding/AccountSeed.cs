@@ -14,6 +14,11 @@ namespace PubHub.API.Domain.Seeding
             _accountTypeSeed = accountTypeSeed;
         }
 
+        /// <summary>
+        /// Find the first <see cref="Account"/> where the email matches the <paramref name="key"/>
+        /// </summary>
+        /// <param name="key">The email of the <see cref="Account"/></param>
+        /// <returns><inheritdoc/></returns>
         public override Account this[string key]
         {
             get

@@ -6,6 +6,11 @@ namespace PubHub.API.Domain.Seeding
 {
     internal class AccessTypeSeed : SeedBase<AccessType, string>
     {
+        /// <summary>
+        /// Find the <see cref="AccessType"/> where the name matches <paramref name="key"/>
+        /// </summary>
+        /// <param name="key">The name to search for</param>
+        /// <returns><inheritdoc/></returns>
         public override AccessType this[string key]
         {
             get
