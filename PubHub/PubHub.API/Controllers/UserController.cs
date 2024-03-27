@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain;
+using PubHub.API.Domain.Entities;
 using PubHub.Common.Models;
 
 namespace PubHub.API.Controllers
@@ -24,7 +25,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetUser(int id)
         {
-            var userModel = _context.PubHubUsers
+            var userModel = _context.Set<User>()
                 .Include(u => u.Account)
                 .ThenInclude(a => a!.AccountType)
                 .Select(u => u.MapUserModelProperties())
@@ -51,13 +52,13 @@ namespace PubHub.API.Controllers
         public async Task<IActionResult> GetBooksAsync(int id)
         {
             // Check if user exists.
-            if (!await _context.PubHubUsers.AnyAsync(u => u.Id == id))
+            if (!await _context.Set<User>().AnyAsync(u => u.Id == id))
             {
                 return NotFound($"No user with ID: {id}");
             }
 
             // Retreive all books.
-            var books = await _context.UserBooks
+            var books = await _context.Set<UserBook>()
                 .Where(b => b.UserId == id)
                 .Select(b => b.Book.MapBookModelProperties())
                 .ToListAsync();
@@ -82,7 +83,7 @@ namespace PubHub.API.Controllers
             // TODO: Validate model.
 
             // Get current entry.
-            var user = _context.PubHubUsers
+            var user = _context.Set<User>()
                 .Include(u => u.Account)
                 .SingleOrDefault(u => u.Id == id);
             if (user == null)
@@ -102,7 +103,7 @@ namespace PubHub.API.Controllers
             user.Surname = userUpdateModel.Surname;
             user.Birthday = userUpdateModel.Birthday;
 
-            _context.PubHubUsers.Update(user);
+            _context.Set<User>().Update(user);
             await _context.SaveChangesAsync();
 
             return Ok();
@@ -122,7 +123,7 @@ namespace PubHub.API.Controllers
         public async Task<IActionResult> DeleteUserAsync(int id)
         {
             // Get account ID.
-            var accountId = await _context.PubHubUsers
+            var accountId = await _context.Set<User>()
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();

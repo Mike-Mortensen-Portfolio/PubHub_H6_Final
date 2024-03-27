@@ -18,9 +18,6 @@ namespace PubHub.API.Domain
 
         public PubHubContext(DbContextOptions<PubHubContext> options) : base(options) { }
 
-        public virtual DbSet<PubHubUser> PubHubUsers { get; set; }
-        public virtual DbSet<UserBook> UserBooks { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -138,7 +135,7 @@ namespace PubHub.API.Domain
                 publisher.TypeToPluralTableName();
             });
 
-            builder.Entity<PubHubUser>(user =>
+            builder.Entity<User>(user =>
             {
                 user.ConfigureId();
 

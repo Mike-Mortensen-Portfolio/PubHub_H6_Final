@@ -11,12 +11,12 @@ namespace PubHub.API.Domain
     public static class PropertyMapper
     {
         /// <summary>
-        /// Map <see cref="PubHubUser"/> to <see cref="UserModel"/>.
+        /// Map <see cref="User"/> to <see cref="UserModel"/>.
         /// </summary>
-        /// <param name="user"><see cref="PubHubUser"/> with occupied <see cref="PubHubUser.Account"/> (and then <see cref="Account.AccountType"/>) properties.</param>
+        /// <param name="user"><see cref="User"/> with occupied <see cref="User.Account"/> (and then <see cref="Account.AccountType"/>) properties.</param>
         /// <returns><see cref="UserModel"/> with data from <paramref name="user"/>.</returns>
         /// <exception cref="InvalidOperationException">The data to map from is invalid.</exception>
-        public static UserModel MapUserModelProperties(this PubHubUser user)
+        public static UserModel MapUserModelProperties(this User user)
         {
             if (user.Account == null) throw new InvalidOperationException("No account. Did you include user account?");
             if (user.Account.AccountType == null) throw new InvalidOperationException("No account type. Did you include user account type?");
