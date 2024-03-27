@@ -15,6 +15,57 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context = context;
 
         /// <summary>
+        /// Add a new user account to PubHub.
+        /// </summary>
+        /// <param name="userCreateModel">User information.</param>
+        /// <response code="200">Success. A new user account was created.</response>
+        /// <response code="400">Invalid model data or format.</response>
+        /// <response code="500">Unexpected error.</response>
+        [HttpPost("", Name = "AddUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IResult> AddUserAsync([FromBody] UserCreateModel userCreateModel)
+        {
+            // TODO (SIA): Validate model.
+
+            // Get account type ID.
+            var accountTypeId = await _context.Set<AccountType>()
+                .Where(a => a.Name.Equals(Constants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+            if (accountTypeId == 0)
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to find account type: '{Constants.USER_ACCOUNT_TYPE}'");
+            }
+
+            // Create user account.
+            // TODO (SIA): Add more account related data to fully set up an account.
+            await _context.Set<User>()
+                .AddAsync(new User()
+                {
+                    Name = userCreateModel.Name,
+                    Surname = userCreateModel.Surname,
+                    Birthday = userCreateModel.Birthday,
+                    Account = new()
+                    {
+                        Email = userCreateModel.Account.Email,
+                        AccountTypeId = accountTypeId
+                    }
+                });
+            if (!(await _context.SaveChangesAsync() > 0))
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to save changes to the database.");
+            }
+
+            return Results.Ok();
+        }
+
+        /// <summary>
         /// Get all general information about a specific user.
         /// </summary>
         /// <param name="id">ID of user.</param>
