@@ -21,18 +21,35 @@ namespace PubHub.API.Controllers
         /// <response code="500">Unexpected error.</response>
         [HttpGet("{id}", Name = "GetUser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetUser(int id)
         {
             var userModel = _context.Set<User>()
                 .Include(u => u.Account)
                 .ThenInclude(a => a!.AccountType)
-                .Select(u => u.MapUserModelProperties())
+                .Select(u => new UserModel()
+                {
+                    Id = u.Id,
+                    Email = u.Account.Email ?? u.Account.NormalizedEmail ?? string.Empty,
+                    Name = u.Name,
+                    Surname = u.Surname,
+                    Birthday = u.Birthday,
+                    AccountType = u.Account!.AccountType!.Name
+
+                })
                 .SingleOrDefault(u => u.Id == id);
             if (userModel == null)
             {
-                return NotFound($"No user with ID: {id}");
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    detail: $"No user with ID: {id}");
+            }
+            if (string.IsNullOrEmpty(userModel.Email))
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: "User has no email.");
             }
 
             return Ok(userModel);
@@ -47,23 +64,29 @@ namespace PubHub.API.Controllers
         /// <response code="500">Unexpected error.</response>
         [HttpGet("{id}/books", Name = "GetBooks")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetBooksAsync(int id)
         {
             // Check if user exists.
             if (!await _context.Set<User>().AnyAsync(u => u.Id == id))
             {
-                return NotFound($"No user with ID: {id}");
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    detail: $"No user with ID: {id}");
             }
 
             // Retreive all books.
-            var books = await _context.Set<UserBook>()
+            var bookModels = await _context.Set<UserBook>()
                 .Where(b => b.UserId == id)
-                .Select(b => b.Book.MapBookModelProperties())
+                .Select(b => new BookModel()
+                {
+                    Title = b.Book.Title,
+                    PublicationDate = b.Book.PublicationDate
+                })
                 .ToListAsync();
             
-            return Ok(books);
+            return Ok(bookModels);
         }
 
         /// <summary>
@@ -76,11 +99,11 @@ namespace PubHub.API.Controllers
         /// <response code="500">Unexpected error.</response>
         [HttpPut("{id}", Name = "UpdateUser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserAsync(int id, [FromBody] UserUpdateModel userUpdateModel)
         {
-            // TODO: Validate model.
+            // TODO (SIA): Validate model.
 
             // Get current entry.
             var user = _context.Set<User>()
@@ -88,13 +111,9 @@ namespace PubHub.API.Controllers
                 .SingleOrDefault(u => u.Id == id);
             if (user == null)
             {
-                return NotFound($"No user with ID: {id}");
-            }
-
-            // Sanity check properties of entry.
-            if (user.Account == null)
-            {
-                throw new NullReferenceException("User account property is null.");
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    detail: $"No user with ID: {id}");
             }
 
             // Update entry with new data.
@@ -118,7 +137,7 @@ namespace PubHub.API.Controllers
         /// <response code="500">Unexpected error.</response>
         [HttpDelete(Name = "DeleteUser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteUserAsync(int id)
         {
@@ -129,7 +148,9 @@ namespace PubHub.API.Controllers
                 .SingleOrDefaultAsync();
             if (accountId == null)
             {
-                return NotFound($"No user with ID: {id}");
+                return Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    detail: $"No user with ID: {id}");
             }
 
             // Delete account.
@@ -141,7 +162,9 @@ namespace PubHub.API.Controllers
                 return Ok();
             }
 
-            return NotFound($"Unable to delete account with ID: {id}");
+            return Problem(
+                statusCode: StatusCodes.Status500InternalServerError,
+                detail: $"Unable to delete account with ID: {id}");
         }
     }
 }
