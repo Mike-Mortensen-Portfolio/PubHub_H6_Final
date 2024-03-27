@@ -4,11 +4,21 @@ using PubHub.API.Domain.Entities;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class GenreSeed : IEntityTypeConfiguration<Genre>
+    public class GenreSeed : SeedBase<Genre, string>
     {
-        public void Configure(EntityTypeBuilder<Genre> builder)
+        public override Genre this[string key]
         {
-            builder.HasData(
+            get
+            {
+                var normalizedKey = key.ToUpperInvariant();
+                return Seeds.First(g => g.Name.Equals(normalizedKey, StringComparison.InvariantCultureIgnoreCase));
+            }
+        }
+
+        public override void Configure(EntityTypeBuilder<Genre> builder)
+        {
+            Seeds =
+            [
                 new Genre { Id = 1, Name = "Romance" },
                 new Genre { Id = 2, Name = "Horror" },
                 new Genre { Id = 3, Name = "History" },
@@ -28,7 +38,10 @@ namespace PubHub.API.Domain.Seeding
                 new Genre { Id = 17, Name = "Humor" },
                 new Genre { Id = 18, Name = "Action" },
                 new Genre { Id = 19, Name = "Adventure" },
-                new Genre { Id = 20, Name = "Short story" });
+                new Genre { Id = 20, Name = "Short story" }
+            ];
+
+            builder.HasData(Seeds);
         }
     }
 }
