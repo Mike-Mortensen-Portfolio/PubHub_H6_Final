@@ -5,14 +5,14 @@ namespace PubHub.API.Domain.Entities
     public sealed class User
     {
         public int Id { get; set; }
-        public int? AccountId { get; set; }
+        public int AccountId { get; set; }
         public required string Name { get; set; }
         public required string Surname { get; set; }
         public required DateOnly Birthday { get; set; }
 
         #region Navs
-        public Account? Account { get; set; }
-        public required IList<UserBook> UserBooks { get; set; }
+        public Account Account { get; set; } = null!;
+        public IList<UserBook> UserBooks { get; set; }
         #endregion
     }
 }

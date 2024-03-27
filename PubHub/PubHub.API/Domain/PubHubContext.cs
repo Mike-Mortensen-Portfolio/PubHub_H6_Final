@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
-using System.Reflection.Emit;
 
 namespace PubHub.API.Domain
 {
