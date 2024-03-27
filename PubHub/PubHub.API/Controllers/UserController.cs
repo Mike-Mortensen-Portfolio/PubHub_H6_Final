@@ -12,6 +12,8 @@ namespace PubHub.API.Controllers
     [Route("[controller]")]
     public class UserController(PubHubContext context) : Controller
     {
+        private const int INVALID_ID = 0;
+
         private readonly PubHubContext _context = context;
 
         /// <summary>
@@ -198,7 +200,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();
-            if (accountId == 0)
+            if (accountId == INVALID_ID)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
@@ -209,22 +211,22 @@ namespace PubHub.API.Controllers
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
                 .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
-            if (updatedRows > 0)
+            if (updatedRows < 1)
             {
-                return Results.Ok();
+                // Unable to delete; report back.
+                Dictionary<string, object?> extensions = new()
+                {
+                    ["UserId"] = id,
+                    ["AccountId"] = accountId
+                };
+
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to delete account (ID: {accountId}) of user (ID: {id}).",
+                    extensions: extensions);
             }
 
-            // Unable to delete; report back.
-            Dictionary<string, object?> extensions = new()
-            {
-                ["UserId"] = id,
-                ["AccountId"] = accountId
-            };
-
-            return Results.Problem(
-                statusCode: StatusCodes.Status500InternalServerError,
-                detail: $"Unable to delete account (ID: {accountId}) of user (ID: {id}).",
-                extensions: extensions);
+            return Results.Ok();
         }
 
         /// <summary>
@@ -245,7 +247,7 @@ namespace PubHub.API.Controllers
                 .Where(a => a.Name.Equals(AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-            if (accountTypeId == 0)
+            if (accountTypeId == INVALID_ID)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
@@ -257,7 +259,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();
-            if (accountId == 0)
+            if (accountId == INVALID_ID)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
@@ -268,23 +270,23 @@ namespace PubHub.API.Controllers
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
                 .ExecuteUpdateAsync(u => u.SetProperty(u => u.AccountTypeId, accountTypeId));
-            if (updatedRows > 0)
+            if (updatedRows < 1)
             {
-                return Results.Ok();
+                // Unable to suspend; report back.
+                Dictionary<string, object?> extensions = new()
+                {
+                    ["UserId"] = id,
+                    ["AccountId"] = accountId,
+                    ["AccountTypeId"] = accountTypeId
+                };
+
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to suspend account (ID: {accountId}) of user (ID: {id}).",
+                    extensions: extensions);
             }
 
-            // Unable to suspend; report back.
-            Dictionary<string, object?> extensions = new()
-            {
-                ["UserId"] = id,
-                ["AccountId"] = accountId,
-                ["AccountTypeId"] = accountTypeId
-            };
-
-            return Results.Problem(
-                statusCode: StatusCodes.Status500InternalServerError,
-                detail: $"Unable to suspend account (ID: {accountId}) of user (ID: {id}).",
-                extensions: extensions);
+            return Results.Ok();
         }
     }
 }
