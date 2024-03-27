@@ -1,6 +1,6 @@
 ﻿namespace PubHub.Common
 {
-    public static class Constants
+    public static class AccountTypeConstants
     {
         public const string USER_ACCOUNT_TYPE = "user";
         public const string SUSPENDED_ACCOUNT_TYPE = "suspended";

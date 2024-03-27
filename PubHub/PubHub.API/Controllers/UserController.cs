@@ -31,14 +31,14 @@ namespace PubHub.API.Controllers
 
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(Constants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Where(a => a.Name.Equals(AccountTypeConstants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
             if (accountTypeId == 0)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to find account type: '{Constants.USER_ACCOUNT_TYPE}'");
+                    detail: $"Unable to find account type: '{AccountTypeConstants.USER_ACCOUNT_TYPE}'");
             }
 
             // Create user account.
@@ -242,14 +242,14 @@ namespace PubHub.API.Controllers
         {
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(Constants.SUSPENDED_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Where(a => a.Name.Equals(AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
             if (accountTypeId == 0)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to find account type: '{Constants.SUSPENDED_ACCOUNT_TYPE}'");
+                    detail: $"Unable to find account type: '{AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE}'");
             }
 
             // Get account ID.
