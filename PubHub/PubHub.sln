@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.API", "PubHub.API\PubHub.API.csproj", "{5F12B6BB-EC86-4BBE-BFB9-E911972AF0AB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.BookWeb", "PubHub.BookWeb\PubHub.BookWeb.csproj", "{CF139919-4158-48FD-983E-FF67B140779B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubHub.Common", "PubHub.Common\PubHub.Common.csproj", "{2D482081-744C-4BE4-A0B7-CF8A20CE638B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubHub.AdminPortal", "PubHub.AdminPortal\PubHub.AdminPortal.csproj", "{450BDB50-E29E-4AC6-A8D4-787B30A292DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +24,14 @@ Global
 		{CF139919-4158-48FD-983E-FF67B140779B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF139919-4158-48FD-983E-FF67B140779B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF139919-4158-48FD-983E-FF67B140779B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D482081-744C-4BE4-A0B7-CF8A20CE638B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D482081-744C-4BE4-A0B7-CF8A20CE638B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D482081-744C-4BE4-A0B7-CF8A20CE638B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D482081-744C-4BE4-A0B7-CF8A20CE638B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{450BDB50-E29E-4AC6-A8D4-787B30A292DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{450BDB50-E29E-4AC6-A8D4-787B30A292DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{450BDB50-E29E-4AC6-A8D4-787B30A292DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{450BDB50-E29E-4AC6-A8D4-787B30A292DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
