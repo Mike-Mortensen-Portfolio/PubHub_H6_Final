@@ -8,6 +8,21 @@ h1:focus {
     outline: none;
 }
 
+.combined-carousel-item {
+    position: relative;
+    display: block;
+}
+
+.container img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain !important; 
+}
+
+.carousel-template {
+    height: 35vh;
+}
+
 a, .btn-link {
     color: #0071c1;
 }

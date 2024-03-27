@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\js\" />
     <Folder Include="wwwroot\libs\" />
     <Folder Include="wwwroot\sample-data\" />
   </ItemGroup>

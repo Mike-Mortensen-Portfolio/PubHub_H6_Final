@@ -1,7 +1,50 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Front page</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="row">
+    <h1 class="text-center">PubHub's news and recommendations</h1>
+</div>
+<div class="row">
+    <div class="carousel slide header-template carousel-template" id="frontPageCarousel" data-bs-ride="carousel" data-bs-wrap="true" data-bs-interval="2000" data-bs-pause="false">
+        <div class="carousel-inner p-2 carousel-template">
+            <div class="carousel-item active">
+                <div class="row carousel-template">
+                    <div class="col-sm-6 container">
+                        <img class="d-block w-100" src="/images/emily-henry-release.jpg" alt="book-release-img" />
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="combined-carousel-item">
+                            <h4>Emily Henry, Funny story</h4>
+                            <textarea class="form-control border-0 text-white" style="background-color: #C7C7F1;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec arcu molestie, mollis purus sit amet, sodales libero. Nulla id odio maximus, congue.</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#frontPageCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#frontPageCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+@code {
+    const string carouselName = "frontPageCarousel";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        object[] args = { carouselName };
+        await JSRuntime.InvokeVoidAsync("startCarousel", args);
+    }
+}
