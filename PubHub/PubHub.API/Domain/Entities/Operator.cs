@@ -8,9 +8,9 @@ namespace PubHub.API.Domain.Entities
         public int? AccountId { get; set; }
         public required string Name { get; set; }
         public required string Surname { get; set; }
-        
+
         #region Navs
-        public required Account Account { get; set; }
+        public Account Account { get; set; } = null!;
         #endregion
     }
 }
