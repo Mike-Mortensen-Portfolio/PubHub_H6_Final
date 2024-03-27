@@ -5,7 +5,7 @@ namespace PubHub.API.Domain.Seeding
 {
     public class AuthorSeed : SeedBase<Author, int>
     {
-        public override Author this[int key] => Seeds.First (a => a.Id == key);
+        public override Author this[int key] => Seeds.First(a => a.Id == key);
 
         public override void Configure(EntityTypeBuilder<Author> builder)
         {
@@ -15,6 +15,8 @@ namespace PubHub.API.Domain.Seeding
                 new Author {Id = 2, Name = "Jane Doe"},
                 new Author {Id = 3, Name = "Dan Turéll"}
             ];
+
+            builder.HasData(Seeds);
         }
     }
 }

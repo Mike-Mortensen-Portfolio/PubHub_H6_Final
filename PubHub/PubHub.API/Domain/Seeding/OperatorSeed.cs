@@ -13,7 +13,7 @@ namespace PubHub.API.Domain.Seeding
             _accountSeed = accountSeed;
         }
 
-        public override Operator this[string key] => Seeds.First(o => o.Account.Email.Equals(key, StringComparison.CurrentCultureIgnoreCase));
+        public override Operator this[string key] => Seeds.First(o => _accountSeed[key].Id == o.AccountId);
 
         public override void Configure(EntityTypeBuilder<Operator> builder)
         {
