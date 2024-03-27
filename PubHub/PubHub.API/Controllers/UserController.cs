@@ -37,7 +37,6 @@ namespace PubHub.API.Controllers
                     Surname = u.Surname,
                     Birthday = u.Birthday,
                     AccountType = u.Account!.AccountType!.Name
-
                 })
                 .SingleOrDefault(u => u.Id == id);
             if (userModel == null)
@@ -118,7 +117,12 @@ namespace PubHub.API.Controllers
             user.Birthday = userUpdateModel.Birthday;
 
             _context.Set<User>().Update(user);
-            await _context.SaveChangesAsync();
+            if (!(await _context.SaveChangesAsync() > 0))
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to save changes to the database.");
+            }
 
             return Results.Ok();
         }
@@ -187,7 +191,9 @@ namespace PubHub.API.Controllers
 
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
-                .FirstOrDefaultAsync(a => a.Name.Equals(accountTypeName, StringComparison.InvariantCultureIgnoreCase));
+                .Where(a => a.Name.Equals(accountTypeName, StringComparison.InvariantCultureIgnoreCase))
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
             if (accountTypeId == default)
             {
                 return Results.Problem(
@@ -210,7 +216,7 @@ namespace PubHub.API.Controllers
             // Set account type.
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
-                .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
+                .ExecuteUpdateAsync(u => u.SetProperty(u => u.AccountTypeId, accountTypeId));
             if (updatedRows > 0)
             {
                 return Results.Ok();
