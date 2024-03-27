@@ -9,12 +9,14 @@ namespace PubHub.API.Domain.Seeding
         private readonly ContentTypeSeed _contentTypeSeed;
         private readonly PublisherSeed _publisherSeed;
         private readonly GenreSeed _genreSeed;
+        private readonly AuthorSeed _authorSeed;
 
-        public BookSeed(ContentTypeSeed contentTypeSeed, PublisherSeed publisherSeed, GenreSeed genreSeed)
+        public BookSeed(ContentTypeSeed contentTypeSeed, PublisherSeed publisherSeed, GenreSeed genreSeed, AuthorSeed authorSeed)
         {
             _contentTypeSeed = contentTypeSeed;
             _publisherSeed = publisherSeed;
             _genreSeed = genreSeed;
+            _authorSeed = authorSeed;
         }
 
         /// <summary>
@@ -35,7 +37,17 @@ namespace PubHub.API.Domain.Seeding
                     Length = TimeSpan.FromHours (1).TotalSeconds,
                     PublicationDate = new DateOnly (1955, 12, 1),
                     PublisherId = _publisherSeed[PUBLISHER_EMAIL].Id,
-                    Title = "My day in the shoos of Tommy"
+                    Title = "My day in the shoos of Tommy",
+                    Genres =
+                    [
+                        _genreSeed.Seeds[0],
+                        _genreSeed.Seeds[2],
+                        _genreSeed.Seeds[8]
+                    ],
+                    Authors =
+                    [
+                        _authorSeed.Seeds[0]
+                    ]
                 },
                 new Book {
                     Id = 2,
@@ -44,16 +56,20 @@ namespace PubHub.API.Domain.Seeding
                     Length = 123,
                     PublicationDate = new DateOnly (2023, 4, 7),
                     PublisherId = _publisherSeed[PUBLISHER_EMAIL].Id,
-                    Title = "My horse is the wildest"
+                    Title = "My horse is the wildest",
+                    Genres =
+                    [
+                        _genreSeed.Seeds[4],
+                        _genreSeed.Seeds[7],
+                        _genreSeed.Seeds[1]
+                    ],
+                    Authors =
+                    [
+                        _authorSeed.Seeds[1],
+                        _authorSeed.Seeds[2]
+                    ]
                 },
             ];
-
-            Seeds[0].Genres.Add(_genreSeed.Seeds[0]);
-            Seeds[0].Genres.Add(_genreSeed.Seeds[2]);
-            Seeds[0].Genres.Add(_genreSeed.Seeds[8]);
-            Seeds[1].Genres.Add(_genreSeed.Seeds[4]);
-            Seeds[1].Genres.Add(_genreSeed.Seeds[7]);
-            Seeds[1].Genres.Add(_genreSeed.Seeds[1]);
 
             builder.HasData(Seeds);
         }
