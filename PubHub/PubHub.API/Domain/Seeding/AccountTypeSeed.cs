@@ -11,7 +11,8 @@ namespace PubHub.API.Domain.Seeding
             builder.HasData(
                 new AccountType { Id = 1, Name = "User" },
                 new AccountType { Id = 2, Name = "Publisher" },
-                new AccountType { Id = 3, Name = "Operator" });
+                new AccountType { Id = 3, Name = "Operator" },
+                new AccountType { Id = 3, Name = "Suspended" });
         }
     }
 }
