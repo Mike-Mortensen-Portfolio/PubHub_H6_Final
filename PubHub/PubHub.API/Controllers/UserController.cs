@@ -31,7 +31,7 @@ namespace PubHub.API.Controllers
                 .Select(u => new UserModel()
                 {
                     Id = u.Id,
-                    Email = u.Account.Email ?? u.Account.NormalizedEmail ?? string.Empty,
+                    Email = u.Account.Email,
                     Name = u.Name,
                     Surname = u.Surname,
                     Birthday = u.Birthday,
@@ -44,12 +44,6 @@ namespace PubHub.API.Controllers
                 return Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     detail: $"No user with ID: {id}");
-            }
-            if (string.IsNullOrEmpty(userModel.Email))
-            {
-                return Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: "User has no email.");
             }
 
             return Ok(userModel);
@@ -146,7 +140,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();
-            if (accountId == null)
+            if (accountId == default)
             {
                 return Problem(
                     statusCode: StatusCodes.Status404NotFound,
