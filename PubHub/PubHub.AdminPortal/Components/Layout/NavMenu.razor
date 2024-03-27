@@ -1,27 +1,45 @@
 ﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light header-template border-bottom box-shadow mb-3">
     <div class="container">
-        <a class="navbar-brand text-white" href=""><b>Pub</b><span style="color: #7E7ECB;"><b>Hub</b></span></a>
+        <div class="combined-logo">
+            <a class="navbar-brand text-white" style="max-height: 64px;" href=""><b>Pub</b><span style="color: #7E7ECB;"><b>Hub</b></span></a>
+            <h6 class="admin-portal text-start">Admin portal</h6>
+        </div>        
         <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="@NavMenuCssClass " @onclick="ToggleNavMenu">
             <ul class="navbar-nav flex-grow-1">
-                <li class="nav-item p-2">
-                    <NavLink class="nav-link text-dark" href="" Match="NavLinkMatch.All">
-                        <span class="oi oi-home" aria-hidden="true"></span> Front page
-                    </NavLink>
-                </li>
-                <li class="nav-item p-2">
-                    <NavLink class="nav-link text-dark" href="counter">
-                        <span class="oi oi-plus" aria-hidden="true"></span> Book search
-                    </NavLink>
-                </li>
-                @* TODO (JBN): Only add if a user is logged in (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
+                @* TODO (JBN): Depending on the user signed in, show corresponding to that (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
                 @if (true)
                 {
                     <li class="nav-item p-2">
-                        <NavLink class="nav-link text-dark" href="personalLib">
-                            <span class="oi oi-plus" aria-hidden="true"></span> Personal library
+                        <NavLink class="nav-link text-dark" href="" Match="NavLinkMatch.All">
+                            <span class="oi oi-home" aria-hidden="true"></span> Book statistics
+                        </NavLink>
+                    </li>
+                }
+                else if (false)
+                {
+                    <li class="nav-item p-2">
+                        <NavLink class="nav-link text-dark" href="">
+                            <span class="oi oi-plus" aria-hidden="true"></span> Manage front page
+                        </NavLink>
+                    </li>
+                }
+                @* TODO (JBN): Depending on the user signed in, show corresponding to that (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
+                @if (true)
+                {
+                    <li class="nav-item p-2">
+                        <NavLink class="nav-link text-dark" href="books" Match="NavLinkMatch.All">
+                            <span class="oi oi-home" aria-hidden="true"></span> Books
+                        </NavLink>
+                    </li>
+                }
+                else if (false)
+                {
+                    <li class="nav-item p-2">
+                        <NavLink class="nav-link text-dark" href="managePublishers">
+                            <span class="oi oi-plus" aria-hidden="true"></span> Manage publishers
                         </NavLink>
                     </li>
                 }
