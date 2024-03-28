@@ -1,10 +1,18 @@
 using PubHub.AdminPortal.Components;
+using PubHub.Common.ApiService;
+using PubHub.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddPubHubServices(new ApiOptions
+{
+    Address = builder.Configuration.GetSection("ApiEndpoint").ToString()!,
+    HttpClientName = "PubHubApi"
+});
 
 var app = builder.Build();
 
