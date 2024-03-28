@@ -10,7 +10,7 @@ namespace PubHub.API.Domain.Entities
         public required string Surname { get; set; }
 
         #region Navs
-        public Account? Account { get; set; } = null!;
+        public Account? Account { get; set; };
         #endregion
     }
 }
