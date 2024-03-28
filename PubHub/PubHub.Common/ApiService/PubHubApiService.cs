@@ -12,7 +12,7 @@ namespace PubHub.Common.ApiService
     {
         private readonly IHttpClientFactory _clientFactory;
         /// <summary>
-        /// The name of the <see cref="HttpClient"/> used to generate calls against the <strong>MBudget</strong> API
+        /// The name of the <see cref="HttpClient"/> used to generate calls against the <strong>PubHub</strong> API
         /// </summary>
         public string ClientName { get; }
 
