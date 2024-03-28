@@ -17,6 +17,12 @@ namespace PubHub.Common.ApiService
 
         protected HttpClient Client { get; }
 
+        /// <summary>
+        /// Creating the Client instance to use in the services.
+        /// </summary>
+        /// <param name="clientFactory"></param>
+        /// <param name="clientName"></param>
+        /// <exception cref="NullReferenceException"></exception>
         internal ServiceRoot(IHttpClientFactory clientFactory, string clientName)
         {
             ClientFactory = clientFactory;
