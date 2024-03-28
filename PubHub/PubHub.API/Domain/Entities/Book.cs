@@ -16,8 +16,8 @@
         public IList<BookAuthor> BookAuthors { get; set; } = [];
         public IList<UserBook> UserBooks { get; set; } = [];
         public IList<BookGenre> BookGenres { get; set; } = [];
-        public Publisher? Publisher { get; set; } = null!;
-        public ContentType? ContentType { get; set; } = null!;
+        public Publisher? Publisher { get; set; }
+        public ContentType? ContentType { get; set; }
         #endregion
     }
 }
