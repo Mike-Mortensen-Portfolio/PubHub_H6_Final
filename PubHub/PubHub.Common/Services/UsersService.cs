@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace PubHub.Common.Services
 {
-    public class UserService
+    public class UsersService
     {
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public UserService()
+        public UsersService()
         {
             _httpClient = new HttpClient();
             _serializerOptions = new JsonSerializerOptions
