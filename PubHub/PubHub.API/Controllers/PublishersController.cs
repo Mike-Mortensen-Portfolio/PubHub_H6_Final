@@ -10,7 +10,7 @@ namespace PubHub.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class PublisherController(PubHubContext context) : Controller
+    public class PublishersController(PubHubContext context) : Controller
     {
         private readonly PubHubContext _context = context;
 
