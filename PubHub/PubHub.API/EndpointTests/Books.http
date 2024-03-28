@@ -1,0 +1,9 @@
+@PubHub.Books = https://localhost:7097/books
+
+GET {{PubHub.Books}}
+Accept: application/json
+### Get all books
+
+GET {{PubHub.Books}}/1
+Accept: application/json
+### Get a specific book. In this case the book with ID 1

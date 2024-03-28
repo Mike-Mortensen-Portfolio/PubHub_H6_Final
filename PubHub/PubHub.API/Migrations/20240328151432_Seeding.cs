@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
+#pragma warning disable IDE0300 // Simplify collection initialization
+#pragma warning disable CA1825 // Avoid zero-length array allocations
 
 namespace PubHub.API.Migrations
 {
@@ -13,6 +15,16 @@ namespace PubHub.API.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "LastSignIn",
+                table: "Accounts",
+                type: "datetime2",
+                nullable: true,
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2");
+
+
+
             migrationBuilder.InsertData(
                 table: "AccessTypes",
                 columns: new[] { "AccessTypeId", "Name" },
@@ -86,10 +98,10 @@ namespace PubHub.API.Migrations
                 columns: new[] { "AccountId", "AccessFailedCount", "AccountTypeId", "ConcurrencyStamp", "Email", "EmailConfirmed", "IsDeleted", "LastSignIn", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { 1, 0, 1, "UserSeedConcurrencyStamp", "User@Test.com", true, false, new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7322), false, null, "USER@TEST.COM", "USER@TEST.COM", "AQAAAAIAAYagAAAAEFVEcf52tlH5E9OXHgL2yEz5agNzRtNJmYCkfJs9A0748BbuQy8Yav2JLGlJPLCb9Q==", "4587654321", false, "UserSeedSecurityStamp", false, "User@Test.com" },
-                    { 2, 0, 2, "PublisherSeedConcurrencyStamp", "Publisher@Test.com", true, false, new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7332), false, null, "PUBLISHER@TEST.COM", "PUBLISHER@TEST.COM", "AQAAAAIAAYagAAAAECMpPT3C0kI93KIxVFeR7zFXs/f1nunIkF1+VRUTjRJkGXg2i5VIBNI895PgFC0WnQ==", "4576543210", false, "PublisherSeedSecurityStamp", false, "Publisher@Test.com" },
-                    { 3, 0, 2, "Publisher2SeedConcurrencyStamp", "Publisher2@Test.com", true, false, new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7338), false, null, "PUBLISHER2@TEST.COM", "PUBLISHER2@TEST.COM", "AQAAAAIAAYagAAAAEA2yN3qdlNRY38oAVFPoih3794O/EWyH2sHf+niLPRlz8AZV2L3KngauSLGmfhqlhw==", "4565432109", false, "Publisher2SeedSecurityStamp", false, "Publisher2@Test.com" },
-                    { 4, 0, 3, "OperatorSeedConcurrencyStamp", "Operator@Test.com", true, false, new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7379), false, null, "OPERATOR@TEST.COM", "OPERATOR@TEST.COM", "AQAAAAIAAYagAAAAEAQPESejzk6Wt6Tm5a3VLuCBxTnCJDLcMkkBvoNzcD2153zZyf7z5rIS9iweuJUbPw==", "4554321098", false, "OperatorSeedSecurityStamp", false, "Operator@Test.com" }
+                    { 1, 0, 1, "UserSeedConcurrencyStamp", "User@Test.com", true, false, new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5670), false, null, "USER@TEST.COM", "USER@TEST.COM", "AQAAAAIAAYagAAAAEFTnCpa3UBbfSLQ7VTnq9vy9DboDapVTyqXbdlucPfePa76mbJ6ltqYS4FqN/Ejt0w==", "4587654321", false, "UserSeedSecurityStamp", false, "User@Test.com" },
+                    { 2, 0, 2, "PublisherSeedConcurrencyStamp", "Publisher@Test.com", true, false, new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5684), false, null, "PUBLISHER@TEST.COM", "PUBLISHER@TEST.COM", "AQAAAAIAAYagAAAAEGAK65ejJJAiS+OtBpBSyqhJJhYmhJZMNJtuX1MYR+sDg35Vyr7EzYzzT+RYQmSg5w==", "4576543210", false, "PublisherSeedSecurityStamp", false, "Publisher@Test.com" },
+                    { 3, 0, 2, "Publisher2SeedConcurrencyStamp", "Publisher2@Test.com", true, false, new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5690), false, null, "PUBLISHER2@TEST.COM", "PUBLISHER2@TEST.COM", "AQAAAAIAAYagAAAAEKAZ13+dGi5AHBdKGEhAA8/3Z/rYjAvj4bCARhutk9TpEyzpzgPqZocJn43Oq8JYmQ==", "4565432109", false, "Publisher2SeedSecurityStamp", false, "Publisher2@Test.com" },
+                    { 4, 0, 3, "OperatorSeedConcurrencyStamp", "Operator@Test.com", true, false, new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5704), false, null, "OPERATOR@TEST.COM", "OPERATOR@TEST.COM", "AQAAAAIAAYagAAAAEAly7TGzLipT1MZa8cJSpNoaeYleeW4KtDNdJEFPl4lfAhTOUbPyTaKx9oyeBZ3qLw==", "4554321098", false, "OperatorSeedSecurityStamp", false, "Operator@Test.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -112,7 +124,7 @@ namespace PubHub.API.Migrations
                 values: new object[,]
                 {
                     { 1, new byte[0], 1, null, false, 3600.0, new DateOnly(1955, 12, 1), 1, "My day in the shoos of Tommy" },
-                    { 2, new byte[0], 2, null, false, 123.0, new DateOnly(2023, 4, 7), 1, "My horse is the wildest" }
+                    { 2, new byte[0], 2, null, false, 123.0, new DateOnly(2023, 4, 7), 2, "My horse is the wildest" }
                 });
 
             migrationBuilder.InsertData(
@@ -289,11 +301,6 @@ namespace PubHub.API.Migrations
                 keyValue: 20);
 
             migrationBuilder.DeleteData(
-                table: "Publishers",
-                keyColumn: "PublisherId",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
                 table: "Users",
                 keyColumn: "UserId",
                 keyValue: 1);
@@ -307,11 +314,6 @@ namespace PubHub.API.Migrations
                 table: "Accounts",
                 keyColumn: "AccountId",
                 keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "Accounts",
-                keyColumn: "AccountId",
-                keyValue: 3);
 
             migrationBuilder.DeleteData(
                 table: "Authors",
@@ -394,14 +396,34 @@ namespace PubHub.API.Migrations
                 keyValue: 1);
 
             migrationBuilder.DeleteData(
+                table: "Publishers",
+                keyColumn: "PublisherId",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
                 table: "Accounts",
                 keyColumn: "AccountId",
                 keyValue: 2);
 
             migrationBuilder.DeleteData(
+                table: "Accounts",
+                keyColumn: "AccountId",
+                keyValue: 3);
+
+            migrationBuilder.DeleteData(
                 table: "AccountTypes",
                 keyColumn: "AccountTypeId",
                 keyValue: 2);
+
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "LastSignIn",
+                table: "Accounts",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2",
+                oldNullable: true);
         }
     }
 }
