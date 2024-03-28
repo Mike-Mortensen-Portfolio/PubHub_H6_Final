@@ -5,15 +5,16 @@ using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models;
+using PubHub.Common.Models.Books;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController(PubHubContext context) : Controller
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
+    public sealed class UsersController(PubHubContext context) : Controller
     {
-        private const int INVALID_ID = 0;
-
         private readonly PubHubContext _context = context;
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. A new user account was created.</response>
         /// <response code="400">Invalid model data or format.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpPost("", Name = "AddUser")]
+        [HttpPost()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -74,7 +75,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. User information was retreived.</response>
         /// <response code="404">The user wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpGet("{id}", Name = "GetUser")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -86,7 +87,7 @@ namespace PubHub.API.Controllers
                 .Select(u => new UserInfoModel()
                 {
                     Id = u.Id,
-                    Email = u.Account.Email,
+                    Email = u.Account!.Email,
                     Name = u.Name,
                     Surname = u.Surname,
                     Birthday = u.Birthday,
@@ -110,7 +111,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. All books of the user was retreived.</response>
         /// <response code="404">The user wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpGet("{id}/books", Name = "GetBooks")]
+        [HttpGet("{id}/books")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -126,14 +127,39 @@ namespace PubHub.API.Controllers
 
             // Retreive all books.
             var bookModels = await _context.Set<UserBook>()
-                .Where(b => b.UserId == id)
-                .Select(b => new BookInfoModel()
+                .Include(ub => ub.Book)
+                    .ThenInclude(b => b!.ContentType)
+                .Include(ub => ub.Book)
+                    .ThenInclude(b => b!.Publisher)
+                .Include(ub => ub.Book)
+                    .ThenInclude(b => b!.BookGenres)
+                        .ThenInclude(bg => bg.Genre)
+                .Where(ub => ub.UserId == id)
+                .Select(ub => new BookInfoModel()
                 {
-                    Title = b.Book.Title,
-                    PublicationDate = b.Book.PublicationDate
+                    ContentType = new ContentTypeInfoModel
+                    {
+                        Id = ub.Book!.ContentTypeId,
+                        Name = ub.Book.ContentType!.Name
+                    },
+                    CoverImage = ub.Book.CoverImage,
+                    Id = ub.Book.Id,
+                    Length = ub.Book.Length,
+                    PublicationDate = ub.Book.PublicationDate,
+                    Publisher = new PublisherInfoModel
+                    {
+                        Id = ub.Book.PublisherId,
+                        Name = ub.Book.Publisher!.Name
+                    },
+                    Title = ub.Book!.Title,
+                    Genres = ub.Book.BookGenres.Select(bookGenres => new GenreInfoModel
+                    {
+                        Id = bookGenres.GenreId,
+                        Name = bookGenres.Genre!.Name
+                    }).ToList()
                 })
                 .ToListAsync();
-            
+
             return Results.Ok(bookModels);
         }
 
@@ -146,7 +172,7 @@ namespace PubHub.API.Controllers
         /// <response code="400">Invalid model data or format.</response>
         /// <response code="404">The user wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpPut("{id}", Name = "UpdateUser")]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -166,7 +192,7 @@ namespace PubHub.API.Controllers
             }
 
             // Update entry with new data.
-            user.Account.Email = userUpdateModel.Account.Email;
+            user.Account!.Email = userUpdateModel.Account.Email;
             user.Name = userUpdateModel.Name;
             user.Surname = userUpdateModel.Surname;
             user.Birthday = userUpdateModel.Birthday;
@@ -189,7 +215,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. The user was deleted.</response>
         /// <response code="404">The user wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpDelete(Name = "DeleteUser")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -200,7 +226,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();
-            if (accountId == INVALID_ID)
+            if (accountId == INVALID_ENTITY_ID)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
@@ -236,7 +262,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. The user was suspended.</response>
         /// <response code="404">The user wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpDelete(Name = "SuspendUser")]
+        [HttpDelete("{id}/suspend-user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -247,7 +273,7 @@ namespace PubHub.API.Controllers
                 .Where(a => a.Name.Equals(AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-            if (accountTypeId == INVALID_ID)
+            if (accountTypeId == INVALID_ENTITY_ID)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
@@ -259,7 +285,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .SingleOrDefaultAsync();
-            if (accountId == INVALID_ID)
+            if (accountId == INVALID_ENTITY_ID)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,

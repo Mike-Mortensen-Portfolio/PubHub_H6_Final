@@ -208,7 +208,7 @@ namespace PubHub.API.Domain
             var contentTypes = new ContentTypeSeed();
             var publishers = new PublisherSeed(accounts);
             var genres = new GenreSeed();
-            var books = new BookSeed(contentTypes, publishers, genres, authors);
+            var books = new BookSeed(contentTypes, publishers);
             var bookAuthors = new BookAuthorSeed(books, authors);
             var bookGenres = new BookGenreSeed(books, genres);
             var operators = new OperatorSeed(accounts);
