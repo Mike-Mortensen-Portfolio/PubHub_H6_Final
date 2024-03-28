@@ -77,6 +77,8 @@ dotnet_style_namespace_match_folder = true:suggestion
 # C# Coding Conventions       #
 ###############################
 [*.cs]
+# General preferences
+csharp_style_prefer_primary_constructors = false
 # var preferences
 csharp_style_var_for_built_in_types = true:silent
 csharp_style_var_when_type_is_apparent = true:silent
