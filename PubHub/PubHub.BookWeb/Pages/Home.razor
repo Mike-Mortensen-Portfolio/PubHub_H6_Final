@@ -66,13 +66,3 @@
         </div>
     </div>
 </div>
-
-@code {
-    const string carouselName = "frontPageCarousel";
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        object[] args = { carouselName };
-        await JSRuntime.InvokeVoidAsync("startCarousel", args);
-    }
-}
