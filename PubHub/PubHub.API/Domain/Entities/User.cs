@@ -11,8 +11,8 @@ namespace PubHub.API.Domain.Entities
         public required DateOnly Birthday { get; set; }
 
         #region Navs
-        public Account Account { get; set; } = null!;
-        public IList<UserBook> UserBooks { get; set; }
+        public Account? Account { get; set; }
+        public IList<UserBook> UserBooks { get; set; } = [];
         #endregion
     }
 }

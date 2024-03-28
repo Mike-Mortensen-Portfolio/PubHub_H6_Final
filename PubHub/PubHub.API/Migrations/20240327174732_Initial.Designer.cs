@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PubHub.API.Domain;
 
@@ -11,9 +12,11 @@ using PubHub.API.Domain;
 namespace PubHub.API.Migrations
 {
     [DbContext(typeof(PubHubContext))]
-    partial class PubHubContextModelSnapshot : ModelSnapshot
+    [Migration("20240327174732_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,28 +176,6 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccessTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Owner"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Subscriber"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Borrower"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Expired"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.AccountType", b =>
@@ -213,28 +194,6 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccountTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Publisher"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Operator"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Suspended"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Author", b =>
@@ -253,23 +212,6 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Jhon Doe"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Jane Doe"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Dan Turéll"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Book", b =>
@@ -314,30 +256,6 @@ namespace PubHub.API.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BookContent = new byte[0],
-                            ContentTypeId = 1,
-                            IsHidden = false,
-                            Length = 3600.0,
-                            PublicationDate = new DateOnly(1955, 12, 1),
-                            PublisherId = 1,
-                            Title = "My day in the shoos of Tommy"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BookContent = new byte[0],
-                            ContentTypeId = 2,
-                            IsHidden = false,
-                            Length = 123.0,
-                            PublicationDate = new DateOnly(2023, 4, 7),
-                            PublisherId = 1,
-                            Title = "My horse is the wildest"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.BookAuthor", b =>
@@ -353,23 +271,6 @@ namespace PubHub.API.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("BookAuthors", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            BookId = 1,
-                            AuthorId = 1
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            AuthorId = 2
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            AuthorId = 3
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.BookGenre", b =>
@@ -385,43 +286,6 @@ namespace PubHub.API.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("BookGenres", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            BookId = 1,
-                            GenreId = 1
-                        },
-                        new
-                        {
-                            BookId = 1,
-                            GenreId = 3
-                        },
-                        new
-                        {
-                            BookId = 1,
-                            GenreId = 9
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 5
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 8
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 2
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 6
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.ContentType", b =>
@@ -440,18 +304,6 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContentTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "AudioBook"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "EBook"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Genre", b =>
@@ -470,108 +322,6 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Genres", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Romance"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Horror"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "History"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Science-Fiction"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Fiction"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Novel"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Fantasy"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "Biography"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "True crime"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Name = "Thriller"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Name = "Young adult"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Name = "Mystery"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Name = "Satire"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Name = "Non-Fiction"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Name = "Self-help"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Name = "Poetry"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Name = "Humor"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Name = "Action"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Name = "Adventure"
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Name = "Short story"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Operator", b =>
@@ -626,20 +376,6 @@ namespace PubHub.API.Migrations
                         .HasFilter("[AccountId] IS NOT NULL");
 
                     b.ToTable("Publishers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccountId = 2,
-                            Name = "Gyldendal"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AccountId = 3,
-                            Name = "Forlaget Als"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.User", b =>
@@ -671,16 +407,6 @@ namespace PubHub.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccountId = 1,
-                            Birthday = new DateOnly(1993, 4, 12),
-                            Name = "Thomas",
-                            Surname = "Berlin"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.UserBook", b =>
@@ -790,88 +516,6 @@ namespace PubHub.API.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Accounts", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 1,
-                            ConcurrencyStamp = "UserSeedConcurrencyStamp",
-                            Email = "User@Test.com",
-                            EmailConfirmed = true,
-                            IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7322),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "USER@TEST.COM",
-                            NormalizedUserName = "USER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFVEcf52tlH5E9OXHgL2yEz5agNzRtNJmYCkfJs9A0748BbuQy8Yav2JLGlJPLCb9Q==",
-                            PhoneNumber = "4587654321",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "UserSeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "User@Test.com"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 2,
-                            ConcurrencyStamp = "PublisherSeedConcurrencyStamp",
-                            Email = "Publisher@Test.com",
-                            EmailConfirmed = true,
-                            IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7332),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "PUBLISHER@TEST.COM",
-                            NormalizedUserName = "PUBLISHER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECMpPT3C0kI93KIxVFeR7zFXs/f1nunIkF1+VRUTjRJkGXg2i5VIBNI895PgFC0WnQ==",
-                            PhoneNumber = "4576543210",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "PublisherSeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "Publisher@Test.com"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 2,
-                            ConcurrencyStamp = "Publisher2SeedConcurrencyStamp",
-                            Email = "Publisher2@Test.com",
-                            EmailConfirmed = true,
-                            IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7338),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "PUBLISHER2@TEST.COM",
-                            NormalizedUserName = "PUBLISHER2@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA2yN3qdlNRY38oAVFPoih3794O/EWyH2sHf+niLPRlz8AZV2L3KngauSLGmfhqlhw==",
-                            PhoneNumber = "4565432109",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "Publisher2SeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "Publisher2@Test.com"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 3,
-                            ConcurrencyStamp = "OperatorSeedConcurrencyStamp",
-                            Email = "Operator@Test.com",
-                            EmailConfirmed = true,
-                            IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7379),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "OPERATOR@TEST.COM",
-                            NormalizedUserName = "OPERATOR@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAQPESejzk6Wt6Tm5a3VLuCBxTnCJDLcMkkBvoNzcD2153zZyf7z5rIS9iweuJUbPw==",
-                            PhoneNumber = "4554321098",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "OperatorSeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "Operator@Test.com"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

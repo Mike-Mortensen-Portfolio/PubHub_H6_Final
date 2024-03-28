@@ -6,7 +6,7 @@
         public required string Name { get; set; }
 
         #region Navs
-        public IList<Book> Books { get; set; } = [];
+        public IList<BookAuthor> BookAuthors { get; set; } = [];
         #endregion 
     }
 }

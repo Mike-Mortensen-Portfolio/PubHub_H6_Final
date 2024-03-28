@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
+using PubHub.API.Domain.Seeding;
+using System.Reflection.Emit;
 
 namespace PubHub.API.Domain
 {
@@ -94,11 +96,19 @@ namespace PubHub.API.Domain
             {
                 author.ConfigureId();
 
-                author.HasMany(a => a.Books)
-                    .WithMany(b => b.Authors)
-                    .UsingEntity(ab => ab.ToTable("AuthorBooks"));
-
                 author.TypeToPluralTableName();
+            });
+
+            builder.Entity<BookAuthor>(bookAuthor =>
+            {
+                bookAuthor.HasKey(ba => new { ba.BookId, ba.AuthorId });
+
+                bookAuthor.HasOne(ba => ba.Book)
+                   .WithMany(b => b.BookAuthors);
+                bookAuthor.HasOne(ba => ba.Author)
+                    .WithMany(a => a.BookAuthors);
+
+                bookAuthor.TypeToPluralTableName();
             });
 
             builder.Entity<Book>(book =>
@@ -108,9 +118,6 @@ namespace PubHub.API.Domain
                     .WithMany(p => p.Books);
                 book.HasOne(b => b.ContentType)
                     .WithMany();
-                book.HasMany(b => b.Genres)
-                    .WithMany(g => g.Books)
-                    .UsingEntity(bg => bg.ToTable("BookGenres"));
 
                 book.TypeToPluralTableName();
             });
@@ -173,12 +180,51 @@ namespace PubHub.API.Domain
                 book.TypeToPluralTableName();
             });
 
+            builder.Entity<BookGenre>(bookGenre =>
+            {
+                bookGenre.HasKey(bg => new { bg.BookId, bg.GenreId });
+
+                bookGenre.HasOne(bg => bg.Book)
+                   .WithMany(b => b.BookGenres);
+                bookGenre.HasOne(bg => bg.Genre)
+                    .WithMany(g => g.BookGenres);
+
+                bookGenre.TypeToPluralTableName();
+            });
+
             builder.Entity<AccessType>(accesstype =>
             {
                 accesstype.ConfigureId();
 
                 accesstype.TypeToPluralTableName();
             });
+            #endregion
+
+            #region Seeding
+            var accessTypes = new AccessTypeSeed();
+            var accountTypes = new AccountTypeSeed();
+            var accounts = new AccountSeed(accountTypes);
+            var authors = new AuthorSeed();
+            var contentTypes = new ContentTypeSeed();
+            var publishers = new PublisherSeed(accounts);
+            var genres = new GenreSeed();
+            var books = new BookSeed(contentTypes, publishers, genres, authors);
+            var bookAuthors = new BookAuthorSeed(books, authors);
+            var bookGenres = new BookGenreSeed(books, genres);
+            var operators = new OperatorSeed(accounts);
+            var users = new UserSeed(accounts);
+
+            builder.ApplyConfiguration(accessTypes);
+            builder.ApplyConfiguration(accountTypes);
+            builder.ApplyConfiguration(accounts);
+            builder.ApplyConfiguration(authors);
+            builder.ApplyConfiguration(contentTypes);
+            builder.ApplyConfiguration(publishers);
+            builder.ApplyConfiguration(genres);
+            builder.ApplyConfiguration(books);
+            builder.ApplyConfiguration(bookAuthors);
+            builder.ApplyConfiguration(bookGenres);
+            builder.ApplyConfiguration(users);
             #endregion
         }
     }

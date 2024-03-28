@@ -9,9 +9,9 @@
         public DateTime AcquireDate { get; set; }
 
         #region Navs
-        public required Book Book { get; set; }
-        public required User User { get; set; }
-        public required AccessType AccessType { get; set; }
+        public Book? Book { get; set; }
+        public User? User { get; set; }
+        public AccessType? AccessType { get; set; }
         #endregion
     }
 }

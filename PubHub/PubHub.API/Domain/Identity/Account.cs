@@ -16,15 +16,18 @@ namespace PubHub.API.Domain.Identity
         /// <br/>UserName
         /// <br/>NormalizedUserName
         /// </summary>
-        public override string? Email
+        new public required string Email
         {
             get
             {
-                return base.Email;
+                return base.Email!;
             }
 
             set
             {
+                if (value is null)
+                    throw new InvalidOperationException($"{nameof(Email)} can't be null");
+
                 base.Email = value;
                 base.NormalizedEmail = _normalizer.NormalizeEmail(value);
 
@@ -35,31 +38,31 @@ namespace PubHub.API.Domain.Identity
         /// <summary>
         /// Gets the normalized email for this user
         /// </summary>
-        public override string? NormalizedEmail
+        public override string NormalizedEmail
         {
             get
             {
-                return base.NormalizedEmail;
+                return base.NormalizedEmail!;
             }
         }
         /// <summary>
         /// Gets the user name for this user
         /// </summary>
-        public override string? UserName
+        public override string UserName
         {
             get
             {
-                return base.UserName;
+                return base.UserName!;
             }
         }
         /// <summary>
         /// Gets the normalized user name for this user
         /// </summary>
-        public override string? NormalizedUserName
+        public override string NormalizedUserName
         {
             get
             {
-                return base.NormalizedUserName;
+                return base.NormalizedUserName!;
             }
         }
         public DateTime? LastSignIn { get; set; }

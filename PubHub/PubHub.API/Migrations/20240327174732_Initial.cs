@@ -98,10 +98,10 @@ namespace PubHub.API.Migrations
                     AccountId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountTypeId = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     LastSignIn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
@@ -277,7 +277,7 @@ namespace PubHub.API.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccountId = table.Column<int>(type: "int", nullable: true),
+                    AccountId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Birthday = table.Column<DateOnly>(type: "date", nullable: false)
@@ -289,7 +289,8 @@ namespace PubHub.API.Migrations
                         name: "FK_Users_Accounts_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Accounts",
-                        principalColumn: "AccountId");
+                        principalColumn: "AccountId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -298,14 +299,14 @@ namespace PubHub.API.Migrations
                 {
                     BookId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ContentTypeId = table.Column<int>(type: "int", nullable: false),
+                    PublisherId = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CoverImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     BookContent = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    ContentTypeId = table.Column<int>(type: "int", nullable: false),
                     PublicationDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Length = table.Column<double>(type: "float", nullable: false),
-                    IsHidden = table.Column<bool>(type: "bit", nullable: false),
-                    PublisherId = table.Column<int>(type: "int", nullable: false)
+                    IsHidden = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -325,24 +326,24 @@ namespace PubHub.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthorBooks",
+                name: "BookAuthors",
                 columns: table => new
                 {
-                    AuthorsId = table.Column<int>(type: "int", nullable: false),
-                    BooksId = table.Column<int>(type: "int", nullable: false)
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    AuthorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthorBooks", x => new { x.AuthorsId, x.BooksId });
+                    table.PrimaryKey("PK_BookAuthors", x => new { x.BookId, x.AuthorId });
                     table.ForeignKey(
-                        name: "FK_AuthorBooks_Authors_AuthorsId",
-                        column: x => x.AuthorsId,
+                        name: "FK_BookAuthors_Authors_AuthorId",
+                        column: x => x.AuthorId,
                         principalTable: "Authors",
                         principalColumn: "AuthorId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AuthorBooks_Books_BooksId",
-                        column: x => x.BooksId,
+                        name: "FK_BookAuthors_Books_BookId",
+                        column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "BookId",
                         onDelete: ReferentialAction.Cascade);
@@ -352,21 +353,21 @@ namespace PubHub.API.Migrations
                 name: "BookGenres",
                 columns: table => new
                 {
-                    BooksId = table.Column<int>(type: "int", nullable: false),
-                    GenresId = table.Column<int>(type: "int", nullable: false)
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    GenreId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookGenres", x => new { x.BooksId, x.GenresId });
+                    table.PrimaryKey("PK_BookGenres", x => new { x.BookId, x.GenreId });
                     table.ForeignKey(
-                        name: "FK_BookGenres_Books_BooksId",
-                        column: x => x.BooksId,
+                        name: "FK_BookGenres_Books_BookId",
+                        column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "BookId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BookGenres_Genres_GenresId",
-                        column: x => x.GenresId,
+                        name: "FK_BookGenres_Genres_GenreId",
+                        column: x => x.GenreId,
                         principalTable: "Genres",
                         principalColumn: "GenreId",
                         onDelete: ReferentialAction.Cascade);
@@ -434,18 +435,17 @@ namespace PubHub.API.Migrations
                 name: "UserNameIndex",
                 table: "Accounts",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorBooks_BooksId",
-                table: "AuthorBooks",
-                column: "BooksId");
+                name: "IX_BookAuthors_AuthorId",
+                table: "BookAuthors",
+                column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookGenres_GenresId",
+                name: "IX_BookGenres_GenreId",
                 table: "BookGenres",
-                column: "GenresId");
+                column: "GenreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Books_ContentTypeId",
@@ -497,8 +497,7 @@ namespace PubHub.API.Migrations
                 name: "IX_Users_AccountId",
                 table: "Users",
                 column: "AccountId",
-                unique: true,
-                filter: "[AccountId] IS NOT NULL");
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -517,7 +516,7 @@ namespace PubHub.API.Migrations
                 name: "AccountTokens");
 
             migrationBuilder.DropTable(
-                name: "AuthorBooks");
+                name: "BookAuthors");
 
             migrationBuilder.DropTable(
                 name: "BookGenres");
