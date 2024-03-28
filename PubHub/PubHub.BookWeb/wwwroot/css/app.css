@@ -13,14 +13,18 @@ h1:focus {
     display: block;
 }
 
-.container img {
-    max-height: 100%;
-    max-width: 100%;
-    object-fit: contain !important; 
+.boxes{
+    background-color: #C7C7F1;
+    border: 1px solid #5856D6;
+    border-radius: 25px;
+    height: 40vh;
+    max-height: 40vh;
 }
 
 .carousel-template {
     height: 35vh;
+    border: 1px solid #5856D6;
+    border-radius: 25px;
 }
 
 a, .btn-link {
