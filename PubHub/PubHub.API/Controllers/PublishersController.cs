@@ -21,7 +21,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. A new publisher account was created.</response>
         /// <response code="400">Invalid model data or format.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpPost("", Name = "AddPublisher")]
+        [HttpPost()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -70,7 +70,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. Publisher information was retreived.</response>
         /// <response code="404">The publisher wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpGet("{id}", Name = "GetPublisher")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -98,7 +98,7 @@ namespace PubHub.API.Controllers
         /// <summary>
         /// Get a list of all publishers.
         /// </summary>
-        [HttpGet("", Name = "GetPublishers")]
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IResult> GetPublishersAsync()
@@ -116,7 +116,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. All books of the publisher was retreived.</response>
         /// <response code="404">The publisher wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpGet("{id}/books", Name = "GetBooks")]
+        [HttpGet("{id}/books")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -152,7 +152,7 @@ namespace PubHub.API.Controllers
         /// <response code="400">Invalid model data or format.</response>
         /// <response code="404">The publisher wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpPut("{id}", Name = "UpdatePublisher")]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -197,7 +197,7 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. The publisher was deleted.</response>
         /// <response code="404">The publisher wasn't found.</response>
         /// <response code="500">Unexpected error.</response>
-        [HttpDelete(Name = "DeletePublisher")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
