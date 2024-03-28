@@ -77,13 +77,14 @@ namespace PubHub.API.Controllers
         public async Task<IResult> GetPublisherAsync(int id)
         {
             var publisherModel = await _context.Set<Publisher>()
+                .Include(p => p.Account)
                 .Select(p => new PublisherInfoModel()
                 {
                     Id = p.Id,
                     Email = p.Account.Email,
                     Name = p.Name
                 })
-                .SingleOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id);
             if (publisherModel == null)
             {
                 return Results.Problem(
@@ -162,7 +163,7 @@ namespace PubHub.API.Controllers
             // Get current entry.
             var publisher = await _context.Set<Publisher>()
                 .Include(u => u.Account)
-                .SingleOrDefaultAsync(u => u.Id == id);
+                .FirstOrDefaultAsync(u => u.Id == id);
             if (publisher == null)
             {
                 return Results.Problem(
@@ -203,12 +204,12 @@ namespace PubHub.API.Controllers
         public async Task<IResult> DeletePublisherAsync(int id)
         {
             const int INVALID_ID = 0;
-            const int NO_ACCOUNT_ID = -1;
+            const int NO_ACCOUNT = -1;
 
             // Get account ID.
             var accountId = await _context.Set<Publisher>()
                 .Where(p => p.Id == id)
-                .Select(p => p.AccountId ?? NO_ACCOUNT_ID)
+                .Select(p => p.AccountId ?? NO_ACCOUNT)
                 .FirstOrDefaultAsync();
             if (accountId == INVALID_ID)
             {
@@ -216,7 +217,7 @@ namespace PubHub.API.Controllers
                     statusCode: StatusCodes.Status404NotFound,
                     detail: $"No publisher with ID: {id}");
             }
-            if (accountId == NO_ACCOUNT_ID)
+            if (accountId == NO_ACCOUNT)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,

@@ -92,7 +92,7 @@ namespace PubHub.API.Controllers
                     Birthday = u.Birthday,
                     AccountType = u.Account!.AccountType!.Name
                 })
-                .SingleOrDefault(u => u.Id == id);
+                .FirstOrDefault(u => u.Id == id);
             if (userModel == null)
             {
                 return Results.Problem(
@@ -157,7 +157,7 @@ namespace PubHub.API.Controllers
             // Get current entry.
             var user = _context.Set<User>()
                 .Include(u => u.Account)
-                .SingleOrDefault(u => u.Id == id);
+                .FirstOrDefault(u => u.Id == id);
             if (user == null)
             {
                 return Results.Problem(
@@ -199,7 +199,7 @@ namespace PubHub.API.Controllers
             var accountId = await _context.Set<User>()
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
-                .SingleOrDefaultAsync();
+                .FirstOrDefaultAsync();
             if (accountId == INVALID_ID)
             {
                 return Results.Problem(
@@ -211,7 +211,7 @@ namespace PubHub.API.Controllers
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
                 .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
-            if (updatedRows < 1)
+            if (updatedRows == 0)
             {
                 // Unable to delete; report back.
                 Dictionary<string, object?> extensions = new()
@@ -258,7 +258,7 @@ namespace PubHub.API.Controllers
             var accountId = await _context.Set<User>()
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
-                .SingleOrDefaultAsync();
+                .FirstOrDefaultAsync();
             if (accountId == INVALID_ID)
             {
                 return Results.Problem(
@@ -270,7 +270,7 @@ namespace PubHub.API.Controllers
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
                 .ExecuteUpdateAsync(u => u.SetProperty(u => u.AccountTypeId, accountTypeId));
-            if (updatedRows < 1)
+            if (updatedRows == 0)
             {
                 // Unable to suspend; report back.
                 Dictionary<string, object?> extensions = new()
