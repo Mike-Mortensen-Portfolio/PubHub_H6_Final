@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="PubHub.BookApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:PubHub.BookApp.Models"
+    xmlns:views="clr-namespace:PubHub.BookApp.Views"
+    Shell.FlyoutBehavior="Disabled">
+
+    <TabBar>
+        <Tab Title="Home">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FaSolid" Glyph="{x:Static models:FaSolidIcons.ListCheck}"/>
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate views:MainPage}" Route="Home" />
+        </Tab>
+        <Tab Title="Search">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FaSolid" Glyph="{x:Static models:FaSolidIcons.MagnifyingGlass}"/>
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate views:BookSearch}" />
+        </Tab>
+        <!--
+        TODO (JBN): Only show if a user is logged in.
+        TODO (JBN): Routing somehow breaks although the <ShellContent/> are taken from Microsofts documentation.
+        -->
+        <Tab Title="Library">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FaSolid" Glyph="{x:Static models:FaSolidIcons.BookOpenReader}"/>
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate views:PersonalLibrary}" />
+        </Tab>
+    </TabBar>
+
+</Shell>
