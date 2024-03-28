@@ -29,8 +29,9 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="userCreateModel">The <see cref="UserCreateModel"/> holding the new user.</param>
         /// <returns>A status telling if a user was successfully added to the database.</returns>
-        public async Task<string> AddUser(UserCreateModel userCreateModel)
+        public async Task<ServiceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
         {
+            string responseCode = "";
             try
             {
                 if (userCreateModel == null)
@@ -45,6 +46,7 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.PostAsync("users", httpContent);
                 string content = await response.Content.ReadAsStringAsync();
+                responseCode = response.StatusCode.ToString();
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -55,12 +57,12 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return $"Successfully added the user: {userCreateModel.Name}";
+                return new ServiceResult<UserCreateModel>(response.StatusCode.ToString(), userCreateModel, $"Successfully added the user: {userCreateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the user: {userCreateModel.Name}, ", ex.Message);
-                return $"Failed to add the user: {userCreateModel.Name}";
+                return new ServiceResult<UserCreateModel>(responseCode, userCreateModel, $"Failed to add the user: {userCreateModel.Name}");
             }
         }
 

@@ -10,8 +10,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddPubHubServices(new ApiOptions
 {
-    Address = builder.Configuration.GetSection("ApiEndpoint").ToString()!,
-    HttpClientName = "PubHubApi"
+    Address = builder.Configuration.GetSection(ApiConstants.API_ENDPOINT).ToString()!,
+    HttpClientName = ApiConstants.HTTPCLIENT_NAME
 });
 
 var app = builder.Build();
