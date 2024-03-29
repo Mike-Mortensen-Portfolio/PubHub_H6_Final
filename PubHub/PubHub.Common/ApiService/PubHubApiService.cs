@@ -17,7 +17,7 @@ namespace PubHub.Common.ApiService
         public string ClientName { get; }
 
         public UserService Users { get; }
-        public BookService Books { get; set; }
+        public BookService Books { get; }
 
         public PubHubApiService(IHttpClientFactory clientFactory, string clientName)
         {
