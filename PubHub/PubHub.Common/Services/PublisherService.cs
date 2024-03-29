@@ -71,7 +71,7 @@ namespace PubHub.Common.Services
         /// Calls the API enpoint to retrieve all of a publisher's books through the <see cref="BookInfoModel"/>
         /// </summary>
         /// <param name="publisherId">The Id of the publisher who's books needs retrieval.</param>
-        /// <returns>Returns a list of <see cref="BookInfoModel"/></returns>
+        /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="NullReferenceException"></exception>
         public async Task<List<BookInfoModel>> GetPublisherBooks(int publisherId)
