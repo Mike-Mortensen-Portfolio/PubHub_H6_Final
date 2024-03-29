@@ -19,6 +19,46 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context = context;
 
         /// <summary>
+        /// Get all general information about a specific user.
+        /// </summary>
+        /// <param name="id">Id of user.</param>
+        /// <response code="200">Success. User information was retreived.</response>
+        /// <response code="404">The user wasn't found.</response>
+        /// <response code="500">Unexpected error.</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public IResult GetUser(int id)
+        {
+            var userModel = _context.Set<User>()
+                .Include(u => u.Account)
+                .ThenInclude(a => a!.AccountType)
+                .Select(u => new UserInfoModel()
+                {
+                    Id = u.Id,
+                    Email = u.Account!.Email,
+                    Name = u.Name,
+                    Surname = u.Surname,
+                    Birthday = u.Birthday,
+                    AccountType = u.Account!.AccountType!.Name
+                })
+                .FirstOrDefault(u => u.Id == id);
+            if (userModel == null)
+            {
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: $"No user with ID: {id}",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", id }
+                    });
+            }
+
+            return Results.Ok(userModel);
+        }
+
+        /// <summary>
         /// Add a new user account to PubHub.
         /// </summary>
         /// <param name="userCreateModel">User information.</param>
@@ -83,46 +123,6 @@ namespace PubHub.API.Controllers
                 .FirstOrDefaultAsync(user => user.Account!.NormalizedEmail == newUser.Account.NormalizedEmail);
 
             return Results.Created($"users/{newUser!.Id}", newUser);
-        }
-
-        /// <summary>
-        /// Get all general information about a specific user.
-        /// </summary>
-        /// <param name="id">Id of user.</param>
-        /// <response code="200">Success. User information was retreived.</response>
-        /// <response code="404">The user wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public IResult GetUser(int id)
-        {
-            var userModel = _context.Set<User>()
-                .Include(u => u.Account)
-                .ThenInclude(a => a!.AccountType)
-                .Select(u => new UserInfoModel()
-                {
-                    Id = u.Id,
-                    Email = u.Account!.Email,
-                    Name = u.Name,
-                    Surname = u.Surname,
-                    Birthday = u.Birthday,
-                    AccountType = u.Account!.AccountType!.Name
-                })
-                .FirstOrDefault(u => u.Id == id);
-            if (userModel == null)
-            {
-                return Results.Problem(
-                    statusCode: NotFoundSpecification.STATUS_CODE,
-                    title: NotFoundSpecification.TITLE,
-                    detail: $"No user with ID: {id}",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        {"Id", id }
-                    });
-            }
-
-            return Results.Ok(userModel);
         }
 
         /// <summary>

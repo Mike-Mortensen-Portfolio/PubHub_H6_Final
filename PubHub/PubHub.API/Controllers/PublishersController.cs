@@ -17,6 +17,53 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context = context;
 
         /// <summary>
+        /// Get a list of all publishers.
+        /// </summary>
+        [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
+        {
+            var publishers = await _context.Set<Publisher>()
+                .Filter(query)
+                .ToArrayAsync();
+
+            return Results.Ok(publishers);
+        }
+
+        /// <summary>
+        /// Get all general information about a specific publisher.
+        /// </summary>
+        /// <param name="id">ID of publisher.</param>
+        /// <response code="200">Success. Publisher information was retreived.</response>
+        /// <response code="404">The publisher wasn't found.</response>
+        /// <response code="500">Unexpected error.</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IResult> GetPublisherAsync(int id)
+        {
+            var publisherModel = await _context.Set<Publisher>()
+                .Include(p => p.Account)
+                .Select(p => new PublisherInfoModel()
+                {
+                    Id = p.Id,
+                    Email = p.Account!.Email,
+                    Name = p.Name
+                })
+                .FirstOrDefaultAsync(p => p.Id == id);
+            if (publisherModel == null)
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status404NotFound,
+                    detail: $"No publisher with ID: {id}");
+            }
+
+            return Results.Ok(publisherModel);
+        }
+
+        /// <summary>
         /// Add a new publisher account to PubHub.
         /// </summary>
         /// <param name="publisherCreateModel">Publisher information.</param>
@@ -66,53 +113,6 @@ namespace PubHub.API.Controllers
         }
 
         /// <summary>
-        /// Get all general information about a specific publisher.
-        /// </summary>
-        /// <param name="id">ID of publisher.</param>
-        /// <response code="200">Success. Publisher information was retreived.</response>
-        /// <response code="404">The publisher wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetPublisherAsync(int id)
-        {
-            var publisherModel = await _context.Set<Publisher>()
-                .Include(p => p.Account)
-                .Select(p => new PublisherInfoModel()
-                {
-                    Id = p.Id,
-                    Email = p.Account!.Email,
-                    Name = p.Name
-                })
-                .FirstOrDefaultAsync(p => p.Id == id);
-            if (publisherModel == null)
-            {
-                return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"No publisher with ID: {id}");
-            }
-
-            return Results.Ok(publisherModel);
-        }
-
-        /// <summary>
-        /// Get a list of all publishers.
-        /// </summary>
-        [HttpGet()]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
-        {
-            var publishers = await _context.Set<Publisher>()
-                .Filter(query)
-                .ToArrayAsync();
-
-            return Results.Ok(publishers);
-        }
-
-        /// <summary>
         /// Get all books for a specific publisher.
         /// </summary>
         /// <param name="id">ID of publisher.</param>
@@ -139,7 +139,7 @@ namespace PubHub.API.Controllers
                 .Include(b => b!.BookGenres)
                     .ThenInclude(bg => bg.Genre)
                 .Include(b => b.BookAuthors)
-                    .ThenInclude (ba => ba.Author)
+                    .ThenInclude(ba => ba.Author)
                 .Include(b => b.ContentType)
                 .Where(b => b.Publisher!.Id == id)
                 .Select(book => new BookInfoModel()
