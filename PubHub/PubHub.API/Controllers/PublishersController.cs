@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
@@ -7,6 +8,7 @@ using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
+using PubHub.Common.Models.Users;
 
 namespace PubHub.API.Controllers
 {
@@ -14,6 +16,7 @@ namespace PubHub.API.Controllers
     [Route("[controller]")]
     public class PublishersController(PubHubContext context) : Controller
     {
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         private readonly PubHubContext _context = context;
 
         /// <summary>
@@ -78,17 +81,30 @@ namespace PubHub.API.Controllers
         {
             // TODO (SIA): Validate model.
 
+            var existingpublisher = await _context.Users.
+                FirstOrDefaultAsync(account => account.NormalizedEmail == publisherCreateModel.Account.Email.ToUpperInvariant());
+
+            if (existingpublisher is not null)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching publisher already exists",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", existingpublisher.Id}
+                    });
+
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
                 .Where(a => a.Name.Equals(AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
+
             if (accountTypeId == 0)
-            {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
                     detail: $"Unable to find account type: '{AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE}'");
-            }
 
             // Create publisher account.
             // TODO (SIA): Add more account related data to fully set up an account.

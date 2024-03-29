@@ -149,12 +149,13 @@ namespace PubHub.API.Controllers
 
             if (existingBook is not null)
                 return Results.Problem(
+                        type: DuplicateProblemSpecification.TYPE,
                         statusCode: DuplicateProblemSpecification.STATUS_CODE,
                         title: DuplicateProblemSpecification.TITLE,
                         detail: "A matching book already exists",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"Book", existingBook}
+                            {"Id", existingBook.Id}
                         });
 
             var publisher = await _context.Set<Publisher>().FirstOrDefaultAsync(publisher => publisher.Id == createModel.PublisherId);

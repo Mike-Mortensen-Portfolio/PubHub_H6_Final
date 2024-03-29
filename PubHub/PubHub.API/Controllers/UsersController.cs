@@ -16,6 +16,7 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class UsersController(PubHubContext context) : Controller
     {
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         private readonly PubHubContext _context = context;
 
         /// <summary>
@@ -72,13 +73,27 @@ namespace PubHub.API.Controllers
         {
             // TODO (SIA): Validate model.
 
+            var existingUser = await _context.Users.
+                FirstOrDefaultAsync(account => account.NormalizedEmail == userCreateModel.Account.Email.ToUpperInvariant());
+
+            if (existingUser is not null)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching user already exists",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", existingUser.Id}
+                    });
+
             // Get account type Id.
             var accountTypeId = await _context.Set<AccountType>()
                 .Where(a => a.Name.Equals(AccountTypeConstants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
+
             if (accountTypeId == INVALID_ENTITY_ID)
-            {
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
@@ -87,7 +102,6 @@ namespace PubHub.API.Controllers
                     {
                         {"Id", accountTypeId }
                     });
-            }
 
             // Create user account.
             // TODO (SIA): Add more account related data to fully set up an account.
