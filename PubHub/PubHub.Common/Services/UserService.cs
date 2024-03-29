@@ -25,6 +25,11 @@ namespace PubHub.Common.Services
 
         // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
+        /// <summary>
+        /// Calls the API endpoint for adding a <see cref="UserCreateModel"/> to the database.
+        /// </summary>
+        /// <param name="userCreateModel">The <see cref="UserCreateModel"/> holding the new user information.</param>
+        /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         public async Task<ServiceInstanceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
         {
             try
@@ -59,7 +64,11 @@ namespace PubHub.Common.Services
                 return new ServiceInstanceResult<UserCreateModel>(HttpStatusCode.Unused, userCreateModel, $"Failed to add the user: {userCreateModel.Name}");
             }
         }
-
+        /// <summary>
+        /// Calls the API end point for retrieving <see cref="UserInfoModel">, to use in the client applications.
+        /// </summary>
+        /// <param name="userId">Id of the user wanting information about.</param>
+        /// <returns>A <see cref="UserInfoModel"/> with the users information.</returns>
         public async Task<UserInfoModel?> GetUserInfo(int userId)
         {
             try
@@ -91,7 +100,11 @@ namespace PubHub.Common.Services
                 return null;
             }
         }
-
+        /// <summary>
+        /// Calls the API enpoint to retrieve all of a user's books through the <see cref="BookInfoModel"/>
+        /// </summary>
+        /// <param name="userId">The Id of the user who's books needs retrieval.</param>
+        /// <returns>Returns a list of <see cref="BookInfoModel"/></returns>
         public async Task<List<BookInfoModel>> GetUserBooks(int userId)
         {
             try
@@ -119,11 +132,16 @@ namespace PubHub.Common.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Unable to get user books:", ex.Message);
+                Debug.WriteLine($"Unable to get user books: {userId}", ex.Message);
                 return null!;
             }
         }
-
+        /// <summary>
+        /// Calls the API endpoint for updating <see cref="UserUpdateModel"/> values in the database.
+        /// </summary>
+        /// <param name="userId">The id of the user being updated.</param>
+        /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
+        /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
         {
             try
@@ -161,7 +179,11 @@ namespace PubHub.Common.Services
                 return new ServiceInstanceResult<UserUpdateModel>(HttpStatusCode.Unused, userUpdateModel, $"Failed to update the user: {userUpdateModel.Name}");
             }
         }
-
+        /// <summary>
+        /// Calls the API endpoint to soft-delete a user./>
+        /// </summary>
+        /// <param name="userId">The Id of the user who needs to be soft-deleted.</param>
+        /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         public async Task<ServiceResult> DeleteUser(int userId)
         {
             try
@@ -189,7 +211,11 @@ namespace PubHub.Common.Services
                 return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the user: {userId}");
             }
         }
-
+        /// <summary>
+        /// Calls the API endpoint to change the user's account type to suspended./>
+        /// </summary>
+        /// <param name="userId">The Id of the user who needs to have their account type as suspended.</param>
+        /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         public async Task<ServiceResult> SuspendUser(int userId)
         {
             try

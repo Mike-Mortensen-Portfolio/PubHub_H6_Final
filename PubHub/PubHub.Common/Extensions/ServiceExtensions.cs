@@ -23,6 +23,7 @@ namespace PubHub.Common.Extensions
             return services
                 .AddScopedApiService<IUserService, UserService>(apiOptions)
                 .AddScopedApiService<IBookService, BookService>(apiOptions)
+                .AddScopedApiService<IPublisherService, PublisherService>(apiOptions)
                 .AddHttpClient(apiOptions.HttpClientName ?? "PubHubApi", options => { options.BaseAddress = new Uri(apiOptions.Address); }).Services;
         }
 
