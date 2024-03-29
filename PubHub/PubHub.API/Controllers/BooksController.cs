@@ -93,7 +93,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: "We couldn't locate a book with the given Id",
+                    detail: "We couldn't locate a book with the given ID",
                     extensions: new Dictionary<string, object?>
                     {
                         { "Id", id }
@@ -163,7 +163,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
-                    detail: "No publisher with the given Id was found",
+                    detail: "No publisher with the given ID was found",
                     extensions: new Dictionary<string, object?>
                     {
                         {"Id", createModel.PublisherId}
@@ -188,7 +188,7 @@ namespace PubHub.API.Controllers
                     return Results.Problem(
                         statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                         title: UnprocessableEntitySpecification.TITLE,
-                        detail: "No genere with the given Id was found",
+                        detail: "No genere with the given ID was found",
                         extensions: new Dictionary<string, object?>
                         {
                             {"Id", genreId}
@@ -208,7 +208,7 @@ namespace PubHub.API.Controllers
                     return Results.Problem(
                         statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                         title: UnprocessableEntitySpecification.TITLE,
-                        detail: "No author with the given Id was found",
+                        detail: "No author with the given ID was found",
                         extensions: new Dictionary<string, object?>
                         {
                             {"Id", authorId}
@@ -294,7 +294,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                         statusCode: NotFoundSpecification.STATUS_CODE,
                         title: NotFoundSpecification.TITLE,
-                        detail: "A book with the given Id couldn't be found",
+                        detail: "A book with the given ID couldn't be found",
                         extensions: new Dictionary<string, object?>
                         {
                             {"Id", id}
@@ -306,7 +306,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
-                    detail: "No publisher with the given Id was found",
+                    detail: "No publisher with the given ID was found",
                     extensions: new Dictionary<string, object?>
                     {
                         {"Id", updateModel.PublisherId}
@@ -437,7 +437,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                         statusCode: NotFoundSpecification.STATUS_CODE,
                         title: NotFoundSpecification.TITLE,
-                        detail: "A book with the given Id couldn't be found",
+                        detail: "A book with the given ID couldn't be found",
                         extensions: new Dictionary<string, object?>
                         {
                             {"Id", id}

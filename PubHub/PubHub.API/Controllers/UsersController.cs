@@ -115,7 +115,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with Id: {id}",
+                    detail: $"No user with ID: {id}",
                     extensions: new Dictionary<string, object?>
                     {
                         {"Id", id }
@@ -143,7 +143,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with Id: {id}",
+                    detail: $"No user with ID: {id}",
                     extensions: new Dictionary<string, object?>
                     {
                         {"Id", id }
@@ -213,7 +213,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with Id: {id}",
+                    detail: $"No user with ID: {id}",
                     extensions: new Dictionary<string, object?>
                     {
                         {"Id", id }
@@ -274,7 +274,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with Id: {id}",
+                    detail: $"No user with ID: {id}",
                     extensions: new Dictionary<string, object?>
                     {
                         {"Id", id }
@@ -293,7 +293,7 @@ namespace PubHub.API.Controllers
                     detail: $"Unable to delete user account",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "UserId", id}
+                        { "Id", id}
                     });
             }
 
@@ -339,7 +339,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with Id: {id}",
+                    detail: $"No user with ID: {id}",
                     extensions: new Dictionary<string, object?>
                     {
                         {"Id", id }
@@ -358,7 +358,7 @@ namespace PubHub.API.Controllers
                     detail: $"Unable to suspend user account",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "UserId", id}
+                        { "Id", id}
                     });
             }
 
