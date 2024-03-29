@@ -10,4 +10,8 @@
     <Folder Include="wwwroot\libs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PubHub.Common\PubHub.Common.csproj" />
+  </ItemGroup>
+
 </Project>
