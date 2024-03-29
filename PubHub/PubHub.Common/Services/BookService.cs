@@ -23,6 +23,11 @@ namespace PubHub.Common.Services
 
         // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
+        /// <summary>
+        /// Calls the API enpoint to retrieve all books through the <see cref="BookInfoModel"/> filtered on the searchQuery.
+        /// </summary>
+        /// <param name="queryOptions">The query options that is requested.</param>
+        /// <returns>A list of <see cref="BookInfoModel"/></returns>
         public async Task<List<BookInfoModel>> GetBooks(BookQuery queryOptions)
         {
             try
@@ -55,7 +60,13 @@ namespace PubHub.Common.Services
                 return null!;
             }
         }
-
+        /// <summary>
+        /// Calls the API end point for retrieving <see cref="BookInfoModel">, to use in the client applications.
+        /// </summary>
+        /// <param name="bookId">Id of the book we want information about.</param>
+        /// <returns>A <see cref="BookInfoModel"/> with a book's information.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="NullReferenceException"></exception>
         public async Task<BookInfoModel?> GetBook(int bookId)
         {
             try
@@ -88,6 +99,13 @@ namespace PubHub.Common.Services
             }
         }
 
+        /// <summary>
+        /// Calls the API endpoint for adding a <see cref="BookCreateModel"/> to the database.
+        /// </summary>
+        /// <param name="bookCreateModel">The <see cref="BookCreateModel"/> holding the new book.</param>
+        /// <returns>A status telling if a book was successfully added to the database.</returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="NullReferenceException"></exception>
         public async Task<ServiceInstanceResult<BookCreateModel>> AddBook(BookCreateModel bookCreateModel)
         {
             try
@@ -123,6 +141,15 @@ namespace PubHub.Common.Services
             }
         }
 
+        /// <summary>
+        /// Calls the API endpoint for updating <see cref="BookUpdateModel"/> values in the database.
+        /// </summary>
+        /// <param name="bookId">The id of the book being updated.</param>
+        /// <param name="bookUpdateModel">The <see cref="BookUpdateModel"/> holding the updated values.</param>
+        /// <returns>A status telling if a book was successfully updated in the database.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="NullReferenceException"></exception>
         public async Task<ServiceInstanceResult<BookUpdateModel>> UpdateBook(int bookId, BookUpdateModel bookUpdateModel)
         {
             try
@@ -161,6 +188,13 @@ namespace PubHub.Common.Services
             }
         }
 
+        /// <summary>
+        /// Calls the API endpoint to soft-delete a book./>
+        /// </summary>
+        /// <param name="bookId">The Id of the book who needs to be soft-deleted.</param>
+        /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="NullReferenceException"></exception>
         public async Task<ServiceResult> DeleteUser(int bookId)
         {
             try

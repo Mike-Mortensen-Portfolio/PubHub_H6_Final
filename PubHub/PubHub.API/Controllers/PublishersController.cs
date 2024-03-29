@@ -8,6 +8,7 @@ using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
+using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
@@ -17,10 +18,11 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class PublishersController(PubHubContext context) : Controller
     {
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         private readonly PubHubContext _context = context;
 
         /// <summary>
-        /// Add a new publisher account to PubHub.
+        /// Get a list of all publishers.
         /// </summary>
         /// <param name="publisherCreateModel">Publisher information.</param>
         /// <response code="200">Success. A new publisher account was created.</response>
@@ -31,6 +33,21 @@ namespace PubHub.API.Controllers
         public async Task<IResult> AddPublisherAsync([FromBody] PublisherCreateModel publisherCreateModel)
         {
             // TODO (SIA): Validate model.
+            
+            // Check if a publisher like this already exists.
+            var existingPublisher = await _context.Users.
+                FirstOrDefaultAsync(account => account.NormalizedEmail == publisherCreateModel.Account.Email.ToUpperInvariant());
+
+            if (existingPublisher is not null)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching publisher already exists",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", existingpublisher.Id}
+                    });
 
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
@@ -103,15 +120,14 @@ namespace PubHub.API.Controllers
             return Results.Ok(publisherModel);
         }
 
-        /// <summary>
-        /// Get a list of all publishers.
-        /// </summary>
         [HttpGet()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PublisherInfoModel[]))]
-        public async Task<IResult> GetPublishersAsync()
+        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
         {
             var publishers = await _context.Set<Publisher>()
-                .Include(p => p.Account)
+                 .Include(u => u.Account)
+                .Filter(query)
                 .Select(p => new PublisherInfoModel()
                 {
                     Id = p.Id,
@@ -122,7 +138,7 @@ namespace PubHub.API.Controllers
 
             return Results.Ok(publishers);
         }
-
+        
         /// <summary>
         /// Get all books for a specific publisher.
         /// </summary>
