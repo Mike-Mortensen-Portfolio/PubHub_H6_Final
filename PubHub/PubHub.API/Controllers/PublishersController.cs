@@ -46,7 +46,7 @@ namespace PubHub.API.Controllers
                     detail: "A matching publisher already exists",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", existingpublisher.Id}
+                        {"Id", existingPublisher.Id}
                     });
 
             // Get account type ID.
