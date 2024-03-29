@@ -227,7 +227,7 @@ namespace PubHub.API.Controllers
             // Delete account.
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
-                .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
+                .ExecuteUpdateAsync(u => u.SetProperty(u => u.DeletedDate, DateTime.UtcNow));
             if (updatedRows < 1)
             {
                 // Unable to delete; report back.

@@ -66,7 +66,7 @@ namespace PubHub.API.Domain.Identity
             }
         }
         public DateTime? LastSignIn { get; set; }
-        public bool IsDeleted { get; set; }
+        public DateTime? DeletedDate { get; set; }
 
         #region Navs
         public AccountType AccountType { get; set; } = null!;
