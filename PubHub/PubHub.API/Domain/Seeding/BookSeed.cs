@@ -8,15 +8,11 @@ namespace PubHub.API.Domain.Seeding
     {
         private readonly ContentTypeSeed _contentTypeSeed;
         private readonly PublisherSeed _publisherSeed;
-        private readonly GenreSeed _genreSeed;
-        private readonly AuthorSeed _authorSeed;
 
-        public BookSeed(ContentTypeSeed contentTypeSeed, PublisherSeed publisherSeed, GenreSeed genreSeed, AuthorSeed authorSeed)
+        public BookSeed(ContentTypeSeed contentTypeSeed, PublisherSeed publisherSeed)
         {
             _contentTypeSeed = contentTypeSeed;
             _publisherSeed = publisherSeed;
-            _genreSeed = genreSeed;
-            _authorSeed = authorSeed;
         }
 
         /// <summary>
@@ -45,7 +41,7 @@ namespace PubHub.API.Domain.Seeding
                     ContentTypeId = _contentTypeSeed[E_BOOK_CONTENT_TYPE].Id,
                     Length = 123,
                     PublicationDate = new DateOnly (2023, 4, 7),
-                    PublisherId = _publisherSeed[PUBLISHER_EMAIL].Id,
+                    PublisherId = _publisherSeed[PUBLISHER2_EMAIL].Id,
                     Title = "My horse is the wildest"
                 }
             ];

@@ -1,4 +1,4 @@
-﻿namespace PubHub.Common.Models
+﻿namespace PubHub.Common.Models.Users
 {
     public class UserInfoModel
     {

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Identity;
 
@@ -133,8 +134,8 @@ namespace PubHub.API
                         await context.Response.WriteAsync(JsonConvert.SerializeObject(new
                         {
                             type = "https://datatracker.ietf.org/doc/html/rfc9110#name-500-internal-server-error",
-                            title = "500 Internal Server Error",
-                            status = context.Response.StatusCode,
+                            title = InternalServerErrorSpecification.TITLE,
+                            status = InternalServerErrorSpecification.STATUS_CODE,
                             detail = "We didn't expect this to happen. Sorry. Please try again, or contact PubHub support if the problem perists."
                         }));
                     }

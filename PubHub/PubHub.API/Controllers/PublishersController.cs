@@ -4,7 +4,7 @@ using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
-using PubHub.Common.Models;
+using PubHub.Common.Models.Publishers;
 
 namespace PubHub.API.Controllers
 {

@@ -335,7 +335,7 @@ namespace PubHub.API.Migrations
                             IsHidden = false,
                             Length = 123.0,
                             PublicationDate = new DateOnly(2023, 4, 7),
-                            PublisherId = 1,
+                            PublisherId = 2,
                             Title = "My horse is the wildest"
                         });
                 });
@@ -739,7 +739,7 @@ namespace PubHub.API.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("LastSignIn")
+                    b.Property<DateTime?>("LastSignIn")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
@@ -801,11 +801,11 @@ namespace PubHub.API.Migrations
                             Email = "User@Test.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7322),
+                            LastSignIn = new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5670),
                             LockoutEnabled = false,
                             NormalizedEmail = "USER@TEST.COM",
                             NormalizedUserName = "USER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFVEcf52tlH5E9OXHgL2yEz5agNzRtNJmYCkfJs9A0748BbuQy8Yav2JLGlJPLCb9Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFTnCpa3UBbfSLQ7VTnq9vy9DboDapVTyqXbdlucPfePa76mbJ6ltqYS4FqN/Ejt0w==",
                             PhoneNumber = "4587654321",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "UserSeedSecurityStamp",
@@ -821,11 +821,11 @@ namespace PubHub.API.Migrations
                             Email = "Publisher@Test.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7332),
+                            LastSignIn = new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5684),
                             LockoutEnabled = false,
                             NormalizedEmail = "PUBLISHER@TEST.COM",
                             NormalizedUserName = "PUBLISHER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECMpPT3C0kI93KIxVFeR7zFXs/f1nunIkF1+VRUTjRJkGXg2i5VIBNI895PgFC0WnQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGAK65ejJJAiS+OtBpBSyqhJJhYmhJZMNJtuX1MYR+sDg35Vyr7EzYzzT+RYQmSg5w==",
                             PhoneNumber = "4576543210",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "PublisherSeedSecurityStamp",
@@ -841,11 +841,11 @@ namespace PubHub.API.Migrations
                             Email = "Publisher2@Test.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7338),
+                            LastSignIn = new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5690),
                             LockoutEnabled = false,
                             NormalizedEmail = "PUBLISHER2@TEST.COM",
                             NormalizedUserName = "PUBLISHER2@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA2yN3qdlNRY38oAVFPoih3794O/EWyH2sHf+niLPRlz8AZV2L3KngauSLGmfhqlhw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKAZ13+dGi5AHBdKGEhAA8/3Z/rYjAvj4bCARhutk9TpEyzpzgPqZocJn43Oq8JYmQ==",
                             PhoneNumber = "4565432109",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "Publisher2SeedSecurityStamp",
@@ -861,11 +861,11 @@ namespace PubHub.API.Migrations
                             Email = "Operator@Test.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
-                            LastSignIn = new DateTime(2024, 3, 27, 18, 6, 6, 470, DateTimeKind.Utc).AddTicks(7379),
+                            LastSignIn = new DateTime(2024, 3, 28, 15, 14, 32, 308, DateTimeKind.Utc).AddTicks(5704),
                             LockoutEnabled = false,
                             NormalizedEmail = "OPERATOR@TEST.COM",
                             NormalizedUserName = "OPERATOR@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAQPESejzk6Wt6Tm5a3VLuCBxTnCJDLcMkkBvoNzcD2153zZyf7z5rIS9iweuJUbPw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAly7TGzLipT1MZa8cJSpNoaeYleeW4KtDNdJEFPl4lfAhTOUbPyTaKx9oyeBZ3qLw==",
                             PhoneNumber = "4554321098",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "OperatorSeedSecurityStamp",
