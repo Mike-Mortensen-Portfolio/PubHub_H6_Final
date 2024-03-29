@@ -50,7 +50,7 @@ namespace PubHub.API.Controllers
                     Id = book.Id,
                     Length = book.Length,
                     PublicationDate = book.PublicationDate,
-                    Publisher = new PublisherInfoModel
+                    Publisher = new BookPublisherModel
                     {
                         Id = book.Publisher!.Id,
                         Name = book.Publisher.Name
@@ -110,7 +110,7 @@ namespace PubHub.API.Controllers
                 Id = entityBook.Id,
                 Length = entityBook.Length,
                 PublicationDate = entityBook.PublicationDate,
-                Publisher = new PublisherInfoModel
+                Publisher = new BookPublisherModel
                 {
                     Id = entityBook.Publisher!.Id,
                     Name = entityBook.Publisher.Name
@@ -258,7 +258,7 @@ namespace PubHub.API.Controllers
                     Id = book.Id,
                     Length = book.Length,
                     PublicationDate = book.PublicationDate,
-                    Publisher = new PublisherInfoModel
+                    Publisher = new BookPublisherModel
                     {
                         Id = book.Publisher!.Id,
                         Name = book.Publisher.Name
@@ -404,7 +404,7 @@ namespace PubHub.API.Controllers
                     Id = book.Id,
                     Length = book.Length,
                     PublicationDate = book.PublicationDate,
-                    Publisher = new PublisherInfoModel
+                    Publisher = new BookPublisherModel
                     {
                         Id = book.Publisher!.Id,
                         Name = book.Publisher.Name

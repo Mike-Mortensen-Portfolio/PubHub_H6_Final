@@ -3,7 +3,7 @@
     public class BookInfoModel
     {
         public int Id { get; init; }
-        public required PublisherInfoModel Publisher { get; init; } = null!;
+        public required BookPublisherModel Publisher { get; init; } = null!;
         public required string Title { get; set; }
         public byte[]? CoverImage { get; set; }
         public required ContentTypeInfoModel ContentType { get; init; }

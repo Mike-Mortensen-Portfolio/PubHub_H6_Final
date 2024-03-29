@@ -171,7 +171,7 @@ namespace PubHub.API.Controllers
                     Id = ub.Book.Id,
                     Length = ub.Book.Length,
                     PublicationDate = ub.Book.PublicationDate,
-                    Publisher = new PublisherInfoModel
+                    Publisher = new BookPublisherModel
                     {
                         Id = ub.Book.PublisherId,
                         Name = ub.Book.Publisher!.Name
