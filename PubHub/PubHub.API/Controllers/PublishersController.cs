@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Books;

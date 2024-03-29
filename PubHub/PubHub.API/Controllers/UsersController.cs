@@ -147,6 +147,9 @@ namespace PubHub.API.Controllers
                 .Include(ub => ub.Book)
                     .ThenInclude(b => b!.BookGenres)
                         .ThenInclude(bg => bg.Genre)
+                .Include(ub => ub.Book)
+                    .ThenInclude(b => b!.BookAuthors)
+                        .ThenInclude(ba => ba.Author)
                 .Where(ub => ub.UserId == id)
                 .Select(ub => new BookInfoModel()
                 {
@@ -169,6 +172,11 @@ namespace PubHub.API.Controllers
                     {
                         Id = bookGenres.GenreId,
                         Name = bookGenres.Genre!.Name
+                    }).ToList(),
+                    Authors = ub.Book.BookAuthors.Select(bookAuthors => new AuthorInfoModel
+                    {
+                        Id = bookAuthors.AuthorId,
+                        Name = bookAuthors.Author!.Name
                     }).ToList()
                 })
                 .ToListAsync();

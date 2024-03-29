@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PubHub.Common.Services
+﻿namespace PubHub.Common.Services
 {
+    /// <summary>
+    /// Represents a <see href="https://datatracker.ietf.org/doc/html/rfc9457">RFC9457</see> compliant error response 
+    /// </summary>
     public class ErrorResponse
     {
         public string? Type { get; set; }

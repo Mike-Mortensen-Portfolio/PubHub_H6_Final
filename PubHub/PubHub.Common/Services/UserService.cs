@@ -9,15 +9,13 @@ using System.Text.Json;
 
 namespace PubHub.Common.Services
 {
-    public class UserService : ServiceRoot
+    public class UserService : ServiceRoot, IUserService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         internal UserService(IHttpClientFactory clientFactory, string clientName) : base(clientFactory, clientName)
         {
-            _httpClientFactory = clientFactory;
-
             _serializerOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -27,13 +25,8 @@ namespace PubHub.Common.Services
 
         // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
-        /// <summary>
-        /// Calls the API endpoint for adding a <see cref="UserCreateModel"/> to the database.
-        /// </summary>
-        /// <param name="userCreateModel">The <see cref="UserCreateModel"/> holding the new user.</param>
-        /// <returns>A status telling if a user was successfully added to the database.</returns>
         public async Task<ServiceInstanceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
-        {            
+        {
             try
             {
                 if (userCreateModel == null)
@@ -67,11 +60,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API end point for retrieving <see cref="UserInfoModel">, to use in the client applications.
-        /// </summary>
-        /// <param name="userId">Id of the user wanting information about.</param>
-        /// <returns></returns>
         public async Task<UserInfoModel?> GetUserInfo(int userId)
         {
             try
@@ -87,12 +75,12 @@ namespace PubHub.Common.Services
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
-                    
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");                    
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
                 UserInfoModel? userInfoModel = JsonSerializer.Deserialize<UserInfoModel>(content, _serializerOptions);
-                if(userInfoModel == null)
+                if (userInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
                 return userInfoModel!;
@@ -104,11 +92,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API enpoint to retrieve all of a user's books through the <see cref="BookInfoModel"/>
-        /// </summary>
-        /// <param name="userId">The Id of the user who's books needs retrieval.</param>
-        /// <returns>Returns a list of <see cref="BookInfoModel"/></returns>
         public async Task<List<BookInfoModel>> GetUserBooks(int userId)
         {
             try
@@ -141,14 +124,8 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API endpoint for updating <see cref="UserUpdateModel"/> values in the database.
-        /// </summary>
-        /// <param name="userId">The id of the user being updated.</param>
-        /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
-        /// <returns>A status telling if a user was successfully updated in the database.</returns>
         public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
-        {            
+        {
             try
             {
                 if (userId <= 0)
@@ -185,11 +162,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API endpoint to soft-delete a user./>
-        /// </summary>
-        /// <param name="userId">The Id of the user who needs to be soft-deleted.</param>
-        /// <returns></returns>
         public async Task<ServiceResult> DeleteUser(int userId)
         {
             try
@@ -197,7 +169,7 @@ namespace PubHub.Common.Services
                 if (userId <= 0)
                     throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
 
-                HttpResponseMessage response = await Client.DeleteAsync("users");
+                HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -218,11 +190,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API endpoint to change the user's account type to suspended./>
-        /// </summary>
-        /// <param name="userId">The Id of the user who needs to have their account type as suspended.</param>
-        /// <returns></returns>
         public async Task<ServiceResult> SuspendUser(int userId)
         {
             try
@@ -230,7 +197,7 @@ namespace PubHub.Common.Services
                 if (userId <= 0)
                     throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
 
-                HttpResponseMessage response = await Client.DeleteAsync("users");
+                HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}/suspend-user");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
