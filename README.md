@@ -2,7 +2,6 @@
     <img src="/Images/PubHub.png" alt="Header_Image" width="300px" height="300px"/>
 </div>
 <div align="center">
-    <strong style="font-size:30px; display:block;">THOP</strong>
     <p style="display:block; font-weight:normal; font-size:20px;">PubHub Distribution Service </p>
 </div>
 
