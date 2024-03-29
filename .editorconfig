@@ -23,6 +23,8 @@ charset = utf-8-bom
 # .NET Coding Conventions     #
 ###############################
 [*.{cs,vb}]
+# Diagnostics
+dotnet_diagnostic.IDE0290.severity = none
 # Organize usings
 dotnet_sort_system_directives_first = true
 # this. preferences
