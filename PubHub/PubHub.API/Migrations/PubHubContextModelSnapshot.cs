@@ -173,22 +173,22 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-735f-ab01-2adc4c4bd70b"),
+                            Id = new Guid("018e8adb-8368-70b8-9718-466effd86b3b"),
                             Name = "Owner"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7360-b1fb-d3becfa8731b"),
+                            Id = new Guid("018e8adb-8368-70b9-a6b3-038c867c2c74"),
                             Name = "Subscriber"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7361-88a2-c3c754683ddb"),
+                            Id = new Guid("018e8adb-8368-70ba-9989-10b795d98bcf"),
                             Name = "Borrower"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7362-8bc3-e805a4177d36"),
+                            Id = new Guid("018e8adb-8368-70bb-958e-44661f184474"),
                             Name = "Expired"
                         });
                 });
@@ -212,22 +212,22 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7363-82b7-76610d269524"),
+                            Id = new Guid("018e8adb-8368-70bc-a239-436bd0b16077"),
                             Name = "User"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7364-a112-d8d7a64a8511"),
+                            Id = new Guid("018e8adb-8368-70bd-8393-772206d0123f"),
                             Name = "Publisher"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7365-b794-3efe0f1e5346"),
+                            Id = new Guid("018e8adb-8368-70be-9081-9f04ff23a4b1"),
                             Name = "Operator"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7366-a987-ff6a35e3f6d8"),
+                            Id = new Guid("018e8adb-8368-70bf-b88c-9d8337f0ed7f"),
                             Name = "Suspended"
                         });
                 });
@@ -251,17 +251,17 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74f7-8db7-20069106f82a"),
+                            Id = new Guid("018e8adb-840f-77a3-ac65-5f1e56d59cd3"),
                             Name = "Jhon Doe"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74f8-98f4-48d2ebf98324"),
+                            Id = new Guid("018e8adb-840f-77a4-8274-f813dfa6df3e"),
                             Name = "Jane Doe"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74f9-838c-3a88d053658b"),
+                            Id = new Guid("018e8adb-840f-77a5-a9f0-8d921238f0f2"),
                             Name = "Dan Turéll"
                         });
                 });
@@ -311,24 +311,24 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7512-81ba-74a2587a5ebd"),
+                            Id = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
                             BookContent = new byte[0],
-                            ContentTypeId = new Guid("018e8a6a-da88-74fa-9a53-5420e5d69571"),
+                            ContentTypeId = new Guid("018e8adb-840f-77a6-8fba-a2058e995998"),
                             IsHidden = false,
                             Length = 3600.0,
                             PublicationDate = new DateOnly(1955, 12, 1),
-                            PublisherId = new Guid("018e8a6a-da88-74fc-8de1-154d1a0fb022"),
+                            PublisherId = new Guid("018e8adb-840f-77a8-8bb4-2180cf904f1d"),
                             Title = "My day in the shoos of Tommy"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7513-9ded-074608658876"),
+                            Id = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
                             BookContent = new byte[0],
-                            ContentTypeId = new Guid("018e8a6a-da88-74fb-9355-40f9f93f77ac"),
+                            ContentTypeId = new Guid("018e8adb-840f-77a7-8af8-4e9efba397ca"),
                             IsHidden = false,
                             Length = 123.0,
                             PublicationDate = new DateOnly(2023, 4, 7),
-                            PublisherId = new Guid("018e8a6a-da88-74fc-8de1-154d1a0fb022"),
+                            PublisherId = new Guid("018e8adb-840f-77a9-ae7a-5fde355e930f"),
                             Title = "My horse is the wildest"
                         });
                 });
@@ -350,18 +350,18 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7512-81ba-74a2587a5ebd"),
-                            AuthorId = new Guid("018e8a6a-da88-74f7-8db7-20069106f82a")
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            AuthorId = new Guid("018e8adb-840f-77a3-ac65-5f1e56d59cd3")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7513-9ded-074608658876"),
-                            AuthorId = new Guid("018e8a6a-da88-74f8-98f4-48d2ebf98324")
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            AuthorId = new Guid("018e8adb-840f-77a4-8274-f813dfa6df3e")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7513-9ded-074608658876"),
-                            AuthorId = new Guid("018e8a6a-da88-74f9-838c-3a88d053658b")
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            AuthorId = new Guid("018e8adb-840f-77a5-a9f0-8d921238f0f2")
                         });
                 });
 
@@ -382,38 +382,38 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7512-81ba-74a2587a5ebd"),
-                            GenreId = new Guid("018e8a6a-da88-74fe-9879-a81d7007f654")
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            GenreId = new Guid("018e8adb-840f-77aa-930a-83f7b2f0cb73")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7512-81ba-74a2587a5ebd"),
-                            GenreId = new Guid("018e8a6a-da88-7500-93c1-82c354f2c864")
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            GenreId = new Guid("018e8adb-840f-77ac-9c19-5a943cfdf7d7")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7512-81ba-74a2587a5ebd"),
-                            GenreId = new Guid("018e8a6a-da88-7506-a648-8f201acd5e18")
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            GenreId = new Guid("018e8adb-840f-77b2-97b2-ec9f5a55663b")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7513-9ded-074608658876"),
-                            GenreId = new Guid("018e8a6a-da88-7502-ab63-e1557e28397c")
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77ae-801c-f7761b058c5c")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7513-9ded-074608658876"),
-                            GenreId = new Guid("018e8a6a-da88-7505-9d3b-732a40fdfec1")
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77b1-b88c-bf08b77ad230")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7513-9ded-074608658876"),
-                            GenreId = new Guid("018e8a6a-da88-74ff-99b9-f8b24c3c48bb")
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77ab-8d6c-8171a947e74d")
                         },
                         new
                         {
-                            BookId = new Guid("018e8a6a-da88-7513-9ded-074608658876"),
-                            GenreId = new Guid("018e8a6a-da88-7503-a9e9-2099a4468197")
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77af-8876-7a7b3b128ac5")
                         });
                 });
 
@@ -436,12 +436,12 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74fa-9a53-5420e5d69571"),
+                            Id = new Guid("018e8adb-840f-77a6-8fba-a2058e995998"),
                             Name = "AudioBook"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74fb-9355-40f9f93f77ac"),
+                            Id = new Guid("018e8adb-840f-77a7-8af8-4e9efba397ca"),
                             Name = "EBook"
                         });
                 });
@@ -465,102 +465,102 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74fe-9879-a81d7007f654"),
+                            Id = new Guid("018e8adb-840f-77aa-930a-83f7b2f0cb73"),
                             Name = "Romance"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74ff-99b9-f8b24c3c48bb"),
+                            Id = new Guid("018e8adb-840f-77ab-8d6c-8171a947e74d"),
                             Name = "Horror"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7500-93c1-82c354f2c864"),
+                            Id = new Guid("018e8adb-840f-77ac-9c19-5a943cfdf7d7"),
                             Name = "History"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7501-887d-d37324d27da0"),
+                            Id = new Guid("018e8adb-840f-77ad-bc45-ef8eb5f728d9"),
                             Name = "Science-Fiction"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7502-ab63-e1557e28397c"),
+                            Id = new Guid("018e8adb-840f-77ae-801c-f7761b058c5c"),
                             Name = "Fiction"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7503-a9e9-2099a4468197"),
+                            Id = new Guid("018e8adb-840f-77af-8876-7a7b3b128ac5"),
                             Name = "Novel"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7504-845f-a931fc40e008"),
+                            Id = new Guid("018e8adb-840f-77b0-9a88-6879bbf73fab"),
                             Name = "Fantasy"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7505-9d3b-732a40fdfec1"),
+                            Id = new Guid("018e8adb-840f-77b1-b88c-bf08b77ad230"),
                             Name = "Biography"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7506-a648-8f201acd5e18"),
+                            Id = new Guid("018e8adb-840f-77b2-97b2-ec9f5a55663b"),
                             Name = "True crime"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7507-a84c-0e332fee277b"),
+                            Id = new Guid("018e8adb-840f-77b3-a2f5-28897b4979a8"),
                             Name = "Thriller"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7508-be0c-06e71ff86374"),
+                            Id = new Guid("018e8adb-840f-77b4-9a27-8ae54fa760ff"),
                             Name = "Young adult"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7509-b5c8-5d68b927e7d6"),
+                            Id = new Guid("018e8adb-840f-77b5-8cc9-629f12944b07"),
                             Name = "Mystery"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-750a-bb41-47334a12f1e5"),
+                            Id = new Guid("018e8adb-840f-77b6-a49e-24c3cf49f7f6"),
                             Name = "Satire"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-750b-aedd-e785e69f50c3"),
+                            Id = new Guid("018e8adb-840f-77b7-b8fb-e33165e8ed6e"),
                             Name = "Non-Fiction"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-750c-8ccf-b0f3ac3d6fce"),
+                            Id = new Guid("018e8adb-840f-77b8-af35-4c46b0a02646"),
                             Name = "Self-help"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-750d-8f47-e84c9407219a"),
+                            Id = new Guid("018e8adb-840f-77b9-aa42-02c964da8b21"),
                             Name = "Poetry"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-750e-aab8-184ebd0af4f0"),
+                            Id = new Guid("018e8adb-840f-77ba-b89b-48361e4499b8"),
                             Name = "Humor"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-750f-9cd8-2784fe895f4b"),
+                            Id = new Guid("018e8adb-840f-77bb-85f1-691c1b8cbd59"),
                             Name = "Action"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7510-abc2-d0d551b25f8f"),
+                            Id = new Guid("018e8adb-840f-77bc-a0b5-683285074af9"),
                             Name = "Adventure"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7511-bf4e-0bcfa48f0533"),
+                            Id = new Guid("018e8adb-840f-77bd-b255-6873e01aac3a"),
                             Name = "Short story"
                         });
                 });
@@ -619,14 +619,14 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74fc-8de1-154d1a0fb022"),
-                            AccountId = new Guid("018e8a6a-d9e1-7368-8aed-591deb4151f9"),
+                            Id = new Guid("018e8adb-840f-77a8-8bb4-2180cf904f1d"),
+                            AccountId = new Guid("018e8adb-8368-70c1-8252-cd2b5e9bc3f1"),
                             Name = "Gyldendal"
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-74fd-be3b-f3dfa6e8c2d0"),
-                            AccountId = new Guid("018e8a6a-d9e1-7369-b74d-235a4d92cf03"),
+                            Id = new Guid("018e8adb-840f-77a9-ae7a-5fde355e930f"),
+                            AccountId = new Guid("018e8adb-8368-70c2-94db-5b205df0edcf"),
                             Name = "Forlaget Als"
                         });
                 });
@@ -664,8 +664,8 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-da88-7514-bee2-834912336022"),
-                            AccountId = new Guid("018e8a6a-d9e1-7367-9dac-954e8d92f4fd"),
+                            Id = new Guid("018e8adb-840f-77c0-aed1-9886932fcbbe"),
+                            AccountId = new Guid("018e8adb-8368-70c0-aa9f-b47e2880ff5c"),
                             Birthday = new DateOnly(1993, 4, 12),
                             Name = "Thomas",
                             Surname = "Berlin"
@@ -790,17 +790,17 @@ namespace PubHub.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7367-9dac-954e8d92f4fd"),
+                            Id = new Guid("018e8adb-8368-70c0-aa9f-b47e2880ff5c"),
                             AccessFailedCount = 0,
-                            AccountTypeId = new Guid("018e8a6a-d9e1-7363-82b7-76610d269524"),
+                            AccountTypeId = new Guid("018e8adb-8368-70bc-a239-436bd0b16077"),
                             ConcurrencyStamp = "UserSeedConcurrencyStamp",
                             Email = "User@Test.com",
                             EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 13, 34, 2, 209, DateTimeKind.Utc).AddTicks(3849),
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3355),
                             LockoutEnabled = false,
                             NormalizedEmail = "USER@TEST.COM",
                             NormalizedUserName = "USER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOczCyB9R28Te+Fn2Xk0gH4miUlBNtXYzJeXBNKcHaCMgWULSea8qt+PgQhVM78QZg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENjQL3p2ARK3fATdbbvylm05GDvKYEthVXLcapETMnsQP8BVR45ZzT2nEGtSqWHHuA==",
                             PhoneNumber = "4587654321",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "UserSeedSecurityStamp",
@@ -809,17 +809,17 @@ namespace PubHub.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7368-8aed-591deb4151f9"),
+                            Id = new Guid("018e8adb-8368-70c1-8252-cd2b5e9bc3f1"),
                             AccessFailedCount = 0,
-                            AccountTypeId = new Guid("018e8a6a-d9e1-7364-a112-d8d7a64a8511"),
+                            AccountTypeId = new Guid("018e8adb-8368-70bd-8393-772206d0123f"),
                             ConcurrencyStamp = "PublisherSeedConcurrencyStamp",
                             Email = "Publisher@Test.com",
                             EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 13, 34, 2, 209, DateTimeKind.Utc).AddTicks(3868),
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3370),
                             LockoutEnabled = false,
                             NormalizedEmail = "PUBLISHER@TEST.COM",
                             NormalizedUserName = "PUBLISHER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFrU4hcQzruwsvlc1qdAQdgqhsq17FDXjOl4lKQpj0WMloePtOFXCyE9obO1y6Z06g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELwMNDmZlgRPj6j74N/HE9qfxwZri6LGjHA/qf7v6miHSrGCs9gwO++4c1cjmwOQ3g==",
                             PhoneNumber = "4576543210",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "PublisherSeedSecurityStamp",
@@ -828,17 +828,17 @@ namespace PubHub.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-7369-b74d-235a4d92cf03"),
+                            Id = new Guid("018e8adb-8368-70c2-94db-5b205df0edcf"),
                             AccessFailedCount = 0,
-                            AccountTypeId = new Guid("018e8a6a-d9e1-7364-a112-d8d7a64a8511"),
+                            AccountTypeId = new Guid("018e8adb-8368-70bd-8393-772206d0123f"),
                             ConcurrencyStamp = "Publisher2SeedConcurrencyStamp",
                             Email = "Publisher2@Test.com",
                             EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 13, 34, 2, 209, DateTimeKind.Utc).AddTicks(3878),
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3381),
                             LockoutEnabled = false,
                             NormalizedEmail = "PUBLISHER2@TEST.COM",
                             NormalizedUserName = "PUBLISHER2@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPwMKnmmEdv7m3EdgJXNFnQIiefizZjMyViAC8lz7+3S85HBP0UtM2Cbo0jwcyptcQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELTI1cGKBGGGZszaBeiVAeEm7ExXYrG08dB/cx349nKUMgxZasuGJ2i2W0/qor+LuA==",
                             PhoneNumber = "4565432109",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "Publisher2SeedSecurityStamp",
@@ -847,17 +847,17 @@ namespace PubHub.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("018e8a6a-d9e1-736a-902e-35bba62af169"),
+                            Id = new Guid("018e8adb-8368-70c3-995b-1c5ff20e5986"),
                             AccessFailedCount = 0,
-                            AccountTypeId = new Guid("018e8a6a-d9e1-7365-b794-3efe0f1e5346"),
+                            AccountTypeId = new Guid("018e8adb-8368-70be-9081-9f04ff23a4b1"),
                             ConcurrencyStamp = "OperatorSeedConcurrencyStamp",
                             Email = "Operator@Test.com",
                             EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 13, 34, 2, 209, DateTimeKind.Utc).AddTicks(3891),
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3391),
                             LockoutEnabled = false,
                             NormalizedEmail = "OPERATOR@TEST.COM",
                             NormalizedUserName = "OPERATOR@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEISeacsTuT/TWbqyMeXgn0gATHnNbqie9YZ3+pgFW2TslQOeNqkjQeaCok5Hs2I8mA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKTzFgkQu7Xi4hVDtVMGPT4o68eZZuIgPXO2QWxHKduFZBU5NRfsTxkssVTq0VUo/g==",
                             PhoneNumber = "4554321098",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "OperatorSeedSecurityStamp",

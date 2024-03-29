@@ -1,5 +1,7 @@
 ﻿using PubHub.Common.ApiService;
 using PubHub.Common.Models;
+using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Users;
 using System.Diagnostics;
 using System.Net;
 using System.Text;

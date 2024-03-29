@@ -12,8 +12,8 @@ using PubHub.API.Domain;
 namespace PubHub.API.Migrations
 {
     [DbContext(typeof(PubHubContext))]
-    [Migration("20240329133308_Initial")]
-    partial class Initial
+    [Migration("20240329153706_Seeding")]
+    partial class Seeding
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -172,6 +172,28 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccessTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70b8-9718-466effd86b3b"),
+                            Name = "Owner"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70b9-a6b3-038c867c2c74"),
+                            Name = "Subscriber"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70ba-9989-10b795d98bcf"),
+                            Name = "Borrower"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70bb-958e-44661f184474"),
+                            Name = "Expired"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.AccountType", b =>
@@ -189,6 +211,28 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccountTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70bc-a239-436bd0b16077"),
+                            Name = "User"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70bd-8393-772206d0123f"),
+                            Name = "Publisher"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70be-9081-9f04ff23a4b1"),
+                            Name = "Operator"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70bf-b88c-9d8337f0ed7f"),
+                            Name = "Suspended"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Author", b =>
@@ -206,6 +250,23 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77a3-ac65-5f1e56d59cd3"),
+                            Name = "Jhon Doe"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77a4-8274-f813dfa6df3e"),
+                            Name = "Jane Doe"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77a5-a9f0-8d921238f0f2"),
+                            Name = "Dan Turéll"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Book", b =>
@@ -249,6 +310,30 @@ namespace PubHub.API.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            BookContent = new byte[0],
+                            ContentTypeId = new Guid("018e8adb-840f-77a6-8fba-a2058e995998"),
+                            IsHidden = false,
+                            Length = 3600.0,
+                            PublicationDate = new DateOnly(1955, 12, 1),
+                            PublisherId = new Guid("018e8adb-840f-77a8-8bb4-2180cf904f1d"),
+                            Title = "My day in the shoos of Tommy"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            BookContent = new byte[0],
+                            ContentTypeId = new Guid("018e8adb-840f-77a7-8af8-4e9efba397ca"),
+                            IsHidden = false,
+                            Length = 123.0,
+                            PublicationDate = new DateOnly(2023, 4, 7),
+                            PublisherId = new Guid("018e8adb-840f-77a9-ae7a-5fde355e930f"),
+                            Title = "My horse is the wildest"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.BookAuthor", b =>
@@ -264,6 +349,23 @@ namespace PubHub.API.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("BookAuthors", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            AuthorId = new Guid("018e8adb-840f-77a3-ac65-5f1e56d59cd3")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            AuthorId = new Guid("018e8adb-840f-77a4-8274-f813dfa6df3e")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            AuthorId = new Guid("018e8adb-840f-77a5-a9f0-8d921238f0f2")
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.BookGenre", b =>
@@ -279,6 +381,43 @@ namespace PubHub.API.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("BookGenres", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            GenreId = new Guid("018e8adb-840f-77aa-930a-83f7b2f0cb73")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            GenreId = new Guid("018e8adb-840f-77ac-9c19-5a943cfdf7d7")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77be-9537-e2fd5052b35b"),
+                            GenreId = new Guid("018e8adb-840f-77b2-97b2-ec9f5a55663b")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77ae-801c-f7761b058c5c")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77b1-b88c-bf08b77ad230")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77ab-8d6c-8171a947e74d")
+                        },
+                        new
+                        {
+                            BookId = new Guid("018e8adb-840f-77bf-afe4-c86000cada32"),
+                            GenreId = new Guid("018e8adb-840f-77af-8876-7a7b3b128ac5")
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.ContentType", b =>
@@ -296,6 +435,18 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContentTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77a6-8fba-a2058e995998"),
+                            Name = "AudioBook"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77a7-8af8-4e9efba397ca"),
+                            Name = "EBook"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Genre", b =>
@@ -313,6 +464,108 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Genres", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77aa-930a-83f7b2f0cb73"),
+                            Name = "Romance"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77ab-8d6c-8171a947e74d"),
+                            Name = "Horror"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77ac-9c19-5a943cfdf7d7"),
+                            Name = "History"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77ad-bc45-ef8eb5f728d9"),
+                            Name = "Science-Fiction"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77ae-801c-f7761b058c5c"),
+                            Name = "Fiction"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77af-8876-7a7b3b128ac5"),
+                            Name = "Novel"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b0-9a88-6879bbf73fab"),
+                            Name = "Fantasy"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b1-b88c-bf08b77ad230"),
+                            Name = "Biography"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b2-97b2-ec9f5a55663b"),
+                            Name = "True crime"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b3-a2f5-28897b4979a8"),
+                            Name = "Thriller"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b4-9a27-8ae54fa760ff"),
+                            Name = "Young adult"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b5-8cc9-629f12944b07"),
+                            Name = "Mystery"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b6-a49e-24c3cf49f7f6"),
+                            Name = "Satire"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b7-b8fb-e33165e8ed6e"),
+                            Name = "Non-Fiction"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b8-af35-4c46b0a02646"),
+                            Name = "Self-help"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77b9-aa42-02c964da8b21"),
+                            Name = "Poetry"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77ba-b89b-48361e4499b8"),
+                            Name = "Humor"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77bb-85f1-691c1b8cbd59"),
+                            Name = "Action"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77bc-a0b5-683285074af9"),
+                            Name = "Adventure"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77bd-b255-6873e01aac3a"),
+                            Name = "Short story"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Operator", b =>
@@ -365,6 +618,20 @@ namespace PubHub.API.Migrations
                         .HasFilter("[AccountId] IS NOT NULL");
 
                     b.ToTable("Publishers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77a8-8bb4-2180cf904f1d"),
+                            AccountId = new Guid("018e8adb-8368-70c1-8252-cd2b5e9bc3f1"),
+                            Name = "Gyldendal"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77a9-ae7a-5fde355e930f"),
+                            AccountId = new Guid("018e8adb-8368-70c2-94db-5b205df0edcf"),
+                            Name = "Forlaget Als"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.User", b =>
@@ -396,6 +663,16 @@ namespace PubHub.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-840f-77c0-aed1-9886932fcbbe"),
+                            AccountId = new Guid("018e8adb-8368-70c0-aa9f-b47e2880ff5c"),
+                            Birthday = new DateOnly(1993, 4, 12),
+                            Name = "Thomas",
+                            Surname = "Berlin"
+                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.UserBook", b =>
@@ -512,6 +789,84 @@ namespace PubHub.API.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Accounts", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70c0-aa9f-b47e2880ff5c"),
+                            AccessFailedCount = 0,
+                            AccountTypeId = new Guid("018e8adb-8368-70bc-a239-436bd0b16077"),
+                            ConcurrencyStamp = "UserSeedConcurrencyStamp",
+                            Email = "User@Test.com",
+                            EmailConfirmed = true,
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3355),
+                            LockoutEnabled = false,
+                            NormalizedEmail = "USER@TEST.COM",
+                            NormalizedUserName = "USER@TEST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAENjQL3p2ARK3fATdbbvylm05GDvKYEthVXLcapETMnsQP8BVR45ZzT2nEGtSqWHHuA==",
+                            PhoneNumber = "4587654321",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "UserSeedSecurityStamp",
+                            TwoFactorEnabled = false,
+                            UserName = "User@Test.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70c1-8252-cd2b5e9bc3f1"),
+                            AccessFailedCount = 0,
+                            AccountTypeId = new Guid("018e8adb-8368-70bd-8393-772206d0123f"),
+                            ConcurrencyStamp = "PublisherSeedConcurrencyStamp",
+                            Email = "Publisher@Test.com",
+                            EmailConfirmed = true,
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3370),
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PUBLISHER@TEST.COM",
+                            NormalizedUserName = "PUBLISHER@TEST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAELwMNDmZlgRPj6j74N/HE9qfxwZri6LGjHA/qf7v6miHSrGCs9gwO++4c1cjmwOQ3g==",
+                            PhoneNumber = "4576543210",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "PublisherSeedSecurityStamp",
+                            TwoFactorEnabled = false,
+                            UserName = "Publisher@Test.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70c2-94db-5b205df0edcf"),
+                            AccessFailedCount = 0,
+                            AccountTypeId = new Guid("018e8adb-8368-70bd-8393-772206d0123f"),
+                            ConcurrencyStamp = "Publisher2SeedConcurrencyStamp",
+                            Email = "Publisher2@Test.com",
+                            EmailConfirmed = true,
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3381),
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PUBLISHER2@TEST.COM",
+                            NormalizedUserName = "PUBLISHER2@TEST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAELTI1cGKBGGGZszaBeiVAeEm7ExXYrG08dB/cx349nKUMgxZasuGJ2i2W0/qor+LuA==",
+                            PhoneNumber = "4565432109",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "Publisher2SeedSecurityStamp",
+                            TwoFactorEnabled = false,
+                            UserName = "Publisher2@Test.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("018e8adb-8368-70c3-995b-1c5ff20e5986"),
+                            AccessFailedCount = 0,
+                            AccountTypeId = new Guid("018e8adb-8368-70be-9081-9f04ff23a4b1"),
+                            ConcurrencyStamp = "OperatorSeedConcurrencyStamp",
+                            Email = "Operator@Test.com",
+                            EmailConfirmed = true,
+                            LastSignIn = new DateTime(2024, 3, 29, 15, 37, 5, 640, DateTimeKind.Utc).AddTicks(3391),
+                            LockoutEnabled = false,
+                            NormalizedEmail = "OPERATOR@TEST.COM",
+                            NormalizedUserName = "OPERATOR@TEST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKTzFgkQu7Xi4hVDtVMGPT4o68eZZuIgPXO2QWxHKduFZBU5NRfsTxkssVTq0VUo/g==",
+                            PhoneNumber = "4554321098",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "OperatorSeedSecurityStamp",
+                            TwoFactorEnabled = false,
+                            UserName = "Operator@Test.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
