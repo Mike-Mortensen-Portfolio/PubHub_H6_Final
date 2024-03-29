@@ -142,10 +142,10 @@ namespace PubHub.Common.Services
         }
 
         /// <summary>
-        /// Calls the API endpoint for updating <see cref="Models.Users.BookUpdateModel"/> values in the database.
+        /// Calls the API endpoint for updating <see cref="UserUpdateModel"/> values in the database.
         /// </summary>
         /// <param name="userId">The id of the user being updated.</param>
-        /// <param name="userUpdateModel">The <see cref="Models.Users.BookUpdateModel"/> holding the updated values.</param>
+        /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
         /// <returns>A status telling if a user was successfully updated in the database.</returns>
         public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
         {            
