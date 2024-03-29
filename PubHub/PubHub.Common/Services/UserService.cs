@@ -11,6 +11,7 @@ namespace PubHub.Common.Services
 {
     public class UserService : ServiceRoot, IUserService
     {
+#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         internal UserService(IHttpClientFactory clientFactory, string clientName) : base(clientFactory, clientName)
@@ -25,7 +26,7 @@ namespace PubHub.Common.Services
         // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
         public async Task<ServiceInstanceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
-        {            
+        {
             try
             {
                 if (userCreateModel == null)
@@ -74,12 +75,12 @@ namespace PubHub.Common.Services
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
-                    
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");                    
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
                 UserInfoModel? userInfoModel = JsonSerializer.Deserialize<UserInfoModel>(content, _serializerOptions);
-                if(userInfoModel == null)
+                if (userInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
                 return userInfoModel!;
@@ -124,7 +125,7 @@ namespace PubHub.Common.Services
         }
 
         public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
-        {            
+        {
             try
             {
                 if (userId <= 0)

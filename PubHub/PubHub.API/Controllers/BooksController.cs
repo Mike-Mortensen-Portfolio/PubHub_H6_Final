@@ -14,6 +14,7 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class BooksController : ControllerBase
     {
+#pragma warning disable IDE0290 // Use primary constructor
         private readonly PubHubContext _context;
 
         public BooksController(PubHubContext context)
@@ -84,7 +85,6 @@ namespace PubHub.API.Controllers
                     .ThenInclude(bookGenres => bookGenres.Genre)
                 .Include(book => book.BookAuthors)
                     .ThenInclude(bookAuthors => bookAuthors.Author);
-
 
             var entityBook = await query.Where(book => book.Id == id)
                 .FirstOrDefaultAsync();
