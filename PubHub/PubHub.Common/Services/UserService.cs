@@ -1,5 +1,7 @@
 ﻿using PubHub.Common.ApiService;
 using PubHub.Common.Models;
+using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Users;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -9,13 +11,11 @@ namespace PubHub.Common.Services
 {
     public class UserService : ServiceRoot
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         internal UserService(IHttpClientFactory clientFactory, string clientName) : base(clientFactory, clientName)
         {
-            _httpClientFactory = clientFactory;
-
             _serializerOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -31,7 +31,7 @@ namespace PubHub.Common.Services
         /// <param name="userCreateModel">The <see cref="UserCreateModel"/> holding the new user.</param>
         /// <returns>A status telling if a user was successfully added to the database.</returns>
         public async Task<ServiceInstanceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
-        {            
+        {
             try
             {
                 if (userCreateModel == null)
@@ -85,12 +85,12 @@ namespace PubHub.Common.Services
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
-                    
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");                    
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
                 UserInfoModel? userInfoModel = JsonSerializer.Deserialize<UserInfoModel>(content, _serializerOptions);
-                if(userInfoModel == null)
+                if (userInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
                 return userInfoModel!;
@@ -146,7 +146,7 @@ namespace PubHub.Common.Services
         /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
         /// <returns>A status telling if a user was successfully updated in the database.</returns>
         public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
-        {            
+        {
             try
             {
                 if (userId <= 0)

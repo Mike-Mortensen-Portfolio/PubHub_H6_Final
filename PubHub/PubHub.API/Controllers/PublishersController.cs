@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
+using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
 
 namespace PubHub.API.Controllers
@@ -81,7 +83,7 @@ namespace PubHub.API.Controllers
                 .Select(p => new PublisherInfoModel()
                 {
                     Id = p.Id,
-                    Email = p.Account.Email,
+                    Email = p.Account!.Email,
                     Name = p.Name
                 })
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -101,9 +103,10 @@ namespace PubHub.API.Controllers
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetPublishersAsync()
+        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
         {
             var publishers = await _context.Set<Publisher>()
+                .Filter(query)
                 .ToArrayAsync();
 
             return Results.Ok(publishers);
@@ -132,11 +135,40 @@ namespace PubHub.API.Controllers
 
             // Retreive all books.
             var bookModels = await _context.Set<Book>()
-                .Where(b => b.Publisher.Id == id)
-                .Select(b => new BookInfoModel()
+                .Include(b => b.Publisher)
+                .Include(b => b!.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .Include(b => b.BookAuthors)
+                    .ThenInclude (ba => ba.Author)
+                .Include(b => b.ContentType)
+                .Where(b => b.Publisher!.Id == id)
+                .Select(book => new BookInfoModel()
                 {
-                    Title = b.Title,
-                    PublicationDate = b.PublicationDate
+                    ContentType = new ContentTypeInfoModel
+                    {
+                        Id = book.ContentTypeId,
+                        Name = book.ContentType!.Name
+                    },
+                    CoverImage = book.CoverImage,
+                    Id = book.Id,
+                    Length = book.Length,
+                    PublicationDate = book.PublicationDate,
+                    Publisher = new BookPublisherModel
+                    {
+                        Id = book.PublisherId,
+                        Name = book.Publisher!.Name
+                    },
+                    Title = book.Title,
+                    Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
+                    {
+                        Id = bookGenres.GenreId,
+                        Name = bookGenres.Genre!.Name
+                    }).ToList(),
+                    Authors = book.BookAuthors.Select(bookAuthors => new AuthorInfoModel
+                    {
+                        Id = bookAuthors.AuthorId,
+                        Name = bookAuthors.Author!.Name
+                    }).ToList()
                 })
                 .ToListAsync();
 
