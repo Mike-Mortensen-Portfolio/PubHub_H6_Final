@@ -28,6 +28,8 @@ namespace PubHub.Common.Services
             };
         }
 
+        // TODO (JBN): Change to GUIDs instead of int when that has been updated.
+
         /// <summary>
         /// Calls the API enpoint to retrieve all books through the <see cref="BookInfoModel"/> filtered on the searchQuery.
         /// </summary>
