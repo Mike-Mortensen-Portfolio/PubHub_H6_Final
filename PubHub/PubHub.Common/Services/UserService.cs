@@ -1,6 +1,7 @@
 ﻿using PubHub.Common.ApiService;
 using PubHub.Common.Models;
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -31,7 +32,7 @@ namespace PubHub.Common.Services
         /// <returns>A status telling if a user was successfully added to the database.</returns>
         public async Task<ServiceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
         {
-            string responseCode = "";
+            HttpStatusCode responseCode = HttpStatusCode.Unused;
             try
             {
                 if (userCreateModel == null)
@@ -46,7 +47,7 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.PostAsync("users", httpContent);
                 string content = await response.Content.ReadAsStringAsync();
-                responseCode = response.StatusCode.ToString();
+                responseCode = response.StatusCode;
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -57,7 +58,7 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return new ServiceResult<UserCreateModel>(response.StatusCode.ToString(), userCreateModel, $"Successfully added the user: {userCreateModel.Name}");
+                return new ServiceResult<UserCreateModel>(response.StatusCode, userCreateModel, $"Successfully added the user: {userCreateModel.Name}");
             }
             catch (Exception ex)
             {
@@ -146,8 +147,9 @@ namespace PubHub.Common.Services
         /// <param name="userId">The id of the user being updated.</param>
         /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
         /// <returns>A status telling if a user was successfully updated in the database.</returns>
-        public async Task<string> UpdateUser(int userId, UserUpdateModel userUpdateModel)
+        public async Task<ServiceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
         {
+            HttpStatusCode responseCode = HttpStatusCode.Unused;
             try
             {
                 if (userId <= 0)
@@ -175,15 +177,16 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return $"Successfully updated the user: {userUpdateModel.Name}";
+                return new ServiceResult<UserUpdateModel>(response.StatusCode, userUpdateModel, $"Successfully updated the user: {userUpdateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to update the user: {userUpdateModel.Name}, ", ex.Message);
-                return $"Failed to update the user: {userUpdateModel.Name}";
+                return new ServiceResult<UserUpdateModel>(responseCode, userUpdateModel, $"Failed to update the user: {userUpdateModel.Name}");
             }
         }
 
+        // TODO (JBN): return with the ServiceResult<T> class when we find out what needs to be done differently.
         /// <summary>
         /// Calls the API endpoint to soft-delete a user./>
         /// </summary>
@@ -217,6 +220,7 @@ namespace PubHub.Common.Services
             }
         }
 
+        // TODO (JBN): return with the ServiceResult<T> class when we find out what needs to be done differently.
         /// <summary>
         /// Calls the API endpoint to change the user's account type to suspended./>
         /// </summary>

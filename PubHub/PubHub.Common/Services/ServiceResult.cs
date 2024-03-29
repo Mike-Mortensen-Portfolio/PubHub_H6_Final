@@ -9,14 +9,14 @@ namespace PubHub.Common.Services
 {
     public class ServiceResult<T>
     {     
-        internal ServiceResult(string statusCode, T instance, string errorDescriptor) 
+        internal ServiceResult(HttpStatusCode statusCode, T instance, string errorDescriptor) 
         {
-            this.StatusCode = statusCode;
-            this.Instance = instance;
-            this.ErrorDescriptor = errorDescriptor;
+            StatusCode = statusCode;
+            Instance = instance;
+            ErrorDescriptor = errorDescriptor;
         }
 
-        public string StatusCode { get; }
+        public HttpStatusCode StatusCode { get; }
         public T Instance { get; }
         public string ErrorDescriptor { get; }
 
