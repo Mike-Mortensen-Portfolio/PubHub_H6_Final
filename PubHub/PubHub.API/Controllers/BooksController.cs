@@ -93,10 +93,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: "We couldn't locate a book with the given ID",
+                    detail: "We couldn't locate a book with the given Id",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "ID", id }
+                        { "Id", id }
                     });
 
             var book = new BookInfoModel
@@ -163,10 +163,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
-                    detail: "No publisher with the given ID was found",
+                    detail: "No publisher with the given Id was found",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"ID", createModel.PublisherId}
+                        {"Id", createModel.PublisherId}
                     });
 
             var createdBook = new Book
@@ -188,10 +188,10 @@ namespace PubHub.API.Controllers
                     return Results.Problem(
                         statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                         title: UnprocessableEntitySpecification.TITLE,
-                        detail: "No genere with the given ID was found",
+                        detail: "No genere with the given Id was found",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"ID", genreId}
+                            {"Id", genreId}
                         });
 
                 createdBook.BookGenres.Add(new BookGenre
@@ -208,10 +208,10 @@ namespace PubHub.API.Controllers
                     return Results.Problem(
                         statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                         title: UnprocessableEntitySpecification.TITLE,
-                        detail: "No author with the given ID was found",
+                        detail: "No author with the given Id was found",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"ID", authorId}
+                            {"Id", authorId}
                         });
 
                 createdBook.BookAuthors.Add(new BookAuthor
@@ -294,10 +294,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                         statusCode: NotFoundSpecification.STATUS_CODE,
                         title: NotFoundSpecification.TITLE,
-                        detail: "A book with the given ID couldn't be found",
+                        detail: "A book with the given Id couldn't be found",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"ID", id}
+                            {"Id", id}
                         });
 
             var publisher = await _context.Set<Publisher>().FirstOrDefaultAsync(publisher => publisher.Id == updateModel.PublisherId);
@@ -306,10 +306,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
-                    detail: "No publisher with the given ID was found",
+                    detail: "No publisher with the given Id was found",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"ID", updateModel.PublisherId}
+                        {"Id", updateModel.PublisherId}
                     });
 
             existingBook.BookContent = updateModel.BookContent;
@@ -340,10 +340,10 @@ namespace PubHub.API.Controllers
             //        return Results.Problem(
             //            statusCode: UnprocessableEntitySpecification.STATUS_CODE,
             //            title: UnprocessableEntitySpecification.TITLE,
-            //            detail: "No genere with the given ID was found",
+            //            detail: "No genere with the given Id was found",
             //            extensions: new Dictionary<string, object?>
             //            {
-            //                {"ID", genreId}
+            //                {"Id", genreId}
             //            });
 
             //    existingBook.BookGenres.Add(new BookGenre
@@ -360,10 +360,10 @@ namespace PubHub.API.Controllers
             //        return Results.Problem(
             //            statusCode: UnprocessableEntitySpecification.STATUS_CODE,
             //            title: UnprocessableEntitySpecification.TITLE,
-            //            detail: "No author with the given ID was found",
+            //            detail: "No author with the given Id was found",
             //            extensions: new Dictionary<string, object?>
             //            {
-            //                {"ID", authorId}
+            //                {"Id", authorId}
             //            });
 
             //    existingBook.BookAuthors.Add(new BookAuthor
@@ -437,10 +437,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                         statusCode: NotFoundSpecification.STATUS_CODE,
                         title: NotFoundSpecification.TITLE,
-                        detail: "A book with the given ID couldn't be found",
+                        detail: "A book with the given Id couldn't be found",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"ID", id}
+                            {"Id", id}
                         });
 
             _context.Set<Book>().Remove(book);

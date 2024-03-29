@@ -6,6 +6,6 @@
     internal static class DuplicateProblemSpecification
     {
         public const int STATUS_CODE = StatusCodes.Status409Conflict;
-        public const string TITLE = "The ressource is already present in persistence";
+        public const string TITLE = "The resource is already present in persistence";
     }
 }

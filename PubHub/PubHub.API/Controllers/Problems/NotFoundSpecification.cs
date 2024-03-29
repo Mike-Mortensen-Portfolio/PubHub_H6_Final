@@ -6,6 +6,6 @@
     internal static class NotFoundSpecification
     {
         public const int STATUS_CODE = StatusCodes.Status404NotFound;
-        public const string TITLE = "The ressource you're looking for does not exist";
+        public const string TITLE = "The resource you're looking for does not exist";
     }
 }

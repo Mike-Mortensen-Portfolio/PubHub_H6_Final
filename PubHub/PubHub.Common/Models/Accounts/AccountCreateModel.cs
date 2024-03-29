@@ -1,4 +1,4 @@
-﻿namespace PubHub.Common.Models
+﻿namespace PubHub.Common.Models.Accounts
 {
     public class AccountCreateModel
     {

@@ -1,4 +1,6 @@
-﻿namespace PubHub.Common.Models
+﻿using PubHub.Common.Models.Accounts;
+
+namespace PubHub.Common.Models.Publishers
 {
     public class PublisherUpdateModel
     {
