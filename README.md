@@ -1,6 +1,10 @@
-![PubHub](https://github.com/Mike-Mortensen-Portfolio/PubHub_H6_Final/assets/61870713/452eeb83-5649-4c6f-91c4-944f0e14cc77)
-
-### PubHub Distribution Service
+<div align="center">
+    <img src="/Images/PubHub.png" alt="Header_Image" width="300px" height="300px"/>
+</div>
+<div align="center">
+    <strong style="font-size:30px; display:block;">THOP</strong>
+    <p style="display:block; font-weight:normal; font-size:20px;">PubHub Distribution Service </p>
+</div>
 
 ---
 
