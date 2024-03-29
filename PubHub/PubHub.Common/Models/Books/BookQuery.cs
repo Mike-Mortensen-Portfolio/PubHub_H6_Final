@@ -3,6 +3,6 @@
     public class BookQuery : PaginationQuery
     {
         public OrderBooksBy OrderBy { get; set; }
-        public int[]? Genres { get; set; }
+        public Guid[]? Genres { get; set; }
     }
 }

@@ -4,7 +4,6 @@ using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
-using PubHub.Common;
 using PubHub.Common.Models.Books;
 
 namespace PubHub.API.Controllers
@@ -27,7 +26,6 @@ namespace PubHub.API.Controllers
         /// <param name="BookQuery">Filtering options</param>
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<BookInfoModel>))]
-
         public async Task<IResult> GetBooks([FromQuery] BookQuery queryOptions)
         {
             var query = _context.Set<Book>()
@@ -75,7 +73,8 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetBook(int id)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
+        public async Task<IResult> GetBook(Guid id)
         {
             var query = _context.Set<Book>()
                 .Include(book => book.ContentType)
@@ -93,7 +92,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: "We couldn't locate a book with the given ID",
+                    detail: "We couldn't locate a book with the given ID.",
                     extensions: new Dictionary<string, object?>
                     {
                         { "Id", id }
@@ -135,6 +134,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
         public async Task<IResult> AddBook([FromBody] BookCreateModel createModel)
         {
             var books = _context.Set<Book>();
@@ -149,13 +149,13 @@ namespace PubHub.API.Controllers
 
             if (existingBook is not null)
                 return Results.Problem(
-                        statusCode: DuplicateProblemSpecification.STATUS_CODE,
-                        title: DuplicateProblemSpecification.TITLE,
-                        detail: "A matching book already exists",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"Book", existingBook}
-                        });
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching book already exists.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Book", existingBook }
+                    });
 
             var publisher = await _context.Set<Publisher>().FirstOrDefaultAsync(publisher => publisher.Id == createModel.PublisherId);
 
@@ -163,10 +163,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
-                    detail: "No publisher with the given ID was found",
+                    detail: "No publisher with the given ID was found.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", createModel.PublisherId}
+                        { "Id", createModel.PublisherId }
                     });
 
             var createdBook = new Book
@@ -188,10 +188,10 @@ namespace PubHub.API.Controllers
                     return Results.Problem(
                         statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                         title: UnprocessableEntitySpecification.TITLE,
-                        detail: "No genere with the given ID was found",
+                        detail: "No genere with the given ID was found.",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"Id", genreId}
+                            { "Id", genreId }
                         });
 
                 createdBook.BookGenres.Add(new BookGenre
@@ -208,10 +208,10 @@ namespace PubHub.API.Controllers
                     return Results.Problem(
                         statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                         title: UnprocessableEntitySpecification.TITLE,
-                        detail: "No author with the given ID was found",
+                        detail: "No author with the given ID was found.",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"Id", authorId}
+                            { "Id", authorId }
                         });
 
                 createdBook.BookAuthors.Add(new BookAuthor
@@ -225,13 +225,13 @@ namespace PubHub.API.Controllers
 
             if (!(await _context.SaveChangesAsync() > 0))
                 return Results.Problem(
-                        statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                        title: InternalServerErrorSpecification.TITLE,
-                        detail: "Something went wrong and the book couldn't be created. Please try again.",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"Book", createdBook}
-                        });
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the book couldn't be created. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Book", createdBook }
+                    });
 
             var bookInfo = await books
                 .Include(book => book.ContentType)
@@ -283,7 +283,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
-        public async Task<IResult> UpdateBook(int id, [FromBody] BookUpdateModel updateModel)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
+        public async Task<IResult> UpdateBook(Guid id, [FromBody] BookUpdateModel updateModel)
         {
             //  TODO (MSM)  Implement updates on genres and authors
             var books = _context.Set<Book>();
@@ -294,10 +295,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                         statusCode: NotFoundSpecification.STATUS_CODE,
                         title: NotFoundSpecification.TITLE,
-                        detail: "A book with the given ID couldn't be found",
+                        detail: "No book with the given ID was be found.",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"Id", id}
+                            { "Id", id }
                         });
 
             var publisher = await _context.Set<Publisher>().FirstOrDefaultAsync(publisher => publisher.Id == updateModel.PublisherId);
@@ -306,10 +307,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
-                    detail: "No publisher with the given ID was found",
+                    detail: "No publisher with the given ID was found.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", updateModel.PublisherId}
+                        { "Id", updateModel.PublisherId }
                     });
 
             existingBook.BookContent = updateModel.BookContent;
@@ -328,9 +329,9 @@ namespace PubHub.API.Controllers
                         detail: "Something went wrong and the book couldn't be created. Please try again.",
                         extensions: new Dictionary<string, object?>
                         {
-                            {"Book", existingBook},
-                            {"GenresIds", updateModel.GenreIds },
-                            {"AuthorIds", updateModel.AuthorIds }
+                            { "Book", existingBook },
+                            { "GenresIds", updateModel.GenreIds },
+                            { "AuthorIds", updateModel.AuthorIds }
                         });
 
             //foreach (var genreId in updateModel.GenreIds)
@@ -377,13 +378,13 @@ namespace PubHub.API.Controllers
 
             if (!(await _context.SaveChangesAsync() > 0))
                 return Results.Problem(
-                        statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                        title: InternalServerErrorSpecification.TITLE,
-                        detail: "Something went wrong and the book couldn't be created. Please try again.",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"Book", existingBook}
-                        });
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the book couldn't be created. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Book", existingBook }
+                    });
 
             var bookInfo = await books
                 .Include(book => book.ContentType)
@@ -426,34 +427,34 @@ namespace PubHub.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> DeleteBook(int id)
+        public async Task<IResult> DeleteBook(Guid id)
         {
             var book = await _context.Set<Book>()
                 .FirstOrDefaultAsync(book => book.Id == id);
 
             if (book is null)
                 return Results.Problem(
-                        statusCode: NotFoundSpecification.STATUS_CODE,
-                        title: NotFoundSpecification.TITLE,
-                        detail: "A book with the given ID couldn't be found",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"Id", id}
-                        });
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "No book with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
 
             _context.Set<Book>().Remove(book);
 
             if (!(await _context.SaveChangesAsync() > 0))
                 return Results.Problem(
-                        statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                        title: InternalServerErrorSpecification.TITLE,
-                        detail: "Something went wrong and the book couldn't be created. Please try again.",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"Book", book}
-                        });
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the book couldn't be deleted. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Book", book }
+                    });
 
             return Results.Ok();
         }

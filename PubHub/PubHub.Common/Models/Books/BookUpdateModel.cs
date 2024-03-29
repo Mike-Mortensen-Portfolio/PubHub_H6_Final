@@ -2,8 +2,8 @@
 {
     public class BookUpdateModel
     {
-        public required int ContentTypeId { get; init; }
-        public required int PublisherId { get; init; }
+        public required Guid ContentTypeId { get; init; }
+        public required Guid PublisherId { get; init; }
         public required string Title { get; set; }
         public byte[]? CoverImage { get; set; }
         public required byte[] BookContent { get; set; }
@@ -19,7 +19,7 @@
         public required double Length { get; set; }
         public bool IsHidden { get; set; }
 
-        public int[] AuthorIds { get; set; } = [];
-        public int[] GenreIds { get; set; } = [];
+        public Guid[] AuthorIds { get; set; } = [];
+        public Guid[] GenreIds { get; set; } = [];
     }
 }
