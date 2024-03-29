@@ -25,7 +25,7 @@ namespace PubHub.API
 
         public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<Account, IdentityRole<int>>(options =>
+            services.AddIdentity<Account, IdentityRole<Guid>>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
                 options.User.RequireUniqueEmail = true;

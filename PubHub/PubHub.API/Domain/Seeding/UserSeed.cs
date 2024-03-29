@@ -26,7 +26,7 @@ namespace PubHub.API.Domain.Seeding
             [
                 new User
                 {
-                    Id = 1,
+                    Id = Guid.Empty,
                     AccountId = _accountSeed[USER_EMAIL].Id,
                     Birthday = new DateOnly (1993, 4, 12),
                     Name = "Thomas",

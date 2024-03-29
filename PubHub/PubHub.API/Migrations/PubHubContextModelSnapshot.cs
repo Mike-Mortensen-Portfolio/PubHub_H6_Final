@@ -22,13 +22,11 @@ namespace PubHub.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -52,7 +50,7 @@ namespace PubHub.API.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,8 +64,8 @@ namespace PubHub.API.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -76,7 +74,7 @@ namespace PubHub.API.Migrations
                     b.ToTable("RoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,8 +88,8 @@ namespace PubHub.API.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -100,7 +98,7 @@ namespace PubHub.API.Migrations
                     b.ToTable("AccountClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -111,8 +109,8 @@ namespace PubHub.API.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("AccountId");
 
                     b.HasKey("LoginProvider", "ProviderKey");
@@ -122,13 +120,13 @@ namespace PubHub.API.Migrations
                     b.ToTable("AccountLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -137,10 +135,10 @@ namespace PubHub.API.Migrations
                     b.ToTable("AccountRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("AccountId");
 
                     b.Property<string>("LoginProvider")
@@ -159,12 +157,10 @@ namespace PubHub.API.Migrations
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.AccessType", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("AccessTypeId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -173,38 +169,14 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccessTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Owner"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Subscriber"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Borrower"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Expired"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.AccountType", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("AccountTypeId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -214,38 +186,14 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccountTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Publisher"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Operator"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Suspended"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Author", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("AuthorId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -255,40 +203,21 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Jhon Doe"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Jane Doe"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Dan Turéll"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Book", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("BookId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<byte[]>("BookContent")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<int>("ContentTypeId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ContentTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("CoverImage")
                         .HasColumnType("varbinary(max)");
@@ -302,8 +231,8 @@ namespace PubHub.API.Migrations
                     b.Property<DateOnly>("PublicationDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("PublisherId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("PublisherId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -317,124 +246,44 @@ namespace PubHub.API.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BookContent = new byte[0],
-                            ContentTypeId = 1,
-                            IsHidden = false,
-                            Length = 3600.0,
-                            PublicationDate = new DateOnly(1955, 12, 1),
-                            PublisherId = 1,
-                            Title = "My day in the shoos of Tommy"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BookContent = new byte[0],
-                            ContentTypeId = 2,
-                            IsHidden = false,
-                            Length = 123.0,
-                            PublicationDate = new DateOnly(2023, 4, 7),
-                            PublisherId = 1,
-                            Title = "My horse is the wildest"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.BookAuthor", b =>
                 {
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("BookId", "AuthorId");
 
                     b.HasIndex("AuthorId");
 
                     b.ToTable("BookAuthors", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            BookId = 1,
-                            AuthorId = 1
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            AuthorId = 2
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            AuthorId = 3
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.BookGenre", b =>
                 {
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("GenreId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("GenreId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("BookId", "GenreId");
 
                     b.HasIndex("GenreId");
 
                     b.ToTable("BookGenres", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            BookId = 1,
-                            GenreId = 1
-                        },
-                        new
-                        {
-                            BookId = 1,
-                            GenreId = 3
-                        },
-                        new
-                        {
-                            BookId = 1,
-                            GenreId = 9
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 5
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 8
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 2
-                        },
-                        new
-                        {
-                            BookId = 2,
-                            GenreId = 6
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.ContentType", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("ContentTypeId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -444,28 +293,14 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContentTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "AudioBook"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "EBook"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Genre", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("GenreId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -475,121 +310,17 @@ namespace PubHub.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Genres", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Romance"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Horror"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "History"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Science-Fiction"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Fiction"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Novel"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Fantasy"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "Biography"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "True crime"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Name = "Thriller"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Name = "Young adult"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Name = "Mystery"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Name = "Satire"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Name = "Non-Fiction"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Name = "Self-help"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Name = "Poetry"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Name = "Humor"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Name = "Action"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Name = "Adventure"
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Name = "Short story"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Operator", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("OperatorId");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -611,15 +342,13 @@ namespace PubHub.API.Migrations
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.Publisher", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("PublisherId");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AccountId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -633,33 +362,17 @@ namespace PubHub.API.Migrations
                         .HasFilter("[AccountId] IS NOT NULL");
 
                     b.ToTable("Publishers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccountId = 2,
-                            Name = "Gyldendal"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AccountId = 3,
-                            Name = "Forlaget Als"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("UserId");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateOnly>("Birthday")
                         .HasColumnType("date");
@@ -680,28 +393,18 @@ namespace PubHub.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccountId = 1,
-                            Birthday = new DateOnly(1993, 4, 12),
-                            Name = "Thomas",
-                            Surname = "Berlin"
-                        });
                 });
 
             modelBuilder.Entity("PubHub.API.Domain.Entities.UserBook", b =>
                 {
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("AccessTypeId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AccessTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AcquireDate")
                         .HasColumnType("datetime2");
@@ -720,18 +423,16 @@ namespace PubHub.API.Migrations
 
             modelBuilder.Entity("PubHub.API.Domain.Identity.Account", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("AccountId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountTypeId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AccountTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -802,96 +503,18 @@ namespace PubHub.API.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Accounts", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 1,
-                            ConcurrencyStamp = "UserSeedConcurrencyStamp",
-                            Email = "User@Test.com",
-                            EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 7, 19, 44, 421, DateTimeKind.Utc).AddTicks(6442),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "USER@TEST.COM",
-                            NormalizedUserName = "USER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFhkCwcV9e752vkTUPwum1GquIPAofTBGnmqktNUQhki/IM4u9E3iy3DTIZkFBTASg==",
-                            PhoneNumber = "4587654321",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "UserSeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "User@Test.com"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 2,
-                            ConcurrencyStamp = "PublisherSeedConcurrencyStamp",
-                            Email = "Publisher@Test.com",
-                            EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 7, 19, 44, 421, DateTimeKind.Utc).AddTicks(6456),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "PUBLISHER@TEST.COM",
-                            NormalizedUserName = "PUBLISHER@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJIu5MlQOtlNwrmNGwTUapprj2drep+HthzMK9AVNahCk2jRj0vMkaeuq29Xdpsj3Q==",
-                            PhoneNumber = "4576543210",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "PublisherSeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "Publisher@Test.com"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 2,
-                            ConcurrencyStamp = "Publisher2SeedConcurrencyStamp",
-                            Email = "Publisher2@Test.com",
-                            EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 7, 19, 44, 421, DateTimeKind.Utc).AddTicks(6465),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "PUBLISHER2@TEST.COM",
-                            NormalizedUserName = "PUBLISHER2@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECPgqEFXiR5BA+asfaF7GmosbfP+LZOoknxrFxpOqZ6o0Be/dVWg/3URKfgc2fnlog==",
-                            PhoneNumber = "4565432109",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "Publisher2SeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "Publisher2@Test.com"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AccessFailedCount = 0,
-                            AccountTypeId = 3,
-                            ConcurrencyStamp = "OperatorSeedConcurrencyStamp",
-                            Email = "Operator@Test.com",
-                            EmailConfirmed = true,
-                            LastSignIn = new DateTime(2024, 3, 29, 7, 19, 44, 421, DateTimeKind.Utc).AddTicks(6480),
-                            LockoutEnabled = false,
-                            NormalizedEmail = "OPERATOR@TEST.COM",
-                            NormalizedUserName = "OPERATOR@TEST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKp0hFbOmQx4yMLAgemv8+ex/Zeqn0L5BIkIpMqC4Z0wV0dPESptBbd5AsI1J+AxEw==",
-                            PhoneNumber = "4554321098",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "OperatorSeedSecurityStamp",
-                            TwoFactorEnabled = false,
-                            UserName = "Operator@Test.com"
-                        });
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("PubHub.API.Domain.Identity.Account", null)
                         .WithMany()
@@ -900,7 +523,7 @@ namespace PubHub.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("PubHub.API.Domain.Identity.Account", null)
                         .WithMany()
@@ -909,9 +532,9 @@ namespace PubHub.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -924,7 +547,7 @@ namespace PubHub.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("PubHub.API.Domain.Identity.Account", null)
                         .WithMany()
@@ -938,7 +561,7 @@ namespace PubHub.API.Migrations
                     b.HasOne("PubHub.API.Domain.Entities.ContentType", "ContentType")
                         .WithMany()
                         .HasForeignKey("ContentTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PubHub.API.Domain.Entities.Publisher", "Publisher")
@@ -1005,7 +628,8 @@ namespace PubHub.API.Migrations
                 {
                     b.HasOne("PubHub.API.Domain.Identity.Account", "Account")
                         .WithOne()
-                        .HasForeignKey("PubHub.API.Domain.Entities.Publisher", "AccountId");
+                        .HasForeignKey("PubHub.API.Domain.Entities.Publisher", "AccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Account");
                 });
@@ -1026,7 +650,7 @@ namespace PubHub.API.Migrations
                     b.HasOne("PubHub.API.Domain.Entities.AccessType", "AccessType")
                         .WithMany()
                         .HasForeignKey("AccessTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PubHub.API.Domain.Entities.Book", "Book")
@@ -1037,7 +661,8 @@ namespace PubHub.API.Migrations
 
                     b.HasOne("PubHub.API.Domain.Entities.User", "User")
                         .WithMany("UserBooks")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("AccessType");
 
@@ -1051,7 +676,7 @@ namespace PubHub.API.Migrations
                     b.HasOne("PubHub.API.Domain.Entities.AccountType", "AccountType")
                         .WithMany()
                         .HasForeignKey("AccountTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("AccountType");

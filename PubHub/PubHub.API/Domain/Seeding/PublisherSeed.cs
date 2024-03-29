@@ -26,13 +26,13 @@ namespace PubHub.API.Domain.Seeding
             [
                 new Publisher
                 {
-                    Id = 1,
+                    Id = Guid.Empty,
                     AccountId = _accountSeed[PUBLISHER_EMAIL].Id,
                     Name = "Gyldendal"
                 },
                 new Publisher
                 {
-                    Id = 2,
+                    Id = Guid.Empty,
                     AccountId = _accountSeed[PUBLISHER2_EMAIL].Id,
                     Name = "Forlaget Als"
                 }

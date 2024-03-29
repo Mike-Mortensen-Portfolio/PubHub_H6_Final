@@ -19,26 +19,26 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new Genre { Id = 1, Name = "Romance" },
-                new Genre { Id = 2, Name = "Horror" },
-                new Genre { Id = 3, Name = "History" },
-                new Genre { Id = 4, Name = "Science-Fiction" },
-                new Genre { Id = 5, Name = "Fiction" },
-                new Genre { Id = 6, Name = "Novel" },
-                new Genre { Id = 7, Name = "Fantasy" },
-                new Genre { Id = 8, Name = "Biography" },
-                new Genre { Id = 9, Name = "True crime" },
-                new Genre { Id = 10, Name = "Thriller" },
-                new Genre { Id = 11, Name = "Young adult" },
-                new Genre { Id = 12, Name = "Mystery" },
-                new Genre { Id = 13, Name = "Satire" },
-                new Genre { Id = 14, Name = "Non-Fiction" },
-                new Genre { Id = 15, Name = "Self-help" },
-                new Genre { Id = 16, Name = "Poetry" },
-                new Genre { Id = 17, Name = "Humor" },
-                new Genre { Id = 18, Name = "Action" },
-                new Genre { Id = 19, Name = "Adventure" },
-                new Genre { Id = 20, Name = "Short story" }
+                new Genre { Id = Guid.Empty, Name = "Romance" },
+                new Genre { Id = Guid.Empty, Name = "Horror" },
+                new Genre { Id = Guid.Empty, Name = "History" },
+                new Genre { Id = Guid.Empty, Name = "Science-Fiction" },
+                new Genre { Id = Guid.Empty, Name = "Fiction" },
+                new Genre { Id = Guid.Empty, Name = "Novel" },
+                new Genre { Id = Guid.Empty, Name = "Fantasy" },
+                new Genre { Id = Guid.Empty, Name = "Biography" },
+                new Genre { Id = Guid.Empty, Name = "True crime" },
+                new Genre { Id = Guid.Empty, Name = "Thriller" },
+                new Genre { Id = Guid.Empty, Name = "Young adult" },
+                new Genre { Id = Guid.Empty, Name = "Mystery" },
+                new Genre { Id = Guid.Empty, Name = "Satire" },
+                new Genre { Id = Guid.Empty, Name = "Non-Fiction" },
+                new Genre { Id = Guid.Empty, Name = "Self-help" },
+                new Genre { Id = Guid.Empty, Name = "Poetry" },
+                new Genre { Id = Guid.Empty, Name = "Humor" },
+                new Genre { Id = Guid.Empty, Name = "Action" },
+                new Genre { Id = Guid.Empty, Name = "Adventure" },
+                new Genre { Id = Guid.Empty, Name = "Short story" }
             ];
 
             builder.HasData(Seeds);

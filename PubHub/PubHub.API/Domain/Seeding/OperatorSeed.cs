@@ -26,7 +26,7 @@ namespace PubHub.API.Domain.Seeding
             [
                 new Operator
                 {
-                    Id = 1,
+                    Id = Guid.Empty,
                     AccountId = _accountSeed[OPERATOR_EMAIL].Id,
                     Name = "Selena",
                     Surname = "Gomez"

@@ -23,10 +23,10 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new AccessType { Id = 1, Name = OWNER_ACCESS_TYPE },
-                new AccessType { Id = 2, Name = SUBSCIBER_ACCESS_TYPE },
-                new AccessType { Id = 3, Name = BORROWER_ACCESS_TYPE },
-                new AccessType { Id = 4, Name = EXPIRED_ACCESS_TYPE }
+                new AccessType { Id = Guid.Empty, Name = OWNER_ACCESS_TYPE },
+                new AccessType { Id = Guid.Empty, Name = SUBSCIBER_ACCESS_TYPE },
+                new AccessType { Id = Guid.Empty, Name = BORROWER_ACCESS_TYPE },
+                new AccessType { Id = Guid.Empty, Name = EXPIRED_ACCESS_TYPE }
             ];
 
             builder.HasData(Seeds);

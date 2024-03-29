@@ -12,9 +12,8 @@ namespace PubHub.API.Controllers
     [Route("[controller]")]
     public class UserController(PubHubContext context) : Controller
     {
-        private const int INVALID_ID = 0;
-
         private readonly PubHubContext _context = context;
+        private readonly Guid _invalidId = Guid.Empty;
 
         /// <summary>
         /// Add a new user account to PubHub.
@@ -36,7 +35,7 @@ namespace PubHub.API.Controllers
                 .Where(a => a.Name.Equals(AccountTypeConstants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-            if (accountTypeId == 0)
+            if (accountTypeId == _invalidId)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
@@ -78,7 +77,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IResult GetUser(int id)
+        public IResult GetUser(Guid id)
         {
             var userModel = _context.Set<User>()
                 .Include(u => u.Account)
@@ -86,7 +85,7 @@ namespace PubHub.API.Controllers
                 .Select(u => new UserInfoModel()
                 {
                     Id = u.Id,
-                    Email = u.Account.Email,
+                    Email = u.Account!.Email,
                     Name = u.Name,
                     Surname = u.Surname,
                     Birthday = u.Birthday,
@@ -114,7 +113,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetBooksAsync(int id)
+        public async Task<IResult> GetBooksAsync(Guid id)
         {
             // Check if user exists.
             if (!await _context.Set<User>().AnyAsync(u => u.Id == id))
@@ -126,10 +125,11 @@ namespace PubHub.API.Controllers
 
             // Retreive all books.
             var bookModels = await _context.Set<UserBook>()
+                .Include(u => u.Book)
                 .Where(b => b.UserId == id)
                 .Select(b => new BookInfoModel()
                 {
-                    Title = b.Book.Title,
+                    Title = b.Book!.Title,
                     PublicationDate = b.Book.PublicationDate
                 })
                 .ToListAsync();
@@ -150,7 +150,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> UpdateUserAsync(int id, [FromBody] UserUpdateModel userUpdateModel)
+        public async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UserUpdateModel userUpdateModel)
         {
             // TODO (SIA): Validate model.
 
@@ -166,7 +166,7 @@ namespace PubHub.API.Controllers
             }
 
             // Update entry with new data.
-            user.Account.Email = userUpdateModel.Account.Email;
+            user.Account!.Email = userUpdateModel.Account.Email;
             user.Name = userUpdateModel.Name;
             user.Surname = userUpdateModel.Surname;
             user.Birthday = userUpdateModel.Birthday;
@@ -193,14 +193,14 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> DeleteUserAsync(int id)
+        public async Task<IResult> DeleteUserAsync(Guid id)
         {
             // Get account ID.
             var accountId = await _context.Set<User>()
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .FirstOrDefaultAsync();
-            if (accountId == INVALID_ID)
+            if (accountId == _invalidId)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
@@ -240,14 +240,14 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> SuspendUserAsync(int id)
+        public async Task<IResult> SuspendUserAsync(Guid id)
         {
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
                 .Where(a => a.Name.Equals(AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-            if (accountTypeId == INVALID_ID)
+            if (accountTypeId == default)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
@@ -259,7 +259,7 @@ namespace PubHub.API.Controllers
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
                 .FirstOrDefaultAsync();
-            if (accountId == INVALID_ID)
+            if (accountId == default)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,

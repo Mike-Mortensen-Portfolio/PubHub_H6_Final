@@ -24,8 +24,8 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new ContentType { Id = 1, Name = AUDIO_CONTENT_TYPE },
-                new ContentType { Id = 2, Name = E_BOOK_CONTENT_TYPE }
+                new ContentType { Id = Guid.Empty, Name = AUDIO_CONTENT_TYPE },
+                new ContentType { Id = Guid.Empty, Name = E_BOOK_CONTENT_TYPE }
             ];
 
             builder.HasData(Seeds);

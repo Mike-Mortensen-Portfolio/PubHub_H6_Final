@@ -8,7 +8,7 @@ using PubHub.API.Domain.Seeding;
 
 namespace PubHub.API.Domain
 {
-    public sealed class PubHubContext : IdentityDbContext<Account, IdentityRole<int>, int>
+    public sealed class PubHubContext : IdentityDbContext<Account, IdentityRole<Guid>, Guid>
     {
         private readonly string? _connectionString;
 
@@ -48,7 +48,8 @@ namespace PubHub.API.Domain
 
                 account.HasOne(a => a.AccountType)
                     .WithMany()
-                    .HasForeignKey(a => a.AccountTypeId);
+                    .HasForeignKey(a => a.AccountTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 account.Property(a => a.Email)
                     .HasMaxLength(EMAIL_MAX_LENGTH);
@@ -67,27 +68,27 @@ namespace PubHub.API.Domain
                 account.TypeToPluralTableName();
             });
 
-            builder.Entity<IdentityUserRole<int>>(accountRole =>
+            builder.Entity<IdentityUserRole<Guid>>(accountRole =>
             {
                 accountRole.ToTable("AccountRoles");
             });
 
-            builder.Entity<IdentityRole<int>>(role =>
+            builder.Entity<IdentityRole<Guid>>(role =>
             {
                 role.ToTable("Roles");
             });
 
-            builder.Entity<IdentityRoleClaim<int>>(roleClaim =>
+            builder.Entity<IdentityRoleClaim<Guid>>(roleClaim =>
             {
                 roleClaim.ToTable("RoleClaims");
             });
 
-            builder.Entity<IdentityUserClaim<int>>(accountClaim =>
+            builder.Entity<IdentityUserClaim<Guid>>(accountClaim =>
             {
                 accountClaim.ToTable("AccountClaims");
             });
 
-            builder.Entity<IdentityUserLogin<int>>(accountLogin =>
+            builder.Entity<IdentityUserLogin<Guid>>(accountLogin =>
             {
                 accountLogin.Property(al => al.UserId)
                     .HasColumnName("AccountId");
@@ -95,7 +96,7 @@ namespace PubHub.API.Domain
                 accountLogin.ToTable("AccountLogins");
             });
 
-            builder.Entity<IdentityUserToken<int>>(accountToken =>
+            builder.Entity<IdentityUserToken<Guid>>(accountToken =>
             {
                 accountToken.Property(at => at.UserId)
                     .HasColumnName("AccountId");
@@ -133,10 +134,12 @@ namespace PubHub.API.Domain
 
                 book.HasOne(b => b.Publisher)
                     .WithMany(b => b.Books)
-                    .HasForeignKey(b => b.PublisherId);
+                    .HasForeignKey(b => b.PublisherId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 book.HasOne(b => b.ContentType)
                     .WithMany()
-                    .HasForeignKey(b => b.ContentTypeId);
+                    .HasForeignKey(b => b.ContentTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 // Book has relations defined in BookAuthor.
                 // Book has relations defined in BookGenre.
                 // Book has relations defined in UserBook.
@@ -203,7 +206,8 @@ namespace PubHub.API.Domain
 
                 @operator.HasOne(o => o.Account)
                     .WithOne()
-                    .HasForeignKey<Operator>(u => u.AccountId);
+                    .HasForeignKey<Operator>(u => u.AccountId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 @operator.Property(o => o.Name)
                     .HasMaxLength(NAME_MAX_LENGTH);
@@ -221,7 +225,8 @@ namespace PubHub.API.Domain
 
                 publisher.HasOne(p => p.Account)
                     .WithOne()
-                    .HasForeignKey<Publisher>(u => u.AccountId);
+                    .HasForeignKey<Publisher>(u => u.AccountId)
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 publisher.Property(o => o.Name)
                     .HasMaxLength(NAME_MAX_LENGTH);
@@ -235,7 +240,8 @@ namespace PubHub.API.Domain
 
                 user.HasOne(u => u.Account)
                     .WithOne()
-                    .HasForeignKey<User>(u => u.AccountId);
+                    .HasForeignKey<User>(u => u.AccountId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 // User has relations defined in UserBook.
 
                 user.Property(o => o.Name)
@@ -255,13 +261,15 @@ namespace PubHub.API.Domain
                 userBook.HasOne(ub => ub.User)
                     .WithMany(u => u.UserBooks)
                     .HasForeignKey(ub => ub.UserId)
-                    .IsRequired(false);
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull);
                 userBook.HasOne(ub => ub.Book)
                     .WithMany(b => b.UserBooks)
                     .HasForeignKey(ub => ub.BookId);
                 userBook.HasOne(ub => ub.AccessType)
                     .WithMany()
-                    .HasForeignKey(ub => ub.AccessTypeId);
+                    .HasForeignKey(ub => ub.AccessTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 userBook.TypeToPluralTableName();
             });
@@ -301,30 +309,30 @@ namespace PubHub.API.Domain
             #endregion
 
             #region Seeding
-            var accessTypes = new AccessTypeSeed();
-            var accountTypes = new AccountTypeSeed();
-            var accounts = new AccountSeed(accountTypes);
-            var authors = new AuthorSeed();
-            var contentTypes = new ContentTypeSeed();
-            var publishers = new PublisherSeed(accounts);
-            var genres = new GenreSeed();
-            var books = new BookSeed(contentTypes, publishers, genres, authors);
-            var bookAuthors = new BookAuthorSeed(books, authors);
-            var bookGenres = new BookGenreSeed(books, genres);
-            var operators = new OperatorSeed(accounts);
-            var users = new UserSeed(accounts);
-
-            builder.ApplyConfiguration(accessTypes);
-            builder.ApplyConfiguration(accountTypes);
-            builder.ApplyConfiguration(accounts);
-            builder.ApplyConfiguration(authors);
-            builder.ApplyConfiguration(contentTypes);
-            builder.ApplyConfiguration(publishers);
-            builder.ApplyConfiguration(genres);
-            builder.ApplyConfiguration(books);
-            builder.ApplyConfiguration(bookAuthors);
-            builder.ApplyConfiguration(bookGenres);
-            builder.ApplyConfiguration(users);
+            //var accessTypes = new AccessTypeSeed();
+            //var accountTypes = new AccountTypeSeed();
+            //var accounts = new AccountSeed(accountTypes);
+            //var authors = new AuthorSeed();
+            //var contentTypes = new ContentTypeSeed();
+            //var publishers = new PublisherSeed(accounts);
+            //var genres = new GenreSeed();
+            //var books = new BookSeed(contentTypes, publishers, genres, authors);
+            //var bookAuthors = new BookAuthorSeed(books, authors);
+            //var bookGenres = new BookGenreSeed(books, genres);
+            //var operators = new OperatorSeed(accounts);
+            //var users = new UserSeed(accounts);
+            //
+            //builder.ApplyConfiguration(accessTypes);
+            //builder.ApplyConfiguration(accountTypes);
+            //builder.ApplyConfiguration(accounts);
+            //builder.ApplyConfiguration(authors);
+            //builder.ApplyConfiguration(contentTypes);
+            //builder.ApplyConfiguration(publishers);
+            //builder.ApplyConfiguration(genres);
+            //builder.ApplyConfiguration(books);
+            //builder.ApplyConfiguration(bookAuthors);
+            //builder.ApplyConfiguration(bookGenres);
+            //builder.ApplyConfiguration(users);
             #endregion
         }
     }

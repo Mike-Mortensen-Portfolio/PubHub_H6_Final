@@ -34,7 +34,7 @@ namespace PubHub.API.Controllers
                 .Where(a => a.Name.Equals(AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-            if (accountTypeId == 0)
+            if (accountTypeId == Guid.Empty)
             {
                 return Results.Problem(
                     statusCode: StatusCodes.Status500InternalServerError,
@@ -74,14 +74,14 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetPublisherAsync(int id)
+        public async Task<IResult> GetPublisherAsync(Guid id)
         {
             var publisherModel = await _context.Set<Publisher>()
                 .Include(p => p.Account)
                 .Select(p => new PublisherInfoModel()
                 {
                     Id = p.Id,
-                    Email = p.Account.Email,
+                    Email = p.Account.Email ?? string.Empty,
                     Name = p.Name
                 })
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -120,7 +120,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetBooksAsync(int id)
+        public async Task<IResult> GetBooksAsync(Guid id)
         {
             // Check if publisher exists.
             if (!await _context.Set<Publisher>().AnyAsync(u => u.Id == id))
@@ -132,7 +132,7 @@ namespace PubHub.API.Controllers
 
             // Retreive all books.
             var bookModels = await _context.Set<Book>()
-                .Where(b => b.Publisher.Id == id)
+                .Where(b => b.Publisher!.Id == id)
                 .Select(b => new BookInfoModel()
                 {
                     Title = b.Title,
@@ -156,7 +156,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> UpdatePublisherAsync(int id, [FromBody] PublisherUpdateModel publisherUpdateModel)
+        public async Task<IResult> UpdatePublisherAsync(Guid id, [FromBody] PublisherUpdateModel publisherUpdateModel)
         {
             // TODO (SIA): Validate model.
 
@@ -201,47 +201,47 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> DeletePublisherAsync(int id)
+        public async Task<IResult> DeletePublisherAsync(Guid id)
         {
-            const int INVALID_ID = 0;
-            const int NO_ACCOUNT = -1;
+            //const int INVALID_ID = 0;
+            //const int NO_ACCOUNT = -1;
 
-            // Get account ID.
-            var accountId = await _context.Set<Publisher>()
-                .Where(p => p.Id == id)
-                .Select(p => p.AccountId ?? NO_ACCOUNT)
-                .FirstOrDefaultAsync();
-            if (accountId == INVALID_ID)
-            {
-                return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"No publisher with ID: {id}");
-            }
-            if (accountId == NO_ACCOUNT)
-            {
-                return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"Publisher (ID: {id}) doesn't have an account.");
-            }
+            //// Get account ID.
+            //var accountId = await _context.Set<Publisher>()
+            //    .Where(p => p.Id == id)
+            //    .Select(p => p.AccountId ?? NO_ACCOUNT)
+            //    .FirstOrDefaultAsync();
+            //if (accountId == INVALID_ID)
+            //{
+            //    return Results.Problem(
+            //        statusCode: StatusCodes.Status404NotFound,
+            //        detail: $"No publisher with ID: {id}");
+            //}
+            //if (accountId == NO_ACCOUNT)
+            //{
+            //    return Results.Problem(
+            //        statusCode: StatusCodes.Status404NotFound,
+            //        detail: $"Publisher (ID: {id}) doesn't have an account.");
+            //}
 
-            // Delete account.
-            int updatedRows = await _context.Set<Account>()
-                .Where(u => u.Id == accountId)
-                .ExecuteUpdateAsync(u => u.SetProperty(u => u.DeletedDate, DateTime.UtcNow));
-            if (updatedRows < 1)
-            {
-                // Unable to delete; report back.
-                Dictionary<string, object?> extensions = new()
-                {
-                    ["PublisherId"] = id,
-                    ["AccountId"] = accountId
-                };
+            //// Delete account.
+            //int updatedRows = await _context.Set<Account>()
+            //    .Where(u => u.Id == accountId)
+            //    .ExecuteUpdateAsync(u => u.SetProperty(u => u.DeletedDate, DateTime.UtcNow));
+            //if (updatedRows < 1)
+            //{
+            //    // Unable to delete; report back.
+            //    Dictionary<string, object?> extensions = new()
+            //    {
+            //        ["PublisherId"] = id,
+            //        ["AccountId"] = accountId
+            //    };
 
-                return Results.Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to delete account (ID: {accountId}) of publisher (ID: {id}).",
-                    extensions: extensions);
-            }
+            //    return Results.Problem(
+            //        statusCode: StatusCodes.Status500InternalServerError,
+            //        detail: $"Unable to delete account (ID: {accountId}) of publisher (ID: {id}).",
+            //        extensions: extensions);
+            //}
 
             return Results.Ok();
         }

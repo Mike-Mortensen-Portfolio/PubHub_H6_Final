@@ -23,10 +23,10 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new AccountType { Id = 1, Name = USER_ACCOUNT_TYPE },
-                new AccountType { Id = 2, Name = PUBLISHER_ACCOUNT_TYPE },
-                new AccountType { Id = 3, Name = OPERATOR_ACCOUNT_TYPE },
-                new AccountType { Id = 4, Name = SUSPENDED_ACCOUNT_TYPE}
+                new AccountType { Id = Guid.Empty, Name = USER_ACCOUNT_TYPE },
+                new AccountType { Id = Guid.Empty, Name = PUBLISHER_ACCOUNT_TYPE },
+                new AccountType { Id = Guid.Empty, Name = OPERATOR_ACCOUNT_TYPE },
+                new AccountType { Id = Guid.Empty, Name = SUSPENDED_ACCOUNT_TYPE}
             ];
 
             builder.HasData(Seeds);

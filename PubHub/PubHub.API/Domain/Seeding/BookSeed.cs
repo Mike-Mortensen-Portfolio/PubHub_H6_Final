@@ -4,7 +4,7 @@ using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class BookSeed : SeedBase<Book, int>
+    public class BookSeed : SeedBase<Book, Guid>
     {
         private readonly ContentTypeSeed _contentTypeSeed;
         private readonly PublisherSeed _publisherSeed;
@@ -24,14 +24,14 @@ namespace PubHub.API.Domain.Seeding
         /// </summary>
         /// <param name="key">The ID of the <see cref="Book"/></param>
         /// <returns><inheritdoc/></returns>
-        public override Book this[int key] => Seeds.First(b => b.Id == key);
+        public override Book this[Guid key] => Seeds.First(b => b.Id == key);
 
         public override void Configure(EntityTypeBuilder<Book> builder)
         {
             Seeds =
             [
                 new Book {
-                    Id = 1,
+                    Id = Guid.Empty,
                     BookContent = [],
                     ContentTypeId = _contentTypeSeed[AUDIO_CONTENT_TYPE].Id,
                     Length = TimeSpan.FromHours (1).TotalSeconds,
@@ -40,7 +40,7 @@ namespace PubHub.API.Domain.Seeding
                     Title = "My day in the shoos of Tommy",
                 },
                 new Book {
-                    Id = 2,
+                    Id = Guid.Empty,
                     BookContent = [],
                     ContentTypeId = _contentTypeSeed[E_BOOK_CONTENT_TYPE].Id,
                     Length = 123,

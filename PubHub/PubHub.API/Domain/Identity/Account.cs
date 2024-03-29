@@ -3,11 +3,11 @@ using PubHub.API.Domain.Entities;
 
 namespace PubHub.API.Domain.Identity
 {
-    public sealed class Account : IdentityUser<int>
+    public sealed class Account : IdentityUser<Guid>
     {
         private readonly UpperInvariantLookupNormalizer _normalizer = new();
 
-        public required int AccountTypeId { get; set; }
+        public required Guid AccountTypeId { get; set; }
         /// <summary>
         /// Gets or sets the email for this user.
         /// <br/>
