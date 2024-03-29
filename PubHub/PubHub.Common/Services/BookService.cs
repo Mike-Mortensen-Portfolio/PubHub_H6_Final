@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Books;
-using PubHub.Common.Models.Users;
 
 namespace PubHub.Common.Services
 {
-    public class BookService : ServiceRoot
+    public class BookService : ServiceRoot, IBookService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         internal BookService(IHttpClientFactory clientFactory, string clientName) : base(clientFactory, clientName)
         {
-            _httpClientFactory = clientFactory;
-
             _serializerOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -30,11 +23,6 @@ namespace PubHub.Common.Services
 
         // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
-        /// <summary>
-        /// Calls the API enpoint to retrieve all books through the <see cref="BookInfoModel"/> filtered on the searchQuery.
-        /// </summary>
-        /// <param name="queryOptions">The query options that is requested.</param>
-        /// <returns>Returns a list of <see cref="BookInfoModel"/></returns>
         public async Task<List<BookInfoModel>> GetBooks(BookQuery queryOptions)
         {
             try
@@ -55,6 +43,7 @@ namespace PubHub.Common.Services
                 }
 
                 List<BookInfoModel>? bookInfoModel = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions);
+
                 if (bookInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
@@ -67,11 +56,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API end point for retrieving <see cref="BookInfoModel">, to use in the client applications.
-        /// </summary>
-        /// <param name="bookId">Id of the book we want information about.</param>
-        /// <returns></returns>
         public async Task<BookInfoModel?> GetBook(int bookId)
         {
             try
@@ -104,11 +88,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API endpoint for adding a <see cref="BookCreateModel"/> to the database.
-        /// </summary>
-        /// <param name="bookCreateModel">The <see cref="BookCreateModel"/> holding the new book.</param>
-        /// <returns>A status telling if a book was successfully added to the database.</returns>
         public async Task<ServiceInstanceResult<BookCreateModel>> AddBook(BookCreateModel bookCreateModel)
         {
             try
@@ -144,12 +123,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API endpoint for updating <see cref="BookUpdateModel"/> values in the database.
-        /// </summary>
-        /// <param name="bookId">The id of the book being updated.</param>
-        /// <param name="bookUpdateModel">The <see cref="BookUpdateModel"/> holding the updated values.</param>
-        /// <returns>A status telling if a book was successfully updated in the database.</returns>
         public async Task<ServiceInstanceResult<BookUpdateModel>> UpdateBook(int bookId, BookUpdateModel bookUpdateModel)
         {
             try
@@ -188,11 +161,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        /// <summary>
-        /// Calls the API endpoint to soft-delete a book./>
-        /// </summary>
-        /// <param name="bookId">The Id of the book who needs to be soft-deleted.</param>
-        /// <returns></returns>
         public async Task<ServiceResult> DeleteUser(int bookId)
         {
             try

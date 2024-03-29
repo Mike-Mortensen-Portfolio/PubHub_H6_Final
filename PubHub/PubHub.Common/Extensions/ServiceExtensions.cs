@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using PubHub.Common.ApiService;
 using PubHub.Common.Services;
-using System.Net.Http;
 
 namespace PubHub.Common.Extensions
 {
@@ -20,11 +20,20 @@ namespace PubHub.Common.Extensions
             if (apiOptions == null)
                 throw new ArgumentNullException(nameof(services), "Options cannot be empty.");
 
-            return services.AddTransient(provider =>
+            return services
+                .AddScopedApiService<IUserService, UserService>(apiOptions)
+                .AddScopedApiService<IBookService, BookService>(apiOptions)
+                .AddHttpClient(apiOptions.HttpClientName ?? "PubHubApi", options => { options.BaseAddress = new Uri(apiOptions.Address); }).Services;
+        }
+
+        private static IServiceCollection AddScopedApiService<TService, TConcrete>(this IServiceCollection services, ApiOptions apiOptions) where TConcrete : ServiceRoot, TService where TService : class
+        {
+            return services.AddScoped<TService, TConcrete>(provider =>
             {
                 var factory = provider.GetRequiredService<IHttpClientFactory>();
-                return new PubHubApiService(factory, apiOptions.HttpClientName ?? "PubHubApi");
-            }).AddHttpClient(apiOptions.HttpClientName ?? "PubHubApi", options => { options.BaseAddress = new Uri(apiOptions.Address); }).Services;
+                var instance = Activator.CreateInstance(typeof(TConcrete), [factory, apiOptions.HttpClientName ?? "PubHubApi"]) as TConcrete;
+                return instance!;
+            });
         }
-    }
+    }    
 }
