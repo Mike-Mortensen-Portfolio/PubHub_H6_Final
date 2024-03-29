@@ -30,9 +30,8 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="userCreateModel">The <see cref="UserCreateModel"/> holding the new user.</param>
         /// <returns>A status telling if a user was successfully added to the database.</returns>
-        public async Task<ServiceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
-        {
-            HttpStatusCode responseCode = HttpStatusCode.Unused;
+        public async Task<ServiceInstanceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
+        {            
             try
             {
                 if (userCreateModel == null)
@@ -47,7 +46,6 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.PostAsync("users", httpContent);
                 string content = await response.Content.ReadAsStringAsync();
-                responseCode = response.StatusCode;
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -58,12 +56,12 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return new ServiceResult<UserCreateModel>(response.StatusCode, userCreateModel, $"Successfully added the user: {userCreateModel.Name}");
+                return new ServiceInstanceResult<UserCreateModel>(response.StatusCode, userCreateModel, $"Successfully added the user: {userCreateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the user: {userCreateModel.Name}, ", ex.Message);
-                return new ServiceResult<UserCreateModel>(responseCode, userCreateModel, $"Failed to add the user: {userCreateModel.Name}");
+                return new ServiceInstanceResult<UserCreateModel>(HttpStatusCode.Unused, userCreateModel, $"Failed to add the user: {userCreateModel.Name}");
             }
         }
 
@@ -147,9 +145,8 @@ namespace PubHub.Common.Services
         /// <param name="userId">The id of the user being updated.</param>
         /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
         /// <returns>A status telling if a user was successfully updated in the database.</returns>
-        public async Task<ServiceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
-        {
-            HttpStatusCode responseCode = HttpStatusCode.Unused;
+        public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
+        {            
             try
             {
                 if (userId <= 0)
@@ -177,22 +174,21 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return new ServiceResult<UserUpdateModel>(response.StatusCode, userUpdateModel, $"Successfully updated the user: {userUpdateModel.Name}");
+                return new ServiceInstanceResult<UserUpdateModel>(response.StatusCode, userUpdateModel, $"Successfully updated the user: {userUpdateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to update the user: {userUpdateModel.Name}, ", ex.Message);
-                return new ServiceResult<UserUpdateModel>(responseCode, userUpdateModel, $"Failed to update the user: {userUpdateModel.Name}");
+                return new ServiceInstanceResult<UserUpdateModel>(HttpStatusCode.Unused, userUpdateModel, $"Failed to update the user: {userUpdateModel.Name}");
             }
         }
 
-        // TODO (JBN): return with the ServiceResult<T> class when we find out what needs to be done differently.
         /// <summary>
         /// Calls the API endpoint to soft-delete a user./>
         /// </summary>
         /// <param name="userId">The Id of the user who needs to be soft-deleted.</param>
         /// <returns></returns>
-        public async Task<string> DeleteUser(int userId)
+        public async Task<ServiceResult> DeleteUser(int userId)
         {
             try
             {
@@ -211,22 +207,21 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return $"Successfully deleted the user: {userId}";
+                return new ServiceResult(response.StatusCode, $"Successfully deleted the user: {userId}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to delete the user: {userId}, ", ex.Message);
-                return $"Failed to delete the user: {userId}";
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the user: {userId}");
             }
         }
 
-        // TODO (JBN): return with the ServiceResult<T> class when we find out what needs to be done differently.
         /// <summary>
         /// Calls the API endpoint to change the user's account type to suspended./>
         /// </summary>
         /// <param name="userId">The Id of the user who needs to have their account type as suspended.</param>
         /// <returns></returns>
-        public async Task<string> SuspendUser(int userId)
+        public async Task<ServiceResult> SuspendUser(int userId)
         {
             try
             {
@@ -245,12 +240,12 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return $"Successfully suspended the user: {userId}";
+                return new ServiceResult(response.StatusCode, $"Successfully suspended the user: {userId}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to suspend the user: {userId}, ", ex.Message);
-                return $"Failed to suspend the user: {userId}";
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to suspend the user: {userId}");
             }
         }
     }

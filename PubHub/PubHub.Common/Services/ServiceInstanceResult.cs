@@ -7,15 +7,17 @@ using System.Threading.Tasks;
 
 namespace PubHub.Common.Services
 {
-    public class ServiceResult 
-    {     
-        internal ServiceResult(HttpStatusCode statusCode, string errorDescriptor) 
+    public class ServiceInstanceResult<T>
+    {
+        internal ServiceInstanceResult(HttpStatusCode statusCode, T instance, string errorDescriptior) 
         {
             StatusCode = statusCode;
-            ErrorDescriptor = errorDescriptor;
+            Instance = instance;
+            ErrorDescriptor = errorDescriptior;
         }
 
         public HttpStatusCode StatusCode { get; }
+        public T Instance { get; set; }
         public string ErrorDescriptor { get; }
     }
 }
