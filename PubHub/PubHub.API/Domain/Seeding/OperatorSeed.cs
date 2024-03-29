@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -26,7 +27,7 @@ namespace PubHub.API.Domain.Seeding
             [
                 new Operator
                 {
-                    Id = 1,
+                    Id = UuidValueGenerator.Next(),
                     AccountId = _accountSeed[OPERATOR_EMAIL].Id,
                     Name = "Selena",
                     Surname = "Gomez"

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Identity;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -35,7 +36,7 @@ namespace PubHub.API.Domain.Seeding
             [
                 new Account
                 {
-                    Id = 1,
+                    Id = UuidValueGenerator.Next(),
                     AccountTypeId = _accountTypeSeed["User"].Id,
                     ConcurrencyStamp = "UserSeedConcurrencyStamp",
                     Email = USER_EMAIL,
@@ -46,7 +47,7 @@ namespace PubHub.API.Domain.Seeding
                 },
                 new Account
                 {
-                    Id = 2,
+                    Id = UuidValueGenerator.Next(),
                     AccountTypeId = _accountTypeSeed["Publisher"].Id,
                     ConcurrencyStamp = "PublisherSeedConcurrencyStamp",
                     Email = PUBLISHER_EMAIL,
@@ -57,7 +58,7 @@ namespace PubHub.API.Domain.Seeding
                 },
                 new Account
                 {
-                    Id = 3,
+                    Id = UuidValueGenerator.Next(),
                     AccountTypeId = _accountTypeSeed["Publisher"].Id,
                     ConcurrencyStamp = "Publisher2SeedConcurrencyStamp",
                     Email = PUBLISHER2_EMAIL,
@@ -68,7 +69,7 @@ namespace PubHub.API.Domain.Seeding
                 },
                 new Account
                 {
-                    Id = 4,
+                    Id = UuidValueGenerator.Next(),
                     AccountTypeId = _accountTypeSeed["Operator"].Id,
                     ConcurrencyStamp = "OperatorSeedConcurrencyStamp",
                     Email = OPERATOR_EMAIL,

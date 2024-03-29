@@ -3,11 +3,11 @@ using PubHub.API.Domain.Entities;
 
 namespace PubHub.API.Domain.Identity
 {
-    public sealed class Account : IdentityUser<int>
+    public sealed class Account : IdentityUser<Guid>
     {
         private readonly UpperInvariantLookupNormalizer _normalizer = new();
 
-        public required int AccountTypeId { get; set; }
+        public required Guid AccountTypeId { get; set; }
         /// <summary>
         /// Gets or sets the email for this user.
         /// <br/>
@@ -16,7 +16,7 @@ namespace PubHub.API.Domain.Identity
         /// <br/>UserName
         /// <br/>NormalizedUserName
         /// </summary>
-        new public required string Email
+        public new required string Email
         {
             get
             {
@@ -66,7 +66,7 @@ namespace PubHub.API.Domain.Identity
             }
         }
         public DateTime? LastSignIn { get; set; }
-        public bool IsDeleted { get; set; }
+        public DateTime? DeletedDate { get; set; }
 
         #region Navs
         public AccountType AccountType { get; set; } = null!;

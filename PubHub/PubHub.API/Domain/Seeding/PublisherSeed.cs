@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -26,13 +27,13 @@ namespace PubHub.API.Domain.Seeding
             [
                 new Publisher
                 {
-                    Id = 1,
+                    Id = UuidValueGenerator.Next(),
                     AccountId = _accountSeed[PUBLISHER_EMAIL].Id,
                     Name = "Gyldendal"
                 },
                 new Publisher
                 {
-                    Id = 2,
+                    Id = UuidValueGenerator.Next(),
                     AccountId = _accountSeed[PUBLISHER2_EMAIL].Id,
                     Name = "Forlaget Als"
                 }

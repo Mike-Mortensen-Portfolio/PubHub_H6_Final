@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 
 namespace PubHub.API.Domain.Seeding
 {
@@ -19,26 +20,26 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new Genre { Id = 1, Name = "Romance" },
-                new Genre { Id = 2, Name = "Horror" },
-                new Genre { Id = 3, Name = "History" },
-                new Genre { Id = 4, Name = "Science-Fiction" },
-                new Genre { Id = 5, Name = "Fiction" },
-                new Genre { Id = 6, Name = "Novel" },
-                new Genre { Id = 7, Name = "Fantasy" },
-                new Genre { Id = 8, Name = "Biography" },
-                new Genre { Id = 9, Name = "True crime" },
-                new Genre { Id = 10, Name = "Thriller" },
-                new Genre { Id = 11, Name = "Young adult" },
-                new Genre { Id = 12, Name = "Mystery" },
-                new Genre { Id = 13, Name = "Satire" },
-                new Genre { Id = 14, Name = "Non-Fiction" },
-                new Genre { Id = 15, Name = "Self-help" },
-                new Genre { Id = 16, Name = "Poetry" },
-                new Genre { Id = 17, Name = "Humor" },
-                new Genre { Id = 18, Name = "Action" },
-                new Genre { Id = 19, Name = "Adventure" },
-                new Genre { Id = 20, Name = "Short story" }
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Romance" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Horror" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "History" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Science-Fiction" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Fiction" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Novel" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Fantasy" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Biography" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "True crime" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Thriller" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Young adult" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Mystery" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Satire" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Non-Fiction" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Self-help" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Poetry" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Humor" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Action" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Adventure" },
+                new Genre { Id = UuidValueGenerator.Next(), Name = "Short story" }
             ];
 
             builder.HasData(Seeds);

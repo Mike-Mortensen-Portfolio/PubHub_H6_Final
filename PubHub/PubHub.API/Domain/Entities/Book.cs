@@ -2,9 +2,9 @@
 {
     public class Book
     {
-        public int Id { get; set; }
-        public int ContentTypeId { get; set; }
-        public int PublisherId { get; set; }
+        public Guid Id { get; set; }
+        public Guid ContentTypeId { get; set; }
+        public Guid PublisherId { get; set; }
         public required string Title { get; set; }
         public byte[]? CoverImage { get; set; }
         public required byte[] BookContent { get; set; }
