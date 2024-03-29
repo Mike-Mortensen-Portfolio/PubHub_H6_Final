@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PubHub.API.Domain.UUID;
 using System.Reflection;
+using UUIDNext.Generator;
 
 namespace PubHub.API.Domain.Extensions
 {
@@ -18,7 +20,8 @@ namespace PubHub.API.Domain.Extensions
             {
                 var type = typeof(T);
                 entityTypeBuilder.Property(propertyInfo.PropertyType, propertyInfo.Name)
-                    .HasColumnName($"{type.Name}Id");
+                    .HasColumnName($"{type.Name}Id")
+                    .HasValueGenerator<UuidValueGenerator>();
                 entityTypeBuilder.HasKey(propertyInfo.Name);
             }
 

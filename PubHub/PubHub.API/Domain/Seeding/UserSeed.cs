@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
-using System.Reflection.Metadata.Ecma335;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -26,7 +26,7 @@ namespace PubHub.API.Domain.Seeding
             [
                 new User
                 {
-                    Id = Guid.Empty,
+                    Id = UuidValueGenerator.Next(),
                     AccountId = _accountSeed[USER_EMAIL].Id,
                     Birthday = new DateOnly (1993, 4, 12),
                     Name = "Thomas",

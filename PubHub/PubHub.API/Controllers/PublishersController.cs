@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
-using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models;
 
@@ -31,7 +30,7 @@ namespace PubHub.API.Controllers
 
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Where(a => a.Name.ToLower() == AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE)
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
             if (accountTypeId == Guid.Empty)

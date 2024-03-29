@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -23,10 +24,10 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new AccessType { Id = Guid.Empty, Name = OWNER_ACCESS_TYPE },
-                new AccessType { Id = Guid.Empty, Name = SUBSCIBER_ACCESS_TYPE },
-                new AccessType { Id = Guid.Empty, Name = BORROWER_ACCESS_TYPE },
-                new AccessType { Id = Guid.Empty, Name = EXPIRED_ACCESS_TYPE }
+                new AccessType { Id = UuidValueGenerator.Next(), Name = OWNER_ACCESS_TYPE },
+                new AccessType { Id = UuidValueGenerator.Next(), Name = SUBSCIBER_ACCESS_TYPE },
+                new AccessType { Id = UuidValueGenerator.Next(), Name = BORROWER_ACCESS_TYPE },
+                new AccessType { Id = UuidValueGenerator.Next(), Name = EXPIRED_ACCESS_TYPE }
             ];
 
             builder.HasData(Seeds);

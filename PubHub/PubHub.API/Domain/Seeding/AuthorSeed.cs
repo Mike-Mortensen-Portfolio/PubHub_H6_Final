@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 
 namespace PubHub.API.Domain.Seeding
 {
@@ -16,9 +17,9 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new Author {Id = Guid.Empty, Name = "Jhon Doe"},
-                new Author {Id = Guid.Empty, Name = "Jane Doe"},
-                new Author {Id = Guid.Empty, Name = "Dan Turéll"}
+                new Author {Id = UuidValueGenerator.Next(), Name = "Jhon Doe"},
+                new Author {Id = UuidValueGenerator.Next(), Name = "Jane Doe"},
+                new Author {Id = UuidValueGenerator.Next(), Name = "Dan Turéll"}
             ];
 
             builder.HasData(Seeds);

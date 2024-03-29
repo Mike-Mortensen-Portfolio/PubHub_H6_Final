@@ -16,7 +16,7 @@ namespace PubHub.API.Domain.Identity
         /// <br/>UserName
         /// <br/>NormalizedUserName
         /// </summary>
-        new public required string Email
+        public new required string Email
         {
             get
             {

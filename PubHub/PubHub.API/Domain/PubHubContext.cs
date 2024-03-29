@@ -256,7 +256,7 @@ namespace PubHub.API.Domain
 
             builder.Entity<UserBook>(userBook =>
             {
-                userBook.HasKey(ub => new { ub.BookId, ub.UserId, ub.AccessTypeId });
+                userBook.ConfigureId();
 
                 userBook.HasOne(ub => ub.User)
                     .WithMany(u => u.UserBooks)
@@ -265,7 +265,8 @@ namespace PubHub.API.Domain
                     .OnDelete(DeleteBehavior.SetNull);
                 userBook.HasOne(ub => ub.Book)
                     .WithMany(b => b.UserBooks)
-                    .HasForeignKey(ub => ub.BookId);
+                    .HasForeignKey(ub => ub.BookId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 userBook.HasOne(ub => ub.AccessType)
                     .WithMany()
                     .HasForeignKey(ub => ub.AccessTypeId)
@@ -309,30 +310,30 @@ namespace PubHub.API.Domain
             #endregion
 
             #region Seeding
-            //var accessTypes = new AccessTypeSeed();
-            //var accountTypes = new AccountTypeSeed();
-            //var accounts = new AccountSeed(accountTypes);
-            //var authors = new AuthorSeed();
-            //var contentTypes = new ContentTypeSeed();
-            //var publishers = new PublisherSeed(accounts);
-            //var genres = new GenreSeed();
-            //var books = new BookSeed(contentTypes, publishers, genres, authors);
-            //var bookAuthors = new BookAuthorSeed(books, authors);
-            //var bookGenres = new BookGenreSeed(books, genres);
-            //var operators = new OperatorSeed(accounts);
-            //var users = new UserSeed(accounts);
-            //
-            //builder.ApplyConfiguration(accessTypes);
-            //builder.ApplyConfiguration(accountTypes);
-            //builder.ApplyConfiguration(accounts);
-            //builder.ApplyConfiguration(authors);
-            //builder.ApplyConfiguration(contentTypes);
-            //builder.ApplyConfiguration(publishers);
-            //builder.ApplyConfiguration(genres);
-            //builder.ApplyConfiguration(books);
-            //builder.ApplyConfiguration(bookAuthors);
-            //builder.ApplyConfiguration(bookGenres);
-            //builder.ApplyConfiguration(users);
+            var accessTypes = new AccessTypeSeed();
+            var accountTypes = new AccountTypeSeed();
+            var accounts = new AccountSeed(accountTypes);
+            var authors = new AuthorSeed();
+            var contentTypes = new ContentTypeSeed();
+            var publishers = new PublisherSeed(accounts);
+            var genres = new GenreSeed();
+            var books = new BookSeed(contentTypes, publishers, genres, authors);
+            var bookAuthors = new BookAuthorSeed(books, authors);
+            var bookGenres = new BookGenreSeed(books, genres);
+            var operators = new OperatorSeed(accounts);
+            var users = new UserSeed(accounts);
+            
+            builder.ApplyConfiguration(accessTypes);
+            builder.ApplyConfiguration(accountTypes);
+            builder.ApplyConfiguration(accounts);
+            builder.ApplyConfiguration(authors);
+            builder.ApplyConfiguration(contentTypes);
+            builder.ApplyConfiguration(publishers);
+            builder.ApplyConfiguration(genres);
+            builder.ApplyConfiguration(books);
+            builder.ApplyConfiguration(bookAuthors);
+            builder.ApplyConfiguration(bookGenres);
+            builder.ApplyConfiguration(users);
             #endregion
         }
     }

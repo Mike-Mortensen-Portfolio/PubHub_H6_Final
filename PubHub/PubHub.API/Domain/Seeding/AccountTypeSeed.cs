@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -23,10 +24,10 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new AccountType { Id = Guid.Empty, Name = USER_ACCOUNT_TYPE },
-                new AccountType { Id = Guid.Empty, Name = PUBLISHER_ACCOUNT_TYPE },
-                new AccountType { Id = Guid.Empty, Name = OPERATOR_ACCOUNT_TYPE },
-                new AccountType { Id = Guid.Empty, Name = SUSPENDED_ACCOUNT_TYPE}
+                new AccountType { Id = UuidValueGenerator.Next(), Name = USER_ACCOUNT_TYPE },
+                new AccountType { Id = UuidValueGenerator.Next(), Name = PUBLISHER_ACCOUNT_TYPE },
+                new AccountType { Id = UuidValueGenerator.Next(), Name = OPERATOR_ACCOUNT_TYPE },
+                new AccountType { Id = UuidValueGenerator.Next(), Name = SUSPENDED_ACCOUNT_TYPE}
             ];
 
             builder.HasData(Seeds);

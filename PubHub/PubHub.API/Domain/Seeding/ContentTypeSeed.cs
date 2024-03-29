@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -24,8 +25,8 @@ namespace PubHub.API.Domain.Seeding
         {
             Seeds =
             [
-                new ContentType { Id = Guid.Empty, Name = AUDIO_CONTENT_TYPE },
-                new ContentType { Id = Guid.Empty, Name = E_BOOK_CONTENT_TYPE }
+                new ContentType { Id = UuidValueGenerator.Next(), Name = AUDIO_CONTENT_TYPE },
+                new ContentType { Id = UuidValueGenerator.Next(), Name = E_BOOK_CONTENT_TYPE }
             ];
 
             builder.HasData(Seeds);

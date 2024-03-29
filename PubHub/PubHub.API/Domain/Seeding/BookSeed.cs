@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
@@ -31,7 +32,7 @@ namespace PubHub.API.Domain.Seeding
             Seeds =
             [
                 new Book {
-                    Id = Guid.Empty,
+                    Id = UuidValueGenerator.Next(),
                     BookContent = [],
                     ContentTypeId = _contentTypeSeed[AUDIO_CONTENT_TYPE].Id,
                     Length = TimeSpan.FromHours (1).TotalSeconds,
@@ -40,7 +41,7 @@ namespace PubHub.API.Domain.Seeding
                     Title = "My day in the shoos of Tommy",
                 },
                 new Book {
-                    Id = Guid.Empty,
+                    Id = UuidValueGenerator.Next(),
                     BookContent = [],
                     ContentTypeId = _contentTypeSeed[E_BOOK_CONTENT_TYPE].Id,
                     Length = 123,

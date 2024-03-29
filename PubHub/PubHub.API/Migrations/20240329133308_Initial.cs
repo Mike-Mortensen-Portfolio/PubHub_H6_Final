@@ -368,15 +368,16 @@ namespace PubHub.API.Migrations
                 name: "UserBooks",
                 columns: table => new
                 {
+                    UserBookId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BookId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     AccessTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProgressInProcent = table.Column<float>(type: "real", nullable: false),
                     AcquireDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserBooks", x => new { x.BookId, x.UserId, x.AccessTypeId });
+                    table.PrimaryKey("PK_UserBooks", x => x.UserBookId);
                     table.ForeignKey(
                         name: "FK_UserBooks_AccessTypes_AccessTypeId",
                         column: x => x.AccessTypeId,
@@ -483,6 +484,11 @@ namespace PubHub.API.Migrations
                 name: "IX_UserBooks_AccessTypeId",
                 table: "UserBooks",
                 column: "AccessTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserBooks_BookId",
+                table: "UserBooks",
+                column: "BookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserBooks_UserId",
