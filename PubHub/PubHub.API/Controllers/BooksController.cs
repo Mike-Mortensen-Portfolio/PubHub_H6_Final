@@ -74,7 +74,6 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetBook(Guid id)
         {
             var query = _context.Set<Book>()
@@ -134,7 +133,6 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ProblemDetails))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
         public async Task<IResult> AddBook([FromBody] BookCreateModel createModel)
         {
             var books = _context.Set<Book>();
@@ -283,7 +281,6 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
         public async Task<IResult> UpdateBook(Guid id, [FromBody] BookUpdateModel updateModel)
         {
             //  TODO (MSM)  Implement updates on genres and authors
@@ -295,7 +292,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                         statusCode: NotFoundSpecification.STATUS_CODE,
                         title: NotFoundSpecification.TITLE,
-                        detail: "No book with the given ID was be found.",
+                        detail: "No book with the given ID was found.",
                         extensions: new Dictionary<string, object?>
                         {
                             { "Id", id }
