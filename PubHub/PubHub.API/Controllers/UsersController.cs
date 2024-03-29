@@ -200,7 +200,7 @@ namespace PubHub.API.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> UpdateUserAsync(int id, [FromBody] UserUpdateModel userUpdateModel)
+        public async Task<IResult> UpdateUserAsync(int id, [FromBody] Common.Models.Users.BookUpdateModel userUpdateModel)
         {
             // TODO (SIA): Validate model.
 

@@ -1,5 +1,7 @@
 ﻿using PubHub.Common.ApiService;
 using PubHub.Common.Models;
+using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Users;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -140,10 +142,10 @@ namespace PubHub.Common.Services
         }
 
         /// <summary>
-        /// Calls the API endpoint for updating <see cref="UserUpdateModel"/> values in the database.
+        /// Calls the API endpoint for updating <see cref="Models.Users.BookUpdateModel"/> values in the database.
         /// </summary>
         /// <param name="userId">The id of the user being updated.</param>
-        /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
+        /// <param name="userUpdateModel">The <see cref="Models.Users.BookUpdateModel"/> holding the updated values.</param>
         /// <returns>A status telling if a user was successfully updated in the database.</returns>
         public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
         {            
@@ -195,7 +197,7 @@ namespace PubHub.Common.Services
                 if (userId <= 0)
                     throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
 
-                HttpResponseMessage response = await Client.DeleteAsync("users");
+                HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -228,7 +230,7 @@ namespace PubHub.Common.Services
                 if (userId <= 0)
                     throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
 
-                HttpResponseMessage response = await Client.DeleteAsync("users");
+                HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}/suspend-user");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
