@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
@@ -7,6 +8,7 @@ using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
+using PubHub.Common.Models.Users;
 
 namespace PubHub.API.Controllers
 {
@@ -14,55 +16,22 @@ namespace PubHub.API.Controllers
     [Route("[controller]")]
     public class PublishersController(PubHubContext context) : Controller
     {
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         private readonly PubHubContext _context = context;
 
         /// <summary>
-        /// Add a new publisher account to PubHub.
+        /// Get a list of all publishers.
         /// </summary>
-        /// <param name="publisherCreateModel">Publisher information.</param>
-        /// <response code="200">Success. A new publisher account was created.</response>
-        /// <response code="400">Invalid model data or format.</response>
-        /// <response code="500">Unexpected error.</response>
-        [HttpPost()]
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> AddPublisherAsync([FromBody] PublisherCreateModel publisherCreateModel)
+        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
         {
-            // TODO (SIA): Validate model.
+            var publishers = await _context.Set<Publisher>()
+                .Filter(query)
+                .ToArrayAsync();
 
-            // Get account type ID.
-            var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
-                .Select(a => a.Id)
-                .FirstOrDefaultAsync();
-            if (accountTypeId == 0)
-            {
-                return Results.Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to find account type: '{AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE}'");
-            }
-
-            // Create publisher account.
-            // TODO (SIA): Add more account related data to fully set up an account.
-            await _context.Set<Publisher>()
-                .AddAsync(new Publisher()
-                {
-                    Name = publisherCreateModel.Name,
-                    Account = new()
-                    {
-                        Email = publisherCreateModel.Account.Email,
-                        AccountTypeId = accountTypeId
-                    }
-                });
-            if (!(await _context.SaveChangesAsync() > 0))
-            {
-                return Results.Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to save changes to the database.");
-            }
-
-            return Results.Ok();
+            return Results.Ok(publishers);
         }
 
         /// <summary>
@@ -98,18 +67,65 @@ namespace PubHub.API.Controllers
         }
 
         /// <summary>
-        /// Get a list of all publishers.
+        /// Add a new publisher account to PubHub.
         /// </summary>
-        [HttpGet()]
+        /// <param name="publisherCreateModel">Publisher information.</param>
+        /// <response code="200">Success. A new publisher account was created.</response>
+        /// <response code="400">Invalid model data or format.</response>
+        /// <response code="500">Unexpected error.</response>
+        [HttpPost()]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
+        public async Task<IResult> AddPublisherAsync([FromBody] PublisherCreateModel publisherCreateModel)
         {
-            var publishers = await _context.Set<Publisher>()
-                .Filter(query)
-                .ToArrayAsync();
+            // TODO (SIA): Validate model.
 
-            return Results.Ok(publishers);
+            var existingpublisher = await _context.Users.
+                FirstOrDefaultAsync(account => account.NormalizedEmail == publisherCreateModel.Account.Email.ToUpperInvariant());
+
+            if (existingpublisher is not null)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching publisher already exists",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", existingpublisher.Id}
+                    });
+
+            // Get account type ID.
+            var accountTypeId = await _context.Set<AccountType>()
+                .Where(a => a.Name.Equals(AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+
+            if (accountTypeId == 0)
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to find account type: '{AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE}'");
+
+            // Create publisher account.
+            // TODO (SIA): Add more account related data to fully set up an account.
+            await _context.Set<Publisher>()
+                .AddAsync(new Publisher()
+                {
+                    Name = publisherCreateModel.Name,
+                    Account = new()
+                    {
+                        Email = publisherCreateModel.Account.Email,
+                        AccountTypeId = accountTypeId
+                    }
+                });
+            if (!(await _context.SaveChangesAsync() > 0))
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: $"Unable to save changes to the database.");
+            }
+
+            return Results.Ok();
         }
 
         /// <summary>
@@ -139,7 +155,7 @@ namespace PubHub.API.Controllers
                 .Include(b => b!.BookGenres)
                     .ThenInclude(bg => bg.Genre)
                 .Include(b => b.BookAuthors)
-                    .ThenInclude (ba => ba.Author)
+                    .ThenInclude(ba => ba.Author)
                 .Include(b => b.ContentType)
                 .Where(b => b.Publisher!.Id == id)
                 .Select(book => new BookInfoModel()

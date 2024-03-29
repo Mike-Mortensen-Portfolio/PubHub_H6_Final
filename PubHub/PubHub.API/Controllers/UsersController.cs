@@ -16,74 +16,8 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class UsersController(PubHubContext context) : Controller
     {
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         private readonly PubHubContext _context = context;
-
-        /// <summary>
-        /// Add a new user account to PubHub.
-        /// </summary>
-        /// <param name="userCreateModel">User information.</param>
-        /// <response code="200">Success. A new user account was created.</response>
-        /// <response code="400">Invalid model data or format.</response>
-        /// <response code="500">Unexpected error.</response>
-        [HttpPost()]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserInfoModel))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
-        public async Task<IResult> AddUserAsync([FromBody] UserCreateModel userCreateModel)
-        {
-            // TODO (SIA): Validate model.
-
-            // Get account type Id.
-            var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(AccountTypeConstants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
-                .Select(a => a.Id)
-                .FirstOrDefaultAsync();
-            if (accountTypeId == INVALID_ENTITY_ID)
-            {
-                return Results.Problem(
-                    statusCode: UnprocessableEntitySpecification.STATUS_CODE,
-                    title: UnprocessableEntitySpecification.TITLE,
-                    detail: $"Unable to find account type: '{AccountTypeConstants.USER_ACCOUNT_TYPE}'",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        {"Id", accountTypeId }
-                    });
-            }
-
-            // Create user account.
-            // TODO (SIA): Add more account related data to fully set up an account.
-            var newUser = new User()
-            {
-                Name = userCreateModel.Name,
-                Surname = userCreateModel.Surname,
-                Birthday = userCreateModel.Birthday,
-                Account = new()
-                {
-                    Email = userCreateModel.Account.Email,
-                    AccountTypeId = accountTypeId
-                }
-            };
-
-            await _context.Set<User>()
-                .AddAsync(newUser);
-
-            if (!(await _context.SaveChangesAsync() > 0))
-            {
-                return Results.Problem(
-                        statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                        title: InternalServerErrorSpecification.TITLE,
-                        detail: "Something went wrong and the user couldn't be created. Please try again.",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"User", newUser}
-                        });
-            }
-
-            newUser = await _context.Set<User>()
-                .Include(user => user.Account)
-                .FirstOrDefaultAsync(user => user.Account!.NormalizedEmail == newUser.Account.NormalizedEmail);
-
-            return Results.Created($"users/{newUser!.Id}", newUser);
-        }
 
         /// <summary>
         /// Get all general information about a specific user.
@@ -123,6 +57,86 @@ namespace PubHub.API.Controllers
             }
 
             return Results.Ok(userModel);
+        }
+
+        /// <summary>
+        /// Add a new user account to PubHub.
+        /// </summary>
+        /// <param name="userCreateModel">User information.</param>
+        /// <response code="200">Success. A new user account was created.</response>
+        /// <response code="400">Invalid model data or format.</response>
+        /// <response code="500">Unexpected error.</response>
+        [HttpPost()]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserInfoModel))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        public async Task<IResult> AddUserAsync([FromBody] UserCreateModel userCreateModel)
+        {
+            // TODO (SIA): Validate model.
+
+            var existingUser = await _context.Users.
+                FirstOrDefaultAsync(account => account.NormalizedEmail == userCreateModel.Account.Email.ToUpperInvariant());
+
+            if (existingUser is not null)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching user already exists",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", existingUser.Id}
+                    });
+
+            // Get account type Id.
+            var accountTypeId = await _context.Set<AccountType>()
+                .Where(a => a.Name.Equals(AccountTypeConstants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+
+            if (accountTypeId == INVALID_ENTITY_ID)
+                return Results.Problem(
+                    statusCode: UnprocessableEntitySpecification.STATUS_CODE,
+                    title: UnprocessableEntitySpecification.TITLE,
+                    detail: $"Unable to find account type: '{AccountTypeConstants.USER_ACCOUNT_TYPE}'",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", accountTypeId }
+                    });
+
+            // Create user account.
+            // TODO (SIA): Add more account related data to fully set up an account.
+            var newUser = new User()
+            {
+                Name = userCreateModel.Name,
+                Surname = userCreateModel.Surname,
+                Birthday = userCreateModel.Birthday,
+                Account = new()
+                {
+                    Email = userCreateModel.Account.Email,
+                    AccountTypeId = accountTypeId
+                }
+            };
+
+            await _context.Set<User>()
+                .AddAsync(newUser);
+
+            if (!(await _context.SaveChangesAsync() > 0))
+            {
+                return Results.Problem(
+                        statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                        title: InternalServerErrorSpecification.TITLE,
+                        detail: "Something went wrong and the user couldn't be created. Please try again.",
+                        extensions: new Dictionary<string, object?>
+                        {
+                            {"User", newUser}
+                        });
+            }
+
+            newUser = await _context.Set<User>()
+                .Include(user => user.Account)
+                .FirstOrDefaultAsync(user => user.Account!.NormalizedEmail == newUser.Account.NormalizedEmail);
+
+            return Results.Created($"users/{newUser!.Id}", newUser);
         }
 
         /// <summary>
