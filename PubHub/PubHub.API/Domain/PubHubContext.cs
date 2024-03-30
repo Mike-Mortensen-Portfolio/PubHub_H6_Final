@@ -37,7 +37,7 @@ namespace PubHub.API.Domain
             const int TYPE_NAME_MAX_LENGTH = 128;
             const int EMAIL_MAX_LENGTH = 256;
             const int USERNAME_MAX_LENGTH = 256;
-            const int BOOK_TITLE_MAX_LENGTH = 258;
+            const int BOOK_TITLE_MAX_LENGTH = 256;
 
             base.OnModelCreating(builder);
 
