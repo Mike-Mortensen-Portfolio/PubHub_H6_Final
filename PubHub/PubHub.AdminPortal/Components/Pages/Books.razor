@@ -1,0 +1,81 @@
+﻿@page "/Books"
+@inherits ComponentBase
+
+<PageTitle>Publisher's books</PageTitle>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-10">
+            <h1 class="text-center">Publisher name's books</h1>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
+        </div>
+        @if (showCreateModal)
+        {
+            <CreateBookModal OnClose="() => OnCreateDialogClose()"></CreateBookModal>
+        }
+        else if (showUpdateModal)
+        {
+            <UpdateBookModal OnClose="() => OnUpdateDialogClose()"></UpdateBookModal>
+        }
+        else if (showRemoveModal)
+        {
+            <RemoveBookModal OnClose="() => OnRemoveDialogClose()"></RemoveBookModal>
+        }
+    </div>
+    <div class="row text-center">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Publication year</th>
+                    <th scope="col">Administration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Title</td>
+                    <td>Year</td>
+                    <td>
+                        <div class="combined-item">
+                            <button class="btn btn-warning" @onclick="() => showUpdateModal = true">Update</button>
+                            <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    bool showCreateModal;
+    bool showUpdateModal;
+    bool showRemoveModal;
+    public EventCallback<bool> OnClose { get; set; }
+
+    #region Dialog closing methods.
+    private async Task OnCreateDialogClose()
+    {
+        showCreateModal = false;
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async Task OnUpdateDialogClose()
+    {
+        showUpdateModal = false;
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async Task OnRemoveDialogClose()
+    {
+        showRemoveModal = false;
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+    #endregion
+}

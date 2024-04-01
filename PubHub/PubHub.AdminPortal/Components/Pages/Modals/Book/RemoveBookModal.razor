@@ -1,0 +1,34 @@
+﻿<div class="modal fade show" id="removeBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">You're about to remove: bind to book title...</h4>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+            </div>
+            <EditForm Model="MyEditForm">
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="removeBookTitleInput" class="form-label">Are you sure you wish to delete this book: Bind to book title.</label>
+                    </div>                    
+                </div>
+            </EditForm>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger">Remove</button>
+                <button type="button" class="btn btn-success" @onclick="() => ModalOptions(false)">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    public EditForm MyEditForm { get; set; } = new();
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}
