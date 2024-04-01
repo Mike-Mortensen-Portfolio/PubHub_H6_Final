@@ -2,8 +2,8 @@
 {
     public class BookAuthor
     {
-        public int BookId { get; set; }
-        public int AuthorId { get; set; }
+        public Guid BookId { get; set; }
+        public Guid AuthorId { get; set; }
 
         #region Navs
         public Book? Book { get; set; }

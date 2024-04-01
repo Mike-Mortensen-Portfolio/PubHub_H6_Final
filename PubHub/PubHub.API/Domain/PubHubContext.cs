@@ -5,11 +5,10 @@ using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
 using PubHub.API.Domain.Seeding;
-using System.Reflection.Emit;
 
 namespace PubHub.API.Domain
 {
-    public sealed class PubHubContext : IdentityDbContext<Account, IdentityRole<int>, int>
+    public sealed class PubHubContext : IdentityDbContext<Account, IdentityRole<Guid>, Guid>
     {
         private readonly string? _connectionString;
 
@@ -34,6 +33,12 @@ namespace PubHub.API.Domain
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            const int NAME_MAX_LENGTH = 128;
+            const int TYPE_NAME_MAX_LENGTH = 128;
+            const int EMAIL_MAX_LENGTH = 256;
+            const int USERNAME_MAX_LENGTH = 256;
+            const int BOOK_TITLE_MAX_LENGTH = 256;
+
             base.OnModelCreating(builder);
 
             #region Identity
@@ -42,43 +47,59 @@ namespace PubHub.API.Domain
                 account.ConfigureId();
 
                 account.HasOne(a => a.AccountType)
-                    .WithMany();
+                    .WithMany()
+                    .HasForeignKey(a => a.AccountTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                account.Property(a => a.Email)
+                    .HasMaxLength(EMAIL_MAX_LENGTH);
+                account.Property(a => a.NormalizedEmail)
+                    .HasMaxLength(EMAIL_MAX_LENGTH);
+                account.Property(a => a.UserName)
+                    .HasMaxLength(USERNAME_MAX_LENGTH);
+                account.Property(a => a.UserName)
+                    .HasMaxLength(USERNAME_MAX_LENGTH);
+
+                account.HasIndex(a => a.Email)
+                    .IsUnique();
+
+                account.HasQueryFilter(a => a.DeletedDate != null);
 
                 account.TypeToPluralTableName();
             });
 
-            builder.Entity<IdentityUserRole<int>>(accountRole =>
+            builder.Entity<IdentityUserRole<Guid>>(accountRole =>
             {
                 accountRole.ToTable("AccountRoles");
             });
 
-            builder.Entity<IdentityRole<int>>(role =>
+            builder.Entity<IdentityRole<Guid>>(role =>
             {
                 role.ToTable("Roles");
             });
 
-            builder.Entity<IdentityRoleClaim<int>>(roleClaim =>
+            builder.Entity<IdentityRoleClaim<Guid>>(roleClaim =>
             {
                 roleClaim.ToTable("RoleClaims");
             });
 
-            builder.Entity<IdentityUserClaim<int>>(accountClaim =>
+            builder.Entity<IdentityUserClaim<Guid>>(accountClaim =>
             {
                 accountClaim.ToTable("AccountClaims");
             });
 
-            builder.Entity<IdentityUserLogin<int>>(accountLogin =>
+            builder.Entity<IdentityUserLogin<Guid>>(accountLogin =>
             {
                 accountLogin.Property(al => al.UserId)
-                .HasColumnName("AccountId");
+                    .HasColumnName("AccountId");
 
                 accountLogin.ToTable("AccountLogins");
             });
 
-            builder.Entity<IdentityUserToken<int>>(accountToken =>
+            builder.Entity<IdentityUserToken<Guid>>(accountToken =>
             {
                 accountToken.Property(at => at.UserId)
-                .HasColumnName("AccountId");
+                    .HasColumnName("AccountId");
 
                 accountToken.ToTable("AccountTokens");
             });
@@ -89,6 +110,9 @@ namespace PubHub.API.Domain
             {
                 accountType.ConfigureId();
 
+                accountType.Property(at => at.Name)
+                    .HasMaxLength(TYPE_NAME_MAX_LENGTH);
+
                 accountType.TypeToPluralTableName();
             });
 
@@ -96,7 +120,34 @@ namespace PubHub.API.Domain
             {
                 author.ConfigureId();
 
+                // Author has relations defined in BookAuthor.
+
+                author.Property(a => a.Name)
+                    .HasMaxLength(NAME_MAX_LENGTH);
+
                 author.TypeToPluralTableName();
+            });
+            
+            builder.Entity<Book>(book =>
+            {
+                book.ConfigureId();
+
+                book.HasOne(b => b.Publisher)
+                    .WithMany(b => b.Books)
+                    .HasForeignKey(b => b.PublisherId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                book.HasOne(b => b.ContentType)
+                    .WithMany()
+                    .HasForeignKey(b => b.ContentTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                // Book has relations defined in BookAuthor.
+                // Book has relations defined in BookGenre.
+                // Book has relations defined in UserBook.
+
+                book.Property(b => b.Title)
+                    .HasMaxLength(BOOK_TITLE_MAX_LENGTH);
+
+                book.TypeToPluralTableName();
             });
 
             builder.Entity<BookAuthor>(bookAuthor =>
@@ -104,22 +155,49 @@ namespace PubHub.API.Domain
                 bookAuthor.HasKey(ba => new { ba.BookId, ba.AuthorId });
 
                 bookAuthor.HasOne(ba => ba.Book)
-                   .WithMany(b => b.BookAuthors);
+                    .WithMany(b => b.BookAuthors)
+                    .HasForeignKey(ba => ba.BookId);
                 bookAuthor.HasOne(ba => ba.Author)
-                    .WithMany(a => a.BookAuthors);
+                    .WithMany(a => a.BookAuthors)
+                    .HasForeignKey(ba => ba.AuthorId);
 
                 bookAuthor.TypeToPluralTableName();
             });
 
-            builder.Entity<Book>(book =>
+            builder.Entity<BookGenre>(bookGenre =>
             {
-                book.ConfigureId();
-                book.HasOne(b => b.Publisher)
-                    .WithMany(p => p.Books);
-                book.HasOne(b => b.ContentType)
-                    .WithMany();
+                bookGenre.HasKey(bg => new { bg.BookId, bg.GenreId });
 
-                book.TypeToPluralTableName();
+                bookGenre.HasOne(bg => bg.Book)
+                    .WithMany(b => b.BookGenres)
+                    .HasForeignKey(bg => bg.BookId);
+                bookGenre.HasOne(bg => bg.Genre)
+                    .WithMany(g => g.BookGenres)
+                    .HasForeignKey(bg => bg.GenreId);
+
+                bookGenre.TypeToPluralTableName();
+            });
+
+            builder.Entity<ContentType>(contentType =>
+            {
+                contentType.ConfigureId();
+
+                contentType.Property(ct => ct.Name)
+                    .HasMaxLength(TYPE_NAME_MAX_LENGTH);
+
+                contentType.TypeToPluralTableName();
+            });
+
+            builder.Entity<Genre>(genre =>
+            {
+                genre.ConfigureId();
+
+                // Genre has relations defined in BookGenre.
+
+                genre.Property(g => g.Name)
+                    .HasMaxLength(NAME_MAX_LENGTH);
+
+                genre.TypeToPluralTableName();
             });
 
             builder.Entity<Operator>(@operator =>
@@ -127,7 +205,16 @@ namespace PubHub.API.Domain
                 @operator.ConfigureId();
 
                 @operator.HasOne(o => o.Account)
-                    .WithOne();
+                    .WithOne()
+                    .HasForeignKey<Operator>(u => u.AccountId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                @operator.Property(o => o.Name)
+                    .HasMaxLength(NAME_MAX_LENGTH);
+                @operator.Property(o => o.Surname)
+                    .HasMaxLength(NAME_MAX_LENGTH);
+
+                @operator.HasQueryFilter(o => o.Account!.DeletedDate != null);
 
                 @operator.TypeToPluralTableName();
             });
@@ -137,7 +224,12 @@ namespace PubHub.API.Domain
                 publisher.ConfigureId();
 
                 publisher.HasOne(p => p.Account)
-                    .WithOne();
+                    .WithOne()
+                    .HasForeignKey<Publisher>(u => u.AccountId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                publisher.Property(o => o.Name)
+                    .HasMaxLength(NAME_MAX_LENGTH);
 
                 publisher.TypeToPluralTableName();
             });
@@ -147,21 +239,38 @@ namespace PubHub.API.Domain
                 user.ConfigureId();
 
                 user.HasOne(u => u.Account)
-                    .WithOne();
+                    .WithOne()
+                    .HasForeignKey<User>(u => u.AccountId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                // User has relations defined in UserBook.
+
+                user.Property(o => o.Name)
+                    .HasMaxLength(NAME_MAX_LENGTH);
+                user.Property(o => o.Surname)
+                    .HasMaxLength(NAME_MAX_LENGTH);
+
+                user.HasQueryFilter(u => u.Account!.DeletedDate != null);
 
                 user.TypeToPluralTableName();
             });
 
             builder.Entity<UserBook>(userBook =>
             {
-                userBook.HasKey(ub => new { ub.BookId, ub.UserId, ub.AccessTypeId });
+                userBook.ConfigureId();
 
                 userBook.HasOne(ub => ub.User)
-                    .WithMany(u => u.UserBooks);
+                    .WithMany(u => u.UserBooks)
+                    .HasForeignKey(ub => ub.UserId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.SetNull);
                 userBook.HasOne(ub => ub.Book)
-                    .WithMany(b => b.UserBooks);
+                    .WithMany(b => b.UserBooks)
+                    .HasForeignKey(ub => ub.BookId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 userBook.HasOne(ub => ub.AccessType)
-                    .WithMany();
+                    .WithMany()
+                    .HasForeignKey(ub => ub.AccessTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 userBook.TypeToPluralTableName();
             });
@@ -213,7 +322,7 @@ namespace PubHub.API.Domain
             var bookGenres = new BookGenreSeed(books, genres);
             var operators = new OperatorSeed(accounts);
             var users = new UserSeed(accounts);
-
+            
             builder.ApplyConfiguration(accessTypes);
             builder.ApplyConfiguration(accountTypes);
             builder.ApplyConfiguration(accounts);

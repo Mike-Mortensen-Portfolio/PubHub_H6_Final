@@ -6,6 +6,7 @@ using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Publishers;
 using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
 
@@ -20,52 +21,11 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context = context;
 
         /// <summary>
-        /// Get all general information about a specific user.
-        /// </summary>
-        /// <param name="id">Id of user.</param>
-        /// <response code="200">Success. User information was retreived.</response>
-        /// <response code="404">The user wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public IResult GetUser(int id)
-        {
-            var userModel = _context.Set<User>()
-                .Include(u => u.Account)
-                .ThenInclude(a => a!.AccountType)
-                .Select(u => new UserInfoModel()
-                {
-                    Id = u.Id,
-                    Email = u.Account!.Email,
-                    Name = u.Name,
-                    Surname = u.Surname,
-                    Birthday = u.Birthday,
-                    AccountType = u.Account!.AccountType!.Name
-                })
-                .FirstOrDefault(u => u.Id == id);
-            if (userModel == null)
-            {
-                return Results.Problem(
-                    statusCode: NotFoundSpecification.STATUS_CODE,
-                    title: NotFoundSpecification.TITLE,
-                    detail: $"No user with ID: {id}",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        {"Id", id }
-                    });
-            }
-
-            return Results.Ok(userModel);
-        }
-
-        /// <summary>
         /// Add a new user account to PubHub.
         /// </summary>
         /// <param name="userCreateModel">User information.</param>
         /// <response code="200">Success. A new user account was created.</response>
         /// <response code="400">Invalid model data or format.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpPost()]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
@@ -87,7 +47,7 @@ namespace PubHub.API.Controllers
                         {"Id", existingUser.Id}
                     });
 
-            // Get account type Id.
+            // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
                 .Where(a => a.Name.Equals(AccountTypeConstants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
                 .Select(a => a.Id)
@@ -97,10 +57,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: UnprocessableEntitySpecification.STATUS_CODE,
                     title: UnprocessableEntitySpecification.TITLE,
-                    detail: $"Unable to find account type: '{AccountTypeConstants.USER_ACCOUNT_TYPE}'",
+                    detail: $"Unable to find account type.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", accountTypeId }
+                        { "AccountType", AccountTypeConstants.USER_ACCOUNT_TYPE }
                     });
 
             // Create user account.
@@ -123,20 +83,46 @@ namespace PubHub.API.Controllers
             if (!(await _context.SaveChangesAsync() > 0))
             {
                 return Results.Problem(
-                        statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                        title: InternalServerErrorSpecification.TITLE,
-                        detail: "Something went wrong and the user couldn't be created. Please try again.",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"User", newUser}
-                        });
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the user couldn't be created. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "User", newUser }
+                    });
             }
 
-            newUser = await _context.Set<User>()
-                .Include(user => user.Account)
-                .FirstOrDefaultAsync(user => user.Account!.NormalizedEmail == newUser.Account.NormalizedEmail);
+            // Get newly added user.
+            var userInfo = await GetUserInfoAsync(newUser.Id);
 
-            return Results.Created($"users/{newUser!.Id}", newUser);
+            return Results.Created($"users/{userInfo!.Id}", userInfo);
+        }
+
+        /// <summary>
+        /// Get all general information about a specific user.
+        /// </summary>
+        /// <param name="id">ID of user.</param>
+        /// <response code="200">Success. User information was retreived.</response>
+        /// <response code="404">The user wasn't found.</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> GetUserAsync(Guid id)
+        {
+            var userInfo = await GetUserInfoAsync(id);
+            if (userInfo == null)
+            {
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "No user with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
+            }
+
+            return Results.Ok(userInfo);
         }
 
         /// <summary>
@@ -145,11 +131,10 @@ namespace PubHub.API.Controllers
         /// <param name="id">Id of user.</param>
         /// <response code="200">Success. All books of the user was retreived.</response>
         /// <response code="404">The user wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpGet("{id}/books")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetBooksAsync(int id)
+        public async Task<IResult> GetBooksAsync(Guid id)
         {
             // Check if user exists.
             if (!await _context.Set<User>().AnyAsync(u => u.Id == id))
@@ -157,10 +142,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with ID: {id}",
+                    detail: "No user with the given ID was found.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", id }
+                        { "Id", id }
                     });
             }
 
@@ -218,11 +203,10 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. The user was updated.</response>
         /// <response code="400">Invalid model data or format.</response>
         /// <response code="404">The user wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> UpdateUserAsync(int id, [FromBody] UserUpdateModel userUpdateModel)
+        public async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UserUpdateModel userUpdateModel)
         {
             // TODO (SIA): Validate model.
 
@@ -235,10 +219,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with ID: {id}",
+                    detail: "No user with the given ID was found.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", id }
+                        { "Id", id }
                     });
             }
 
@@ -262,13 +246,13 @@ namespace PubHub.API.Controllers
             if (!(await _context.SaveChangesAsync() > 0))
             {
                 return Results.Problem(
-                        statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                        title: InternalServerErrorSpecification.TITLE,
-                        detail: "Something went wrong and the user couldn't be created. Please try again.",
-                        extensions: new Dictionary<string, object?>
-                        {
-                            {"User", updatedUser}
-                        });
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the user couldn't be updated. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "User", updatedUser }
+                    });
             }
 
             return Results.Ok(updatedUser);
@@ -280,11 +264,10 @@ namespace PubHub.API.Controllers
         /// <param name="id">Id of user.</param>
         /// <response code="200">Success. The user was deleted.</response>
         /// <response code="404">The user wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> DeleteUserAsync(int id)
+        public async Task<IResult> DeleteUserAsync(Guid id)
         {
             // Get account Id.
             var accountId = await _context.Set<User>()
@@ -296,26 +279,26 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with ID: {id}",
+                    detail: "No user with the given ID was found.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", id }
+                        { "Id", id }
                     });
             }
 
             // Delete account.
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
-                .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
+                .ExecuteUpdateAsync(u => u.SetProperty(u => u.DeletedDate, DateTime.UtcNow));
             if (updatedRows == 0)
             {
                 Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
-                    detail: $"Unable to delete user account",
+                    detail: $"Unable to delete user account.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Id", id}
+                        { "Id", id }
                     });
             }
 
@@ -328,14 +311,13 @@ namespace PubHub.API.Controllers
         /// <param name="id">Id of user.</param>
         /// <response code="200">Success. The user was suspended.</response>
         /// <response code="404">The user wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpDelete("{id}/suspend-user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IResult> SuspendUserAsync(int id)
+        public async Task<IResult> SuspendUserAsync(Guid id)
         {
-            // Get account type Id.
+            // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Where(a => a.Name.ToLower() == AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE)
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
 
@@ -347,11 +329,11 @@ namespace PubHub.API.Controllers
                     detail: $"Something went wrong and the user couldn't be suspended. Please try again.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", id }
+                        { "Id", id }
                     });
             }
 
-            // Get account Id.
+            // Get account ID.
             var accountId = await _context.Set<User>()
                 .Where(u => u.Id == id)
                 .Select(u => u.AccountId)
@@ -361,10 +343,10 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
-                    detail: $"No user with ID: {id}",
+                    detail: "No user with the given ID was found.",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", id }
+                        { "Id", id }
                     });
             }
 
@@ -377,7 +359,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
-                    detail: $"Unable to suspend user account",
+                    detail: $"Unable to suspend user account.",
                     extensions: new Dictionary<string, object?>
                     {
                         { "Id", id}
@@ -386,5 +368,20 @@ namespace PubHub.API.Controllers
 
             return Results.Ok();
         }
+
+        private async Task<UserInfoModel?> GetUserInfoAsync(Guid id) =>
+            await _context.Set<User>()
+                .Include(u => u.Account)
+                    .ThenInclude(a => a!.AccountType)
+                .Select(u => new UserInfoModel()
+                {
+                    Id = u.Id,
+                    Email = u.Account!.Email,
+                    Name = u.Name,
+                    Surname = u.Surname,
+                    Birthday = u.Birthday,
+                    AccountType = u.Account!.AccountType!.Name
+                })
+                .FirstOrDefaultAsync(u => u.Id == id);
     }
 }

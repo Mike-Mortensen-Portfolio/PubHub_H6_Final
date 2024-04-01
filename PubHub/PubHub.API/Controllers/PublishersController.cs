@@ -9,11 +9,13 @@ using PubHub.Common;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
 using PubHub.Common.Models.Users;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class PublishersController(PubHubContext context) : Controller
     {
 #pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
@@ -22,16 +24,73 @@ namespace PubHub.API.Controllers
         /// <summary>
         /// Get a list of all publishers.
         /// </summary>
-        [HttpGet()]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
+        /// <param name="publisherCreateModel">Publisher information.</param>
+        /// <response code="200">Success. A new publisher account was created.</response>
+        /// <response code="400">Invalid model data or format.</response>
+        [HttpPost()]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(PublisherInfoModel))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        public async Task<IResult> AddPublisherAsync([FromBody] PublisherCreateModel publisherCreateModel)
         {
-            var publishers = await _context.Set<Publisher>()
-                .Filter(query)
-                .ToArrayAsync();
+            // TODO (SIA): Validate model.
+            
+            // Check if a publisher like this already exists.
+            var existingPublisher = await _context.Users.
+                FirstOrDefaultAsync(account => account.NormalizedEmail == publisherCreateModel.Account.Email.ToUpperInvariant());
 
-            return Results.Ok(publishers);
+            if (existingPublisher is not null)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching publisher already exists",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", existingPublisher.Id}
+                    });
+
+            // Get account type ID.
+            var accountTypeId = await _context.Set<AccountType>()
+                .Where(a => a.Name.ToLower() == AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+            if (accountTypeId == Guid.Empty)
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: $"Unable to find account type.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "AccountType", AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE }
+                    });
+            }
+
+            // Create publisher account.
+            // TODO (SIA): Add more account related data to fully set up an account.
+            var addedPublisher = new Publisher()
+            {
+                Name = publisherCreateModel.Name,
+                Account = new()
+                {
+                    Email = publisherCreateModel.Account.Email,
+                    AccountTypeId = accountTypeId
+                }
+            };
+            await _context.Set<Publisher>()
+                .AddAsync(addedPublisher);
+            if (!(await _context.SaveChangesAsync() > 0))
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: $"Unable to save changes to the database.");
+            }
+
+            // Retrieve newly added publisher.
+            var publisherInfo = await GetPublisherInfoAsync(addedPublisher.Id);
+
+            return Results.Created($"publishers/{publisherInfo!.Id}", publisherInfo);
         }
 
         /// <summary>
@@ -40,147 +99,102 @@ namespace PubHub.API.Controllers
         /// <param name="id">ID of publisher.</param>
         /// <response code="200">Success. Publisher information was retreived.</response>
         /// <response code="404">The publisher wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetPublisherAsync(int id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PublisherInfoModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> GetPublisherAsync(Guid id)
         {
-            var publisherModel = await _context.Set<Publisher>()
-                .Include(p => p.Account)
-                .Select(p => new PublisherInfoModel()
-                {
-                    Id = p.Id,
-                    Email = p.Account!.Email,
-                    Name = p.Name
-                })
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var publisherModel = await GetPublisherInfoAsync(id);
             if (publisherModel == null)
             {
                 return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"No publisher with ID: {id}");
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "No publisher with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
             }
 
             return Results.Ok(publisherModel);
         }
 
-        /// <summary>
-        /// Add a new publisher account to PubHub.
-        /// </summary>
-        /// <param name="publisherCreateModel">Publisher information.</param>
-        /// <response code="200">Success. A new publisher account was created.</response>
-        /// <response code="400">Invalid model data or format.</response>
-        /// <response code="500">Unexpected error.</response>
-        [HttpPost()]
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> AddPublisherAsync([FromBody] PublisherCreateModel publisherCreateModel)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PublisherInfoModel[]))]
+        public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
         {
-            // TODO (SIA): Validate model.
-
-            var existingpublisher = await _context.Users.
-                FirstOrDefaultAsync(account => account.NormalizedEmail == publisherCreateModel.Account.Email.ToUpperInvariant());
-
-            if (existingpublisher is not null)
-                return Results.Problem(
-                    type: DuplicateProblemSpecification.TYPE,
-                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
-                    title: DuplicateProblemSpecification.TITLE,
-                    detail: "A matching publisher already exists",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        {"Id", existingpublisher.Id}
-                    });
-
-            // Get account type ID.
-            var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
-                .Select(a => a.Id)
-                .FirstOrDefaultAsync();
-
-            if (accountTypeId == 0)
-                return Results.Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to find account type: '{AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE}'");
-
-            // Create publisher account.
-            // TODO (SIA): Add more account related data to fully set up an account.
-            await _context.Set<Publisher>()
-                .AddAsync(new Publisher()
+            var publishers = await _context.Set<Publisher>()
+                 .Include(u => u.Account)
+                .Filter(query)
+                .Select(p => new PublisherInfoModel()
                 {
-                    Name = publisherCreateModel.Name,
-                    Account = new()
-                    {
-                        Email = publisherCreateModel.Account.Email,
-                        AccountTypeId = accountTypeId
-                    }
-                });
-            if (!(await _context.SaveChangesAsync() > 0))
-            {
-                return Results.Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to save changes to the database.");
-            }
+                    Id = p.Id,
+                    Name = p.Name,
+                    Email = p.Account!.Email
+                })
+                .ToArrayAsync();
 
-            return Results.Ok();
+            return Results.Ok(publishers);
         }
-
+        
         /// <summary>
         /// Get all books for a specific publisher.
         /// </summary>
         /// <param name="id">ID of publisher.</param>
         /// <response code="200">Success. All books of the publisher was retreived.</response>
         /// <response code="404">The publisher wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpGet("{id}/books")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> GetBooksAsync(int id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<BookInfoModel>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> GetBooksAsync(Guid id)
         {
             // Check if publisher exists.
             if (!await _context.Set<Publisher>().AnyAsync(u => u.Id == id))
             {
                 return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"No publisher with ID: {id}");
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "No publisher with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
             }
 
             // Retreive all books.
             var bookModels = await _context.Set<Book>()
                 .Include(b => b.Publisher)
-                .Include(b => b!.BookGenres)
+                .Include(b => b.ContentType)
+                .Include(b => b.BookGenres)
                     .ThenInclude(bg => bg.Genre)
                 .Include(b => b.BookAuthors)
                     .ThenInclude(ba => ba.Author)
-                .Include(b => b.ContentType)
                 .Where(b => b.Publisher!.Id == id)
-                .Select(book => new BookInfoModel()
+                .Select(b => new BookInfoModel()
                 {
                     ContentType = new ContentTypeInfoModel
                     {
-                        Id = book.ContentTypeId,
-                        Name = book.ContentType!.Name
+                        Id = b.ContentTypeId,
+                        Name = b.ContentType!.Name
                     },
-                    CoverImage = book.CoverImage,
-                    Id = book.Id,
-                    Length = book.Length,
-                    PublicationDate = book.PublicationDate,
+                    CoverImage = b.CoverImage,
+                    Id = b.Id,
+                    Length = b.Length,
+                    PublicationDate = b.PublicationDate,
                     Publisher = new BookPublisherModel
                     {
-                        Id = book.PublisherId,
-                        Name = book.Publisher!.Name
+                        Id = b.Publisher!.Id,
+                        Name = b.Publisher.Name
                     },
-                    Title = book.Title,
-                    Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
+                    Title = b.Title,
+                    Genres = b.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,
                         Name = bookGenres.Genre!.Name
                     }).ToList(),
-                    Authors = book.BookAuthors.Select(bookAuthors => new AuthorInfoModel
+                    Authors = b.BookAuthors.Select(bookAuthors => new AuthorInfoModel
                     {
                         Id = bookAuthors.AuthorId,
                         Name = bookAuthors.Author!.Name
@@ -199,12 +213,10 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. The publisher was updated.</response>
         /// <response code="400">Invalid model data or format.</response>
         /// <response code="404">The publisher wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> UpdatePublisherAsync(int id, [FromBody] PublisherUpdateModel publisherUpdateModel)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PublisherInfoModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> UpdatePublisherAsync(Guid id, [FromBody] PublisherUpdateModel publisherUpdateModel)
         {
             // TODO (SIA): Validate model.
 
@@ -215,8 +227,13 @@ namespace PubHub.API.Controllers
             if (publisher == null)
             {
                 return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"No publisher with ID: {id}");
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "No publisher with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                       { "Id", id }
+                    });
             }
 
             // Update entry with new data.
@@ -227,15 +244,30 @@ namespace PubHub.API.Controllers
             }
             publisher.Name = publisherUpdateModel.Name;
 
+            var updatedPublisher = new PublisherInfoModel()
+            {
+                Id = publisher.Id,
+                Email = publisher.Account!.Email,
+                Name = publisherUpdateModel.Name
+            };
+
             _context.Set<Publisher>().Update(publisher);
             if (!(await _context.SaveChangesAsync() > 0))
             {
                 return Results.Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to save changes to the database.");
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the publisher couldn't be updated. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Publisher", updatedPublisher }
+                    });
             }
 
-            return Results.Ok();
+            // Retreive newly updated publisher.
+            var publisherInfo = await GetPublisherInfoAsync(id);
+
+            return Results.Ok(publisherInfo);
         }
 
         /// <summary>
@@ -244,54 +276,72 @@ namespace PubHub.API.Controllers
         /// <param name="id">ID of publisher.</param>
         /// <response code="200">Success. The publisher was deleted.</response>
         /// <response code="404">The publisher wasn't found.</response>
-        /// <response code="500">Unexpected error.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IResult> DeletePublisherAsync(int id)
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> DeletePublisherAsync(Guid id)
         {
-            const int INVALID_ID = 0;
-            const int NO_ACCOUNT = -1;
+            // Check if publisher exists.
+            if (!await _context.Set<Publisher>().AnyAsync(p => p.Id == id))
+            {
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "No publisher with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
+            }
 
             // Get account ID.
             var accountId = await _context.Set<Publisher>()
                 .Where(p => p.Id == id)
-                .Select(p => p.AccountId ?? NO_ACCOUNT)
+                .Select(p => p.AccountId)
                 .FirstOrDefaultAsync();
-            if (accountId == INVALID_ID)
+            if (accountId == INVALID_ENTITY_ID)
             {
                 return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"No publisher with ID: {id}");
-            }
-            if (accountId == NO_ACCOUNT)
-            {
-                return Results.Problem(
-                    statusCode: StatusCodes.Status404NotFound,
-                    detail: $"Publisher (ID: {id}) doesn't have an account.");
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "Publisher with the given ID doesn't have an account.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
             }
 
             // Delete account.
             int updatedRows = await _context.Set<Account>()
                 .Where(u => u.Id == accountId)
-                .ExecuteUpdateAsync(u => u.SetProperty(u => u.IsDeleted, true));
+                .ExecuteUpdateAsync(u => u.SetProperty(u => u.DeletedDate, DateTime.UtcNow));
             if (updatedRows < 1)
             {
                 // Unable to delete; report back.
-                Dictionary<string, object?> extensions = new()
-                {
-                    ["PublisherId"] = id,
-                    ["AccountId"] = accountId
-                };
-
                 return Results.Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    detail: $"Unable to delete account (ID: {accountId}) of publisher (ID: {id}).",
-                    extensions: extensions);
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the publisher couldn't be deleted. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        ["PublisherId"] = id,
+                        ["AccountId"] = accountId
+                    });
             }
 
             return Results.Ok();
         }
+
+        private async Task<PublisherInfoModel?> GetPublisherInfoAsync(Guid id) =>
+            await _context.Set<Publisher>()
+                .Include(p => p.Account)
+                .Select(p => new PublisherInfoModel()
+                {
+                    Id = p.Id,
+                    Email = p.Account!.Email ?? string.Empty,
+                    Name = p.Name
+                })
+                .FirstOrDefaultAsync(p => p.Id == id);
+
     }
 }

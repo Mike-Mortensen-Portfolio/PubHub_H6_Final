@@ -2,6 +2,6 @@
 {
     public static class IntegrityConstants
     {
-        public const int INVALID_ENTITY_ID = 0;
+        public static readonly Guid INVALID_ENTITY_ID = Guid.Empty;
     }
 }
