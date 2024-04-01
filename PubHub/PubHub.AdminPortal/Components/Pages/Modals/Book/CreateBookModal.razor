@@ -1,4 +1,7 @@
-﻿<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+﻿@inject PubHub.Common.Services.IBookService BookService
+@inject PubHub.Common.Services.IPublisherService PublisherService
+
+<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -6,11 +9,11 @@
                 <h4 class="modal-title">Create a new book</h4>
                 <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
             </div>
-            <EditForm Model="MyEditForm">
+            <EditForm Model="bookCreateForm" OnSubmit="() => CreateBook()">
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <label for="createBookTitleInput" class="form-label"><b>Book title:</b></label>
-                        <input id="createBookTitleInput" class="form-control" placeholder="Type in the book title..." />
+                        <input @bind-value="bookCreateForm.Title" id="createBookTitleInput" class="form-control" placeholder="Type in the book title..." />
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
@@ -23,19 +26,19 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="createBookContent" class="form-label"><b>Book content:</b></label>
-                                <InputFile id="createBookContent" class="form-control">Content</InputFile>
+                                <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
                             </div>
                         </div>
                     </div>
                     <div class="form-group mb-2">
                         <label for="createBookCoverImg" class="form-label"><b>Cover image:</b></label>
-                        <InputFile id="createBookCoverImg" class="form-control">Cover image</InputFile>
+                        <InputFile OnChange="BookCoverImgFileChanged" id="createBookCoverImg" class="form-control">Cover image</InputFile>
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="createBookLength" class="form-label"><b>Book length:</b></label>
-                                <input id="createBookLength" class="form-control" placeholder="Type in the length of the book..." />
+                                <input @bind-value="bookCreateForm.Length" id="createBookLength" class="form-control" placeholder="Type in the length of the book..." />
                             </div>
                             <div class="col-md-6">
                                 <label for="createIsBookHidden" class="form-label"><b>Accessability:</b></label>
@@ -44,7 +47,7 @@
                                         <label class="form-label">Should the book be accessable?</label>
                                     </div>
                                     <div class="col-md-4 mt-2">
-                                        <input id="createIsBookHidden" type="checkbox" class="form-check" />
+                                        <input @bind-value="bookCreateForm.IsHidden" id="createIsBookHidden" type="checkbox" class="form-check" />
                                     </div>
                                 </div>
                             </div>
@@ -73,11 +76,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Create</button>
+                    <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                </div>
             </EditForm>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success">Create</button>
-                <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
-            </div>
         </div>
     </div>
 </div>
@@ -86,10 +89,41 @@
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
 
-    public EditForm MyEditForm { get; set; } = new();
+    private EditForm editForm { get; set; } = new();
+
+    private BookCreateForm bookCreateForm = new();
+
+    // TODO (JBN): Not working, fix when BookContent have been talked about with the group.
+    //private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
+    //{
+    //    using (var stream = new FileStream(inputFileChange.File.Name, FileMode.Open))
+    //    {
+    //        BinaryReader binaryReader = new BinaryReader(stream);
+    //        long byteLength = inputFileChange.File.OpenReadStream().Length;
+    //        bookCreateForm.BookContent = binaryReader.ReadBytes((Int32)byteLength);
+    //    }
+    //}
+
+    // TODO (JBN): Fix tomorrow, figure out how to save an image in a byte[].
+    //private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)
+    //{
+    //    using (var stream = new FileStream(inputFileChange.File.Name, FileMode.Open))
+    //    {
+    //        BinaryReader binaryReader = new BinaryReader(stream);
+    //        long byteLength = inputFileChange.File.OpenReadStream().Length;
+    //        bookCreateForm.CoverImage = binaryReader.ReadBytes((Int32)byteLength);
+    //        binaryReader.Close();
+    //    }
+    //}
+
+    private void CreateBook()
+    {
+        var result = BookService.AddBook(bookCreateForm.CreateBookModel());
+        ModalOptions(false);
+    }
 
     Task ModalOptions(bool IsClosing)
     {
-    return OnClose.InvokeAsync(IsClosing);
+        return OnClose.InvokeAsync(IsClosing);
     }
-    }
+}

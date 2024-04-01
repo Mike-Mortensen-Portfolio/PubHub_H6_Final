@@ -1,5 +1,6 @@
 ﻿@page "/Books"
 @inherits ComponentBase
+@inject PubHub.Common.Services.IPublisherService PublisherService
 
 <PageTitle>Publisher's books</PageTitle>
 
@@ -15,15 +16,7 @@
         @if (showCreateModal)
         {
             <CreateBookModal OnClose="() => OnCreateDialogClose()"></CreateBookModal>
-        }
-        else if (showUpdateModal)
-        {
-            <UpdateBookModal OnClose="() => OnUpdateDialogClose()"></UpdateBookModal>
-        }
-        else if (showRemoveModal)
-        {
-            <RemoveBookModal OnClose="() => OnRemoveDialogClose()"></RemoveBookModal>
-        }
+        }               
     </div>
     <div class="row text-center">
         <table class="table table-striped">
@@ -36,14 +29,25 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Title</td>
-                    <td>Year</td>
-                    <td>
-                        <div class="combined-item">
-                            <button class="btn btn-warning" @onclick="() => showUpdateModal = true">Update</button>
-                            <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
-                        </div>
-                    </td>
+                    @foreach (var item in BookInfos)
+                    {
+                        <td>@item.Title</td>
+                        <td>@item.PublicationDate</td>
+                        <td>
+                            <div class="combined-item">
+                                <button class="btn btn-warning" @onclick="() => showUpdateModal = true">Update</button>
+                                @if (showUpdateModal)
+                                {
+                                    <UpdateBookModal OnClose="() => OnUpdateDialogClose()" BookInfo="@item"></UpdateBookModal>
+                                }
+                                <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
+                                @if (showRemoveModal)
+                                {
+                                    <RemoveBookModal OnClose="() => OnRemoveDialogClose()"></RemoveBookModal>
+                                }
+                            </div>
+                        </td>
+                    }
                 </tr>
             </tbody>
         </table>
@@ -55,6 +59,14 @@
     bool showUpdateModal;
     bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
+
+    public List<BookInfoModel>? BookInfos { get; set; } = new();
+    public Guid PublisherGuid { get; set; } = new Guid("7bf64e8c-9a22-8299-8575-018e8ede1d91");
+
+    protected async override Task OnInitializedAsync()
+    {
+        BookInfos = await PublisherService.GetPublisherBooks(PublisherGuid);
+    }
 
     #region Dialog closing methods.
     private async Task OnCreateDialogClose()

@@ -1,4 +1,4 @@
-using PubHub.AdminPortal.Components;
+﻿using PubHub.AdminPortal.Components;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
 
@@ -6,12 +6,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddCircuitOptions(options =>
+    {
+        options.DetailedErrors = true;
+    });
 
-builder.Services.AddPubHubServices(new ApiOptions
+builder.Services.AddPubHubServices(options =>
 {
-    Address = builder.Configuration.GetSection(ApiConstants.API_ENDPOINT).ToString()!,
-    HttpClientName = ApiConstants.HTTPCLIENT_NAME
+    string address = builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT);
+    if (address == null)
+        throw new ArgumentNullException(nameof(address), "Api base address couldn't be found.");
+
+    options.Address = address;
+    options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
 });
 
 var app = builder.Build();

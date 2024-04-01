@@ -1,4 +1,6 @@
-﻿<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+﻿@inject PubHub.Common.Services.IBookService BookService
+
+<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -10,7 +12,7 @@
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <label for="updateBookTitleInput" class="form-label"><b>Book title:</b></label>
-                        <input id="updateBookTitleInput" class="form-control" placeholder="Bind to book title..." />
+                        <input @bind-value="BookInfo.Title" id="updateBookTitleInput" class="form-control" />
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
@@ -34,8 +36,8 @@
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="updateBookLength" class="form-label"><b>Bind to Book length:</b></label>
-                                <input id="updateBookLength" class="form-control" placeholder="Type in the length of the book..." />
+                                <label for="updateBookLength" class="form-label"><b>Book length:</b></label>
+                                <input id="updateBookLength" class="form-control" />
                             </div>
                             <div class="col-md-6">
                                 <label for="updateIsBookHidden" class="form-label"><b>Accessability:</b></label>
@@ -63,12 +65,12 @@
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="updatePublisherInput" class="form-label"><b>Bind to Publisher:</b></label>
-                                <input id="updatePublisherInput" class="form-control" disabled placeholder="Insert signed in publisher here..." />
+                                <label for="updatePublisherInput" class="form-label"><b>Publisher:</b></label>
+                                <input id="updatePublisherInput" class="form-control" disabled />
                             </div>
                             <div class="col-md-6">
-                                <label for="updatePublicationYear" class="form-label"><b>Bind to Publication year:</b></label>
-                                <input id="updatePublicationYear" type="datetime" class="form-control" placeholder="Type in the date this will be published..." />
+                                <label for="updatePublicationYear" class="form-label"><b>Publication year:</b></label>
+                                <input @bind-value="BookInfo.PublicationDate" id="updatePublicationYear" type="datetime" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -86,7 +88,15 @@
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
 
+    [Parameter]
+    public BookInfoModel? BookInfo { get; set; }
+
     public EditForm MyEditForm { get; set; } = new();
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
 
     Task ModalOptions(bool IsClosing)
     {

@@ -7,12 +7,15 @@ namespace PubHub.Common.Extensions
 {
     public static class ServiceExtensions
     {
-        public static IServiceCollection AddPubHubServices(this IServiceCollection services, ApiOptions apiOptions)
+        public static IServiceCollection AddPubHubServices(this IServiceCollection services, Action<ApiOptions> apiOptions)
         {
             if (apiOptions == null) 
                 throw new ArgumentNullException(nameof(services), "Options cannot be empty.");
 
-            return services.AddApiService(apiOptions);
+            var options = new ApiOptions();
+            apiOptions(options);            
+
+            return services.AddApiService(options);
         }
 
         private static IServiceCollection AddApiService(this IServiceCollection services, ApiOptions apiOptions)

@@ -1,4 +1,6 @@
-﻿<div class="modal fade show" id="removeBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+﻿@inject PubHub.Common.Services.IBookService BookService
+
+<div class="modal fade show" id="removeBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -10,7 +12,7 @@
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <label for="removeBookTitleInput" class="form-label">Are you sure you wish to delete this book: Bind to book title.</label>
-                    </div>                    
+                    </div>
                 </div>
             </EditForm>
             <div class="modal-footer">
