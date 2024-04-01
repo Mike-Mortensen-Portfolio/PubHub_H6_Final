@@ -5,7 +5,7 @@ using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
-using PubHub.Common.Models.Users;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.Common.Services
 {
@@ -76,7 +76,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (publisherId == Guid.Empty)
+                if (publisherId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}/books");
@@ -115,7 +115,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (publisherId == Guid.Empty)
+                if (publisherId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}");
@@ -156,7 +156,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (publisherId == Guid.Empty)
+                if (publisherId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 if (publisherUpdateModel == null)
@@ -201,7 +201,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (publisherId == Guid.Empty)
+                if (publisherId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"publishers/{publisherId}");

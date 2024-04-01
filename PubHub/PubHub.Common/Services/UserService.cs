@@ -1,11 +1,11 @@
-﻿using PubHub.Common.ApiService;
-using PubHub.Common.Models;
-using PubHub.Common.Models.Books;
-using PubHub.Common.Models.Users;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using PubHub.Common.ApiService;
+using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Users;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.Common.Services
 {
@@ -76,7 +76,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (userId == Guid.Empty)
+                if (userId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}");
@@ -115,7 +115,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (userId == Guid.Empty)
+                if (userId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}/books");
@@ -156,7 +156,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (userId == Guid.Empty)
+                if (userId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 if (userUpdateModel == null)
@@ -201,7 +201,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (userId == Guid.Empty)
+                if (userId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}");
@@ -236,7 +236,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (userId == Guid.Empty)
+                if (userId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}/suspend-user");

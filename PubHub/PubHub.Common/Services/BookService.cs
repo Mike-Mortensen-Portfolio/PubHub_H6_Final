@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Books;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.Common.Services
 {
@@ -70,7 +71,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (bookId == Guid.Empty)
+                if (bookId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The book Id wasn't a valid Id: {bookId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"books/{bookId}");
@@ -153,7 +154,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (bookId == Guid.Empty)
+                if (bookId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The user Id wasn't a valid Id: {bookId}");
 
                 if (bookUpdateModel == null)
@@ -198,7 +199,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (bookId == Guid.Empty)
+                if (bookId == INVALID_ENTITY_ID)
                     throw new ArgumentException($"The book Id wasn't a valid Id: {bookId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"books/{bookId}");
