@@ -135,7 +135,7 @@ namespace PubHub.API.Domain
                 book.HasOne(b => b.Publisher)
                     .WithMany(b => b.Books)
                     .HasForeignKey(b => b.PublisherId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
                 book.HasOne(b => b.ContentType)
                     .WithMany()
                     .HasForeignKey(b => b.ContentTypeId)
