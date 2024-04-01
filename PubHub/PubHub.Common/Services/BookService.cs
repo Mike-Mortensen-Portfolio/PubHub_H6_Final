@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Books;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.Common.Services
 {
@@ -20,8 +21,6 @@ namespace PubHub.Common.Services
                 WriteIndented = true,
             };
         }
-
-        // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
         /// <summary>
         /// Calls the API enpoint to retrieve all books through the <see cref="BookInfoModel"/> filtered on the searchQuery.
@@ -60,19 +59,20 @@ namespace PubHub.Common.Services
                 return null!;
             }
         }
+
         /// <summary>
         /// Calls the API end point for retrieving <see cref="BookInfoModel">, to use in the client applications.
         /// </summary>
         /// <param name="bookId">Id of the book we want information about.</param>
         /// <returns>A <see cref="BookInfoModel"/> with a book's information.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<BookInfoModel?> GetBook(int bookId)
+        public async Task<BookInfoModel?> GetBook(Guid bookId)
         {
             try
             {
-                if (bookId <= 0)
-                    throw new ArgumentOutOfRangeException($"The book Id wasn't a valid Id: {bookId}");
+                if (bookId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The book Id wasn't a valid Id: {bookId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"books/{bookId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -147,15 +147,15 @@ namespace PubHub.Common.Services
         /// <param name="bookId">The id of the book being updated.</param>
         /// <param name="bookUpdateModel">The <see cref="BookUpdateModel"/> holding the updated values.</param>
         /// <returns>A status telling if a book was successfully updated in the database.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<BookUpdateModel>> UpdateBook(int bookId, BookUpdateModel bookUpdateModel)
+        public async Task<ServiceInstanceResult<BookUpdateModel>> UpdateBook(Guid bookId, BookUpdateModel bookUpdateModel)
         {
             try
             {
-                if (bookId <= 0)
-                    throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {bookId}");
+                if (bookId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The user Id wasn't a valid Id: {bookId}");
 
                 if (bookUpdateModel == null)
                     throw new ArgumentNullException($"The User update model wasn't valid: {bookUpdateModel?.Title}");
@@ -193,14 +193,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="bookId">The Id of the book who needs to be soft-deleted.</param>
         /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteUser(int bookId)
+        public async Task<ServiceResult> DeleteUser(Guid bookId)
         {
             try
             {
-                if (bookId <= 0)
-                    throw new ArgumentOutOfRangeException($"The book Id wasn't a valid Id: {bookId}");
+                if (bookId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The book Id wasn't a valid Id: {bookId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"books/{bookId}");
                 string content = await response.Content.ReadAsStringAsync();

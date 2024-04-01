@@ -6,10 +6,10 @@ namespace PubHub.Common.Services
     public interface IUserService
     {
         Task<ServiceInstanceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel);
-        Task<UserInfoModel?> GetUserInfo(int userId);
-        Task<List<BookInfoModel>> GetUserBooks(int userId);
-        Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel);
-        Task<ServiceResult> DeleteUser(int userId);
-        Task<ServiceResult> SuspendUser(int userId);
+        Task<UserInfoModel?> GetUserInfo(Guid userId);
+        Task<List<BookInfoModel>> GetUserBooks(Guid userId);
+        Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(Guid userId, UserUpdateModel userUpdateModel);
+        Task<ServiceResult> DeleteUser(Guid userId);
+        Task<ServiceResult> SuspendUser(Guid userId);
     }
 }

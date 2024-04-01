@@ -5,7 +5,7 @@ using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
-using PubHub.Common.Models.Users;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.Common.Services
 {
@@ -22,8 +22,6 @@ namespace PubHub.Common.Services
                 WriteIndented = true,
             };
         }
-
-        // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
         /// <summary>
         /// Calls the API endpoint for adding a <see cref="PublisherCreateModel"/> to the database.
@@ -72,14 +70,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="publisherId">The Id of the publisher who's books needs retrieval.</param>
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<List<BookInfoModel>> GetPublisherBooks(int publisherId)
+        public async Task<List<BookInfoModel>> GetPublisherBooks(Guid publisherId)
         {
             try
             {
-                if (publisherId <= 0)
-                    throw new ArgumentOutOfRangeException($"The publisher Id wasn't a valid Id: {publisherId}");
+                if (publisherId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}/books");
                 string content = await response.Content.ReadAsStringAsync();
@@ -111,14 +109,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="publisherId">Id of the publisher wanting information about.</param>
         /// <returns>A <see cref="PublisherInfoModel"/> with the users information.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<PublisherInfoModel?> GetPublisherInfo(int publisherId)
+        public async Task<PublisherInfoModel?> GetPublisherInfo(Guid publisherId)
         {
             try
             {
-                if (publisherId <= 0)
-                    throw new ArgumentOutOfRangeException($"The publisher Id wasn't a valid Id: {publisherId}");
+                if (publisherId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -151,15 +149,15 @@ namespace PubHub.Common.Services
         /// <param name="publisherId">The id of the publisher being updated.</param>
         /// <param name="publisherUpdateModel">The <see cref="PublisherUpdateModel"/> holding the updated values.</param>
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<PublisherUpdateModel>> UpdatePublisher(int publisherId, PublisherUpdateModel publisherUpdateModel)
+        public async Task<ServiceInstanceResult<PublisherUpdateModel>> UpdatePublisher(Guid publisherId, PublisherUpdateModel publisherUpdateModel)
         {
             try
             {
-                if (publisherId <= 0)
-                    throw new ArgumentOutOfRangeException($"The publisher Id wasn't a valid Id: {publisherId}");
+                if (publisherId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 if (publisherUpdateModel == null)
                     throw new ArgumentNullException($"The publisher update model wasn't valid: {publisherUpdateModel?.Name}");
@@ -197,14 +195,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="publisherId">The Id of the publisher who needs to be soft-deleted.</param>
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeletePublisher(int publisherId)
+        public async Task<ServiceResult> DeletePublisher(Guid publisherId)
         {
             try
             {
-                if (publisherId <= 0)
-                    throw new ArgumentOutOfRangeException($"The publisher Id wasn't a valid Id: {publisherId}");
+                if (publisherId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The publisher Id wasn't a valid Id: {publisherId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"publishers/{publisherId}");
                 string content = await response.Content.ReadAsStringAsync();

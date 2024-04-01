@@ -1,11 +1,11 @@
-﻿using PubHub.Common.ApiService;
-using PubHub.Common.Models;
-using PubHub.Common.Models.Books;
-using PubHub.Common.Models.Users;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using PubHub.Common.ApiService;
+using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Users;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.Common.Services
 {
@@ -22,8 +22,6 @@ namespace PubHub.Common.Services
                 WriteIndented = true,
             };
         }
-
-        // TODO (JBN): Change to GUIDs instead of int when that has been updated.
 
         /// <summary>
         /// Calls the API endpoint for adding a <see cref="UserCreateModel"/> to the database.
@@ -72,14 +70,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="userId">Id of the user wanting information about.</param>
         /// <returns>A <see cref="UserInfoModel"/> with the users information.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<UserInfoModel?> GetUserInfo(int userId)
+        public async Task<UserInfoModel?> GetUserInfo(Guid userId)
         {
             try
             {
-                if (userId <= 0)
-                    throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
+                if (userId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -111,14 +109,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="userId">The Id of the user who's books needs retrieval.</param>
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<List<BookInfoModel>> GetUserBooks(int userId)
+        public async Task<List<BookInfoModel>> GetUserBooks(Guid userId)
         {
             try
             {
-                if (userId <= 0)
-                    throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
+                if (userId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}/books");
                 string content = await response.Content.ReadAsStringAsync();
@@ -151,15 +149,15 @@ namespace PubHub.Common.Services
         /// <param name="userId">The id of the user being updated.</param>
         /// <param name="userUpdateModel">The <see cref="UserUpdateModel"/> holding the updated values.</param>
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(int userId, UserUpdateModel userUpdateModel)
+        public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(Guid userId, UserUpdateModel userUpdateModel)
         {
             try
             {
-                if (userId <= 0)
-                    throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
+                if (userId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 if (userUpdateModel == null)
                     throw new ArgumentNullException($"The User update model wasn't valid: {userUpdateModel?.Name}");
@@ -197,14 +195,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="userId">The Id of the user who needs to be soft-deleted.</param>
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteUser(int userId)
+        public async Task<ServiceResult> DeleteUser(Guid userId)
         {
             try
             {
-                if (userId <= 0)
-                    throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
+                if (userId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -232,14 +230,14 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="userId">The Id of the user who needs to have their account type as suspended.</param>
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> SuspendUser(int userId)
+        public async Task<ServiceResult> SuspendUser(Guid userId)
         {
             try
             {
-                if (userId <= 0)
-                    throw new ArgumentOutOfRangeException($"The user Id wasn't a valid Id: {userId}");
+                if (userId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}/suspend-user");
                 string content = await response.Content.ReadAsStringAsync();
