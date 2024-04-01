@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
+using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Identity;
 
 namespace PubHub.API
@@ -24,7 +25,7 @@ namespace PubHub.API
             });
         }
 
-        public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
+        public static IServiceCollection ConfigureIdentity(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddIdentity<Account, IdentityRole<Guid>>(options =>
             {
@@ -38,6 +39,9 @@ namespace PubHub.API
             })
             .AddEntityFrameworkStores<PubHubContext>()
             .AddDefaultTokenProviders();
+
+            services.Configure<AuthOptions>(configuration.GetSection("Jwt"));
+            services.AddScoped<AuthService>();
 
             return services;
         }
