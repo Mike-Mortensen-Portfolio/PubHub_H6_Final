@@ -24,7 +24,7 @@ namespace PubHub.API.Controllers
 
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<GenreInfoModel>))]
-        public async Task<IResult> GetGenreAsync()
+        public async Task<IResult> GetGenresAsync()
         {
             var genres = await _context.Set<Genre>()
                 .Select(genre => new GenreInfoModel
