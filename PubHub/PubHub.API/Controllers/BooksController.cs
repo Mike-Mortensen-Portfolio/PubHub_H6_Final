@@ -13,7 +13,6 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class BooksController : ControllerBase
     {
-#pragma warning disable IDE0290 // Use primary constructor
         private readonly PubHubContext _context;
 
         public BooksController(PubHubContext context)
