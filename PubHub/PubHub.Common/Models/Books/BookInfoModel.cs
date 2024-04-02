@@ -1,4 +1,6 @@
-﻿namespace PubHub.Common.Models.Books
+﻿using PubHub.Common.Models.Genres;
+
+namespace PubHub.Common.Models.Books
 {
     public class BookInfoModel
     {

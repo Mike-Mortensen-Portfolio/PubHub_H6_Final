@@ -5,6 +5,7 @@ using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Genres;
 
 namespace PubHub.API.Controllers
 {

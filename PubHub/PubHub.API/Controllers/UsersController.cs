@@ -6,7 +6,7 @@ using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
-using PubHub.Common.Models.Publishers;
+using PubHub.Common.Models.Genres;
 using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
 
