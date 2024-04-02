@@ -34,7 +34,7 @@ namespace PubHub.API.Controllers
         }
 
         [HttpPost("token")]
-        public async Task<IResult> GetTokenAsync(AccountLoginModel loginInfo)
+        public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password)
         {
             if (!ModelState.IsValid)
             {
@@ -48,31 +48,28 @@ namespace PubHub.API.Controllers
                     });
             }
 
-            //var user = await _context.Set<User>().Include(u => u.Account).FirstOrDefaultAsync();
-            //_authService.CreateToken(user.Account);
+            // Validate user email.
+            var account = await _userManager.FindByNameAsync(email);
+            if (account == null)
+            {
+                return Results.Problem(
+                    statusCode: UnauthorizedSpecification.STATUS_CODE,
+                    title: UnauthorizedSpecification.TITLE,
+                    detail: "Email doesn't exist.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Email", email }
+                    });
+            }
 
-            //// Validate user email.
-            //var account = await _userManager.FindByEmailAsync(loginInfo.Email);
-            //if (account == null)
-            //{
-            //    return Results.Problem(
-            //        statusCode: UnauthorizedSpecification.STATUS_CODE,
-            //        title: UnauthorizedSpecification.TITLE,
-            //        detail: "Email doesn't exist.",
-            //        extensions: new Dictionary<string, object?>
-            //        {
-            //            { "Email", loginInfo.Email }
-            //        });
-            //}
-
-            //// Validate user password.
-            //if (!(await _userManager.CheckPasswordAsync(account, loginInfo.Password)))
-            //{
-            //    return Results.Problem(
-            //        statusCode: UnauthorizedSpecification.STATUS_CODE,
-            //        title: UnauthorizedSpecification.TITLE,
-            //        detail: "Provided password is incorrect.");
-            //}
+            // Validate user password.
+            if (!(await _userManager.CheckPasswordAsync(account, password)))
+            {
+                return Results.Problem(
+                    statusCode: UnauthorizedSpecification.STATUS_CODE,
+                    title: UnauthorizedSpecification.TITLE,
+                    detail: "Provided password is incorrect.");
+            }
 
             // Create token.
 
