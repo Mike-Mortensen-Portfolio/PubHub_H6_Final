@@ -70,6 +70,7 @@ namespace PubHub.API.Domain.Identity
 
         #region Navs
         public AccountType AccountType { get; set; } = null!;
+        public List<AccountRefreshToken> AccountRefreshTokens { get; set; } = [];
         #endregion
     }
 }
