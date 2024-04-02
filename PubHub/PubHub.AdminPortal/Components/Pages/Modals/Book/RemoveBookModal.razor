@@ -27,6 +27,9 @@
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
 
+    [Parameter]
+    public Guid? BookId { get; set; }
+
     public EditForm MyEditForm { get; set; } = new();
 
     Task ModalOptions(bool IsClosing)
