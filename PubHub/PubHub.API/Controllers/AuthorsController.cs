@@ -40,7 +40,7 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthorInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetAuthorsAsync(Guid id)
+        public async Task<IResult> GetAuthorAsync(Guid id)
         {
             var author = await _context.Set<Author>()
                  .Select(author => new AuthorInfoModel
