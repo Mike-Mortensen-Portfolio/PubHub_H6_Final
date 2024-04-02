@@ -52,7 +52,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get authors:", ex.Message);
-                return new List<AuthorInfoModel>();
+                return [];
             }
         }
 

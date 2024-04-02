@@ -56,7 +56,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get user books:", ex.Message);
-                return null!;
+                return [];
             }
         }
 

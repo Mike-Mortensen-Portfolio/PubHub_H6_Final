@@ -100,7 +100,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Unable to get publisher's books: {publisherId}", ex.Message);
-                return null!;
+                return [];
             }
         }
 
