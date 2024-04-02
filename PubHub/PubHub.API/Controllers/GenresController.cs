@@ -24,7 +24,7 @@ namespace PubHub.API.Controllers
 
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<GenreInfoModel>))]
-        public async Task<IResult> GetGenresAsync()
+        public async Task<IResult> GetGenreAsync()
         {
             var genres = await _context.Set<Genre>()
                 .Select(genre => new GenreInfoModel
@@ -40,7 +40,7 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenreInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetGenresAsync(Guid id)
+        public async Task<IResult> GetGenreAsync(Guid id)
         {
             var genre = await _context.Set<Genre>()
                  .Select(genre => new GenreInfoModel
