@@ -3,18 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PubHub.BookMobile.Pages.Home"
              xmlns:pages="clr-namespace:PubHub.BookMobile.Pages"
-             x:DataType="pages:Home">
+             x:DataType="pages:Home"
+             Title="Home">
     <ScrollView>
-        <StackLayout Orientation="Vertical">
-            <Label FontSize="{StaticResource Header}"
+        <StackLayout Orientation="Vertical"
+                     VerticalOptions="CenterAndExpand">
+            <StackLayout Orientation="Vertical"
+                         VerticalOptions="EndAndExpand">
+                <Label FontSize="{StaticResource Header}"
                    FontAttributes="Bold"
                    HorizontalTextAlignment="Center">PubHub</Label>
-            <Label FontSize="{StaticResource Subheader}"
+                <Label FontSize="{StaticResource Subheader}"
                    HorizontalTextAlignment="Center"
                    FontAttributes="Bold">With our E-books, we save a Finnish forest a day</Label>
+            </StackLayout>
 
             <CarouselView ItemsSource="{x:Static pages:Home.Items}"
-                          VerticalOptions="FillAndExpand">
+                          HeightRequest="500"
+                          IndicatorView="indicator"
+                          VerticalOptions="CenterAndExpand">
                 <CarouselView.ItemTemplate>
                     <DataTemplate>
                         <Frame x:DataType="pages:Item"
@@ -22,21 +29,27 @@
                                HorizontalOptions="CenterAndExpand"
                                BackgroundColor="{StaticResource WarmWhite}">
                             <StackLayout Orientation="Vertical">
-                                <Image Source="{Binding ImageUrl}"/>
-                                <Frame Margin="0,10,0,10"
-                                       BackgroundColor="{StaticResource WarmWhite}">
-                                    <StackLayout Orientation="Vertical">
-                                        <Label FontSize="Subtitle"
+                                <Frame>
+                                    <Image Source="{Binding ImageUrl}"/>
+                                </Frame>
+                                <StackLayout Orientation="Vertical"
+                                             Margin="0,10,0,10">
+                                    <Label FontSize="Subtitle"
                                                FontAttributes="Bold"
                                                Text="{Binding Header}"/>
-                                        <Label Text="{Binding Description}"/>
-                                    </StackLayout>
-                                </Frame>
+                                    <Label Text="{Binding Description}"/>
+                                </StackLayout>
                             </StackLayout>
                         </Frame>
                     </DataTemplate>
                 </CarouselView.ItemTemplate>
             </CarouselView>
+            <IndicatorView x:Name="indicator"
+                           IndicatorsShape="Circle"
+                           IndicatorColor="LightGray"
+                           SelectedIndicatorColor="DarkGray"
+                           HorizontalOptions="Center"
+                           Margin="0,10,0,0"/>
         </StackLayout>
     </ScrollView>
 </ContentPage>
