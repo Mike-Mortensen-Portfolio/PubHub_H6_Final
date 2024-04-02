@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Radzen.Blazor" Version="4.29.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PubHub.Common\PubHub.Common.csproj" />
   </ItemGroup>
 

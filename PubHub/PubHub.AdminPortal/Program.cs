@@ -1,6 +1,7 @@
 ﻿using PubHub.AdminPortal.Components;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services.AddPubHubServices(options =>
     options.Address = address;
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
 });
+
+builder.Services.AddRadzenComponents();
 
 var app = builder.Build();
 
