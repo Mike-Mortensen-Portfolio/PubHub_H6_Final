@@ -6,6 +6,7 @@ using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
+using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
 using PubHub.Common.Models.Users;
@@ -18,7 +19,6 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class PublishersController(PubHubContext context) : Controller
     {
-#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         private readonly PubHubContext _context = context;
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace PubHub.API.Controllers
         public async Task<IResult> AddPublisherAsync([FromBody] PublisherCreateModel publisherCreateModel)
         {
             // TODO (SIA): Validate model.
-            
+
             // Check if a publisher like this already exists.
             var existingPublisher = await _context.Users.
                 FirstOrDefaultAsync(account => account.NormalizedEmail == publisherCreateModel.Account.Email.ToUpperInvariant());
@@ -138,7 +138,7 @@ namespace PubHub.API.Controllers
 
             return Results.Ok(publishers);
         }
-        
+
         /// <summary>
         /// Get all books for a specific publisher.
         /// </summary>
