@@ -116,7 +116,7 @@ namespace PubHub.Common.Services
                 var bookModelValues = JsonSerializer.Serialize(bookCreateModel);
 
                 if (bookModelValues == null)
-                    throw new NullReferenceException($"Unable to serialize the userCreateModel to json.");
+                    throw new NullReferenceException($"Unable to serialize the bookCreateModel to json.");
 
                 HttpContent httpContent = new StringContent(bookModelValues.ToString(), Encoding.UTF8, "application/json");
 
