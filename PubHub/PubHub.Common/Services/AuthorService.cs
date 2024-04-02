@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Authors;
-using PubHub.Common.Models.Books;
 using static PubHub.Common.IntegrityConstants;
 
-namespace PubHub.Common.Services 
+namespace PubHub.Common.Services
 {
     public class AuthorService : ServiceRoot, IAuthorService
     {
