@@ -35,7 +35,7 @@
                         <td>@item.PublicationDate</td>
                         <td>
                             <div class="combined-item">
-                                <button class="btn btn-warning" @onclick="() => showUpdateModal = true">Update</button>
+                                <button class="btn btn-warning me-2" @onclick="() => showUpdateModal = true">Update</button>
                                 @if (showUpdateModal)
                                 {
                                     <UpdateBookModal OnClose="() => OnUpdateDialogClose()" BookInfo="@item"></UpdateBookModal>

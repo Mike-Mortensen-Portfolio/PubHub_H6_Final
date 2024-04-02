@@ -55,13 +55,16 @@
                     </div>
                     <div class="form-group mb-2">
                         <label for="createBookGenres" class="form-label"><b>Genres:</b></label>
-                        <select id="createBookGenres" class="form-select">
-                            <option></option>
-                        </select>
+                        <RadzenDropDown TValue="int" Multiple="true" Placeholder="Select genres" Chips="true" Name="DropDownMultipleChips"></RadzenDropDown>
                     </div>
                     <div class="form-group mb-2">
                         <label for="createBookAuthors" class="form-label"><b>Authors:</b></label>
-                        <input id="createBookAuthors" class="form-control" placeholder="Make this a searchable input to look through already existing authors" />
+                        <input id="createBookAuthors" list="authorList" class="form-control" placeholder="Type in author name" />
+                        <datalist id="authorList">
+                            <option>Hola </option>
+                            <option>Comes estas</option>
+                            <option>Por favor</option>
+                        </datalist>
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
@@ -107,13 +110,7 @@
     // TODO (JBN): Fix tomorrow, figure out how to save an image in a byte[].
     //private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)
     //{
-    //    using (var stream = new FileStream(inputFileChange.File.Name, FileMode.Open))
-    //    {
-    //        BinaryReader binaryReader = new BinaryReader(stream);
-    //        long byteLength = inputFileChange.File.OpenReadStream().Length;
-    //        bookCreateForm.CoverImage = binaryReader.ReadBytes((Int32)byteLength);
-    //        binaryReader.Close();
-    //    }
+
     //}
 
     private void CreateBook()
