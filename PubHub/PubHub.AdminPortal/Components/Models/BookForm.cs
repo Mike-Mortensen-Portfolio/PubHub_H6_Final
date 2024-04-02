@@ -30,6 +30,7 @@ namespace PubHub.AdminPortal.Components.Models
         public Guid[] AuthorIds { get; set; } = [];
         public Guid[] GenreIds { get; set; } = [];
 
+        // TODO (JBN): Remove the test hard-coded values.
         public BookCreateModel CreateBookModel()
         {
             return new BookCreateModel()

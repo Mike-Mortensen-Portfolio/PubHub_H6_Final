@@ -61,6 +61,7 @@
     public EventCallback<bool> OnClose { get; set; }
 
     public List<BookInfoModel>? BookInfos { get; set; } = new();
+    // TODO (JBN): Remove the test hard-coded values.
     public Guid PublisherGuid { get; set; } = new Guid("7bf64e8c-9a22-8299-8575-018e8ede1d91");
 
     protected async override Task OnInitializedAsync()
