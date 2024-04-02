@@ -182,6 +182,25 @@ namespace PubHub.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AccountRefreshTokens",
+                columns: table => new
+                {
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountRefreshTokens", x => new { x.AccountId, x.Value });
+                    table.ForeignKey(
+                        name: "FK_AccountRefreshTokens_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "AccountId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AccountRoles",
                 columns: table => new
                 {
@@ -292,7 +311,7 @@ namespace PubHub.API.Migrations
                     BookId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ContentTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PublisherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(258)", maxLength: 258, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     CoverImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     BookContent = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     PublicationDate = table.Column<DateOnly>(type: "date", nullable: false),
@@ -313,7 +332,7 @@ namespace PubHub.API.Migrations
                         column: x => x.PublisherId,
                         principalTable: "Publishers",
                         principalColumn: "PublisherId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -510,6 +529,9 @@ namespace PubHub.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "AccountLogins");
+
+            migrationBuilder.DropTable(
+                name: "AccountRefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "AccountRoles");

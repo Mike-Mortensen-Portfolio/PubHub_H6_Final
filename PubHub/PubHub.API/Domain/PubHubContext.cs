@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Azure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
@@ -50,6 +51,9 @@ namespace PubHub.API.Domain
                     .WithMany()
                     .HasForeignKey(a => a.AccountTypeId)
                     .OnDelete(DeleteBehavior.Restrict);
+                account.HasMany(a => a.AccountRefreshTokens)
+                    .WithOne(art => art.Account)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 account.Property(a => a.Email)
                     .HasMaxLength(EMAIL_MAX_LENGTH);
@@ -66,6 +70,15 @@ namespace PubHub.API.Domain
                 account.HasQueryFilter(a => a.DeletedDate == null);
 
                 account.TypeToPluralTableName();
+            });
+
+            builder.Entity<AccountRefreshToken>(accountRefreshToken =>
+            {
+                accountRefreshToken.HasKey(art => new { art.AccountId, art.Value });
+
+                accountRefreshToken.HasQueryFilter(o => o.Account!.DeletedDate == null);
+
+                accountRefreshToken.TypeToPluralTableName();
             });
 
             builder.Entity<IdentityUserRole<Guid>>(accountRole =>
