@@ -1,5 +1,6 @@
 ﻿@inject PubHub.Common.Services.IBookService BookService
 @inject PubHub.Common.Services.IPublisherService PublisherService
+@inject PubHub.AdminPortal.Components.Helpers.FileHandler FileHandler
 
 <div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
@@ -32,7 +33,7 @@
                     </div>
                     <div class="form-group mb-2">
                         <label for="createBookCoverImg" class="form-label"><b>Cover image:</b></label>
-                        <InputFile id="createBookCoverImg" class="form-control">Cover image</InputFile>
+                        <InputFile OnChange="@BookCoverImgFileChanged" id="createBookCoverImg" class="form-control">Cover image</InputFile>
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
@@ -94,24 +95,18 @@
 
     private EditForm editForm { get; set; } = new();
 
-    private BookCreateForm bookCreateForm = new();
+    private BookForm bookCreateForm = new();
 
     // TODO (JBN): Not working, fix when BookContent have been talked about with the group.
     //private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
     //{
-    //    using (var stream = new FileStream(inputFileChange.File.Name, FileMode.Open))
-    //    {
-    //        BinaryReader binaryReader = new BinaryReader(stream);
-    //        long byteLength = inputFileChange.File.OpenReadStream().Length;
-    //        bookCreateForm.BookContent = binaryReader.ReadBytes((Int32)byteLength);
-    //    }
+    //    bookCreateForm.BookContent = await FileHandler.FileToByteArray(inputFileChange.File);
     //}
 
-    // TODO (JBN): Fix tomorrow, figure out how to save an image in a byte[].
-    //private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)
-    //{
-
-    //}
+    private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)
+    {
+        bookCreateForm.CoverImage = await FileHandler.FileToByteArray(inputFileChange.File);
+    }
 
     private void CreateBook()
     {

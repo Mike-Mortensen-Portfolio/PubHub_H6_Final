@@ -3,8 +3,9 @@ using PubHub.Common.Models.Books;
 
 namespace PubHub.AdminPortal.Components.Models
 {
-    public class BookCreateForm
+    public class BookForm
     {
+        // TODO (JBN): make this fit the new models being created for the Book.
         public Guid ContentTypeId { get; set; }
         [Required]
         public Guid PublisherId { get; set; }

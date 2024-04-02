@@ -1,4 +1,5 @@
 ﻿using PubHub.AdminPortal.Components;
+using PubHub.AdminPortal.Components.Helpers;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
 using Radzen;
@@ -24,6 +25,7 @@ builder.Services.AddPubHubServices(options =>
 });
 
 builder.Services.AddRadzenComponents();
+builder.Services.AddScoped<FileHandler>();
 
 var app = builder.Build();
 
