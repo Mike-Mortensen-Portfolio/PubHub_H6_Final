@@ -5,19 +5,21 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">You're about to remove: bind to book title...</h4>
+                <h4 class="modal-title">You're about to remove: <b>@BookTitle</b></h4>
                 <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
             </div>
-            <EditForm Model="MyEditForm">
-                <div class="modal-body">
-                    <div class="form-group mb-2">
-                        <label for="removeBookTitleInput" class="form-label">Are you sure you wish to delete this book: Bind to book title.</label>
-                    </div>
+            <div class="modal-body">
+                <div class="form-group mb-2">
+                    <label for="removeBookTitleInput" class="form-label">Are you sure you wish to delete this book: <b>@BookTitle</b></label>
                 </div>
-            </EditForm>
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger">Remove</button>
+                <button type="button" class="btn btn-danger" @onclick="() => RemoveBook()">Remove</button>
                 <button type="button" class="btn btn-success" @onclick="() => ModalOptions(false)">Cancel</button>
+                @if (unsuccessfulResult)
+                {
+                    <label class="text-danger">Unable to remove the book.</label>
+                }
             </div>
         </div>
     </div>
@@ -28,9 +30,26 @@
     public EventCallback<bool> OnClose { get; set; }
 
     [Parameter]
-    public Guid? BookId { get; set; }
+    public Guid BookId { get; set; }
 
-    public EditForm MyEditForm { get; set; } = new();
+    [Parameter]
+    public string BookTitle { get; set; }
+
+    private bool unsuccessfulResult = false;
+
+    // TODO (JBN): Add alert boxes instead, depending on the result.
+    private void RemoveBook()
+    {
+        var result = BookService.DeleteBook(BookId);
+        if (result.Result.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            ModalOptions(false);
+        }
+        else
+        {
+            unsuccessfulResult = true;
+        }
+    }
 
     Task ModalOptions(bool IsClosing)
     {

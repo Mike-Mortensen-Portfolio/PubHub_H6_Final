@@ -43,7 +43,7 @@
                                 <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
                                 @if (showRemoveModal)
                                 {
-                                    <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@item.Id"></RemoveBookModal>
+                                    <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@item.Id" BookTitle="@item.Title"></RemoveBookModal>
                                 }
                             </div>
                         </td>
