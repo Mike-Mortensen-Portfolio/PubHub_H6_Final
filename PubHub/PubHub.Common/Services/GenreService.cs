@@ -4,16 +4,17 @@ using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Authors;
+using PubHub.Common.Models.Genres;
 using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.Common.Services
 {
-    public class AuthorService : ServiceRoot, IAuthorService
+    public class GenreService : ServiceRoot, IGenreService
     {
 #pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
-        internal AuthorService(IHttpClientFactory clientFactory, string clientName) : base(clientFactory, clientName)
+        internal GenreService(IHttpClientFactory clientFactory, string clientName) : base(clientFactory, clientName)
         {
             _serializerOptions = new JsonSerializerOptions
             {
@@ -23,14 +24,14 @@ namespace PubHub.Common.Services
         }
 
         /// <summary>
-        /// Calls the API enpoint to retrieve all authors through the <see cref="AuthorInfoModel"/>.
+        /// Calls the API enpoint to retrieve all genres through the <see cref="GenreInfoModel"/>.
         /// </summary>
-        /// <returns>A list of <see cref="AuthorInfoModel"/></returns>
-        public async Task<List<AuthorInfoModel>> GetAuthors()
+        /// <returns>A list of <see cref="GenreInfoModel"/></returns>
+        public async Task<List<GenreInfoModel>> GetGenres()
         {
             try
             {
-                HttpResponseMessage response = await Client.GetAsync($"authors");
+                HttpResponseMessage response = await Client.GetAsync($"genres");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -42,35 +43,35 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                List<AuthorInfoModel>? authorInfoModel = JsonSerializer.Deserialize<List<AuthorInfoModel>>(content, _serializerOptions);
+                List<GenreInfoModel>? genreInfoModel = JsonSerializer.Deserialize<List<GenreInfoModel>>(content, _serializerOptions);
 
-                if (authorInfoModel == null)
+                if (genreInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
-                return authorInfoModel!;
+                return genreInfoModel!;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Unable to get authors:", ex.Message);
+                Debug.WriteLine("Unable to get genres:", ex.Message);
                 return [];
             }
         }
 
         /// <summary>
-        /// Calls the API end point for retrieving <see cref="AuthorInfoModel">, to use in the client applications.
+        /// Calls the API end point for retrieving <see cref="GenreInfoModel">, to use in the client applications.
         /// </summary>
-        /// <param name="authorId">Id of the author we want information about.</param>
-        /// <returns>A <see cref="AuthorInfoModel"/> with an author's information.</returns>
+        /// <param name="genreId">Id of the genre we want information about.</param>
+        /// <returns>A <see cref="GenreInfoModel"/> with a genre's information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<AuthorInfoModel?> GetAuthor(Guid authorId)
+        public async Task<GenreInfoModel?> GetGenre(Guid genreId)
         {
             try
             {
-                if (authorId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The author Id wasn't a valid Id: {authorId}");
+                if (genreId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The genre Id wasn't a valid Id: {genreId}");
 
-                HttpResponseMessage response = await Client.GetAsync($"authors/{authorId}");
+                HttpResponseMessage response = await Client.GetAsync($"genres/{genreId}");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -82,41 +83,41 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                AuthorInfoModel? authorInfoModel = JsonSerializer.Deserialize<AuthorInfoModel>(content, _serializerOptions);
-                if (authorInfoModel == null)
+                GenreInfoModel? genreInfoModel = JsonSerializer.Deserialize<GenreInfoModel>(content, _serializerOptions);
+                if (genreInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
-                return authorInfoModel!;
+                return genreInfoModel!;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Get author info failed:", ex.Message);
+                Debug.WriteLine("Get genre info failed:", ex.Message);
                 return null;
             }
         }
 
         /// <summary>
-        /// Calls the API endpoint for adding a <see cref="AuthorCreateModel"/> to the database.
+        /// Calls the API endpoint for adding a <see cref="GenreCreateModel"/> to the database.
         /// </summary>
-        /// <param name="authorCreateModel">The <see cref="AuthorCreateModel"/> holding the new author.</param>
-        /// <returns>A status telling if an author was successfully added to the database.</returns>
+        /// <param name="genreCreateModel">The <see cref="GenreCreateModel"/> holding the new genre.</param>
+        /// <returns>A status telling if a genre was successfully added to the database.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<AuthorCreateModel>> AddAuthor(AuthorCreateModel authorCreateModel)
+        public async Task<ServiceInstanceResult<GenreCreateModel>> AddGenre(GenreCreateModel genreCreateModel)
         {
             try
             {
-                if (authorCreateModel == null)
-                    throw new ArgumentNullException($"The author create model wasn't valid: {authorCreateModel?.Name}");
+                if (genreCreateModel == null)
+                    throw new ArgumentNullException($"The genre create model wasn't valid: {genreCreateModel?.Name}");
 
-                var authorModelValues = JsonSerializer.Serialize(authorCreateModel);
+                var genreModelValues = JsonSerializer.Serialize(genreCreateModel);
 
-                if (authorModelValues == null)
-                    throw new NullReferenceException($"Unable to serialize the authorCreateModel to json.");
+                if (genreModelValues == null)
+                    throw new NullReferenceException($"Unable to serialize the genreCreateModel to json.");
 
-                HttpContent httpContent = new StringContent(authorModelValues.ToString(), Encoding.UTF8, "application/json");
+                HttpContent httpContent = new StringContent(genreModelValues.ToString(), Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await Client.PostAsync("authors", httpContent);
+                HttpResponseMessage response = await Client.PostAsync("genres", httpContent);
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -128,30 +129,30 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return new ServiceInstanceResult<AuthorCreateModel>(response.StatusCode, authorCreateModel, $"Successfully added the author: {authorCreateModel.Name}");
+                return new ServiceInstanceResult<GenreCreateModel>(response.StatusCode, genreCreateModel, $"Successfully added the genre: {genreCreateModel.Name}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Failed to add the author: {authorCreateModel.Name}, ", ex.Message);
-                return new ServiceInstanceResult<AuthorCreateModel>(HttpStatusCode.Unused, authorCreateModel, $"Failed to add the author: {authorCreateModel.Name}");
+                Debug.WriteLine($"Failed to add the genre: {genreCreateModel.Name}, ", ex.Message);
+                return new ServiceInstanceResult<GenreCreateModel>(HttpStatusCode.Unused, genreCreateModel, $"Failed to add the genre: {genreCreateModel.Name}");
             }
         }
 
         /// <summary>
-        /// Calls the API endpoint to soft-delete an author./>
+        /// Calls the API endpoint to soft-delete a genre./>
         /// </summary>
-        /// <param name="authorId">The Id of the author who needs to be soft-deleted.</param>
+        /// <param name="genreId">The Id of the genre who needs to be soft-deleted.</param>
         /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteAuthor(Guid authorId)
+        public async Task<ServiceResult> DeleteGenre(Guid genreId)
         {
             try
             {
-                if (authorId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The author Id wasn't a valid Id: {authorId}");
+                if (genreId == INVALID_ENTITY_ID)
+                    throw new ArgumentException($"The genre Id wasn't a valid Id: {genreId}");
 
-                HttpResponseMessage response = await Client.DeleteAsync($"authors/{authorId}");
+                HttpResponseMessage response = await Client.DeleteAsync($"genres/{genreId}");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -163,12 +164,12 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return new ServiceResult(response.StatusCode, $"Successfully deleted the author: {authorId}");
+                return new ServiceResult(response.StatusCode, $"Successfully deleted the genre: {genreId}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Failed to delete the author: {authorId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the author: {authorId}");
+                Debug.WriteLine($"Failed to delete the genre: {genreId}, ", ex.Message);
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the genre: {genreId}");
             }
         }
     }
