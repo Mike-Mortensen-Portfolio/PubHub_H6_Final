@@ -47,5 +47,22 @@ namespace PubHub.AdminPortal.Components.Models
                 IsHidden = IsHidden
             };
         }
+
+        public BookUpdateModel UpdateBookModel()
+        {
+            return new BookUpdateModel()
+            {
+                Title = Title,
+                Length = Length,
+                PublicationDate = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day),
+                BookContent = BookContent,
+                PublisherId = new Guid("7bf64e8c-9a22-8299-8575-018e8ede1d91"),
+                ContentTypeId = new Guid("484F3814-65DE-8400-8574-018E8EDE1D91"),
+                CoverImage = CoverImage,
+                AuthorIds = AuthorIds,
+                GenreIds = GenreIds,
+                IsHidden = IsHidden
+            };
+        }
     }
 }

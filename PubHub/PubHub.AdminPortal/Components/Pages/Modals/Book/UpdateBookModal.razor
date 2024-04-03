@@ -1,4 +1,5 @@
 ﻿@inject PubHub.Common.Services.IBookService BookService
+@inject Radzen.NotificationService NotificationService
 
 <div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
@@ -92,10 +93,25 @@
     public BookInfoModel? BookInfo { get; set; }
 
     public EditForm MyEditForm { get; set; } = new();
+    private BookForm bookUpdateform = new();
 
     protected override Task OnInitializedAsync()
     {
         return base.OnInitializedAsync();
+    }
+
+    private void UpdateBook()
+    {
+        var result = BookService.UpdateBook(BookInfo.Id, bookUpdateform.UpdateBookModel());
+        if (result.Result.StatusCode == ResponseCodeConstants.OK_CODE)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.Result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            ModalOptions(false);
+        }
+        else
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.Result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+        }
     }
 
     Task ModalOptions(bool IsClosing)

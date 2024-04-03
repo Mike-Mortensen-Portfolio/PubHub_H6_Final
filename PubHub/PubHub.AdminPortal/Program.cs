@@ -25,6 +25,7 @@ builder.Services.AddPubHubServices(options =>
 });
 
 builder.Services.AddRadzenComponents();
+builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<FileHandler>();
 
 var app = builder.Build();

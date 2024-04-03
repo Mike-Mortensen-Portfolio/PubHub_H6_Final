@@ -1,6 +1,7 @@
 ﻿@inject PubHub.Common.Services.IBookService BookService
 @inject PubHub.Common.Services.IPublisherService PublisherService
 @inject PubHub.AdminPortal.Components.Helpers.FileHandler FileHandler
+@inject Radzen.NotificationService NotificationService
 
 <div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
@@ -111,7 +112,15 @@
     private void CreateBook()
     {
         var result = BookService.AddBook(bookCreateForm.CreateBookModel());
-        ModalOptions(false);
+        if (result.Result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.Result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            ModalOptions(false);
+        }
+        else
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.Result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+        }
     }
 
     Task ModalOptions(bool IsClosing)
