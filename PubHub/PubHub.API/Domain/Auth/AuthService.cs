@@ -41,7 +41,7 @@ namespace PubHub.API.Domain.Auth
         private string CreateToken(Account account)
         {
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authOptions.Key)), SecurityAlgorithms.HmacSha256);
-            var claims = GetClaimsAsync(account);
+            var claims = BuildClaimsAsync(account);
             var jwt = GetJwtToken(signingCredentials, claims);
 
             string token = string.Empty;
@@ -90,11 +90,11 @@ namespace PubHub.API.Domain.Auth
         }
 
         /// <summary>
-        /// Get claims based on properties of a given <see cref="Account"/>. Claims include claims used for identification as well as audiences to which access is given.
+        /// Build claims based on properties of a given <see cref="Account"/>. Claims include claims used for identification as well as audiences to which access is given.
         /// </summary>
         /// <param name="account"><see cref="Account"/> to create claims for.</param>
         /// <returns>List of claims for the account.</returns>
-        private List<Claim> GetClaimsAsync(Account account)
+        private List<Claim> BuildClaimsAsync(Account account)
         {
             List<Claim> claims =
             [
@@ -121,7 +121,7 @@ namespace PubHub.API.Domain.Auth
             var jwt = new JwtSecurityToken(
                 issuer: _authOptions.Issuers.FirstOrDefault(),
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(_authOptions.Lifetime),
+                expires: DateTime.UtcNow.AddMinutes(_authOptions.Lifetime),
                 signingCredentials: signingCredentials);
             
             return jwt;

@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace PubHub.API.Controllers
     [AllowAnonymous]
     [ApiController]
     [Route("[controller]")]
+    [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class AuthController : Controller
@@ -30,6 +32,8 @@ namespace PubHub.API.Controllers
         }
 
         [HttpPost("token")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
         public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password)
         {
             if (!ModelState.IsValid)
@@ -77,6 +81,8 @@ namespace PubHub.API.Controllers
         }
 
         [HttpPost("refresh")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
         public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken)
         {
             // Read expired token and find subject (account GUID).
@@ -155,6 +161,8 @@ namespace PubHub.API.Controllers
         }
         
         [HttpPost("revoke")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken)
         {
             // Read expired token and find subject (account GUID).
