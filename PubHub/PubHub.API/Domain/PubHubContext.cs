@@ -50,6 +50,9 @@ namespace PubHub.API.Domain
                     .WithMany()
                     .HasForeignKey(a => a.AccountTypeId)
                     .OnDelete(DeleteBehavior.Restrict);
+                account.HasMany(a => a.AccountRefreshTokens)
+                    .WithOne(art => art.Account)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 account.Property(a => a.Email)
                     .HasMaxLength(EMAIL_MAX_LENGTH);
@@ -63,9 +66,18 @@ namespace PubHub.API.Domain
                 account.HasIndex(a => a.Email)
                     .IsUnique();
 
-                account.HasQueryFilter(a => a.DeletedDate != null);
+                account.HasQueryFilter(a => a.DeletedDate == null);
 
                 account.TypeToPluralTableName();
+            });
+
+            builder.Entity<AccountRefreshToken>(accountRefreshToken =>
+            {
+                accountRefreshToken.HasKey(art => new { art.AccountId, art.Value });
+
+                accountRefreshToken.HasQueryFilter(o => o.Account!.DeletedDate == null);
+
+                accountRefreshToken.TypeToPluralTableName();
             });
 
             builder.Entity<IdentityUserRole<Guid>>(accountRole =>
@@ -214,7 +226,7 @@ namespace PubHub.API.Domain
                 @operator.Property(o => o.Surname)
                     .HasMaxLength(NAME_MAX_LENGTH);
 
-                @operator.HasQueryFilter(o => o.Account!.DeletedDate != null);
+                @operator.HasQueryFilter(o => o.Account!.DeletedDate == null);
 
                 @operator.TypeToPluralTableName();
             });
@@ -249,7 +261,7 @@ namespace PubHub.API.Domain
                 user.Property(o => o.Surname)
                     .HasMaxLength(NAME_MAX_LENGTH);
 
-                user.HasQueryFilter(u => u.Account!.DeletedDate != null);
+                user.HasQueryFilter(u => u.Account!.DeletedDate == null);
 
                 user.TypeToPluralTableName();
             });
