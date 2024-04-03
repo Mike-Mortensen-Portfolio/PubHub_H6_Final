@@ -11,20 +11,20 @@ public partial class Home : ContentPage
         BindingContext = this;
     }
 
-    public static ObservableCollection<Item> Items =
+    public static ObservableCollection<Item> Items { get; } =
     [
         new Item
         {
             Description = "This is sample text and it will descripe the image above",
             Header = "This is a header",
-            ImageUrl = "https://st.depositphotos.com/2274151/4841/i/450/depositphotos_48410095-stock-photo-sample-blue-square-grungy-stamp.jpg"
-        },       
+            ImageUrl = "https://st.depositphotos.com/2274151/4841/i/450/depositphotos_48410095-stock-photo-sample-blue-square-grungy-stamp.jpg",
+        },
         new Item
         {
             Description = "This is sample text and it will descripe the image above",
             Header = "This is a header",
             ImageUrl = "https://st.depositphotos.com/2274151/4841/i/450/depositphotos_48410095-stock-photo-sample-blue-square-grungy-stamp.jpg"
-        },      
+        },
         new Item
         {
             Description = "This is sample text and it will descripe the image above",

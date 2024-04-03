@@ -7,6 +7,6 @@
     <x:Double x:Key="VerySmall">11.11</x:Double>
     <x:Double x:Key="Small">13.33</x:Double>
     <x:Double x:Key="Normal">16</x:Double>
-    <x:Double x:Key="Subheader">27.65</x:Double>
-    <x:Double x:Key="Header">47.78</x:Double>
+    <x:Double x:Key="Subheader">21.65</x:Double>
+    <x:Double x:Key="Header">27.65</x:Double>
 </ResourceDictionary>
