@@ -51,7 +51,7 @@ namespace PubHub.API.Domain.Auth
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to create token.");
+                _logger.LogError(ex, "Unable to create token for account: {AccountId}", account.Id);
             }
 
             return token;

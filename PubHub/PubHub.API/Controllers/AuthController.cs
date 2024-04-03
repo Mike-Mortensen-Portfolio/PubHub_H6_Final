@@ -9,6 +9,7 @@ using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Identity;
 using PubHub.Common.Models.Accounts;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
 {
@@ -16,24 +17,26 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class AuthController : Controller
     {
+        private readonly ILogger<AuthController> _logger;
         private readonly PubHubContext _context;
         private readonly UserManager<Account> _userManager;
         private readonly AuthService _authService;
 
-        public AuthController(PubHubContext context, UserManager<Account> userManager, AuthService authService)
+        public AuthController(ILogger<AuthController> logger, PubHubContext context, UserManager<Account> userManager, AuthService authService)
         {
+            _logger = logger;
             _context = context;
             _userManager = userManager;
             _authService = authService;
         }
 
         [HttpPost("token")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password)
         {
             if (!ModelState.IsValid)
@@ -81,8 +84,8 @@ namespace PubHub.API.Controllers
         }
 
         [HttpPost("refresh")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken)
         {
             // Read expired token and find subject (account GUID).
@@ -161,8 +164,8 @@ namespace PubHub.API.Controllers
         }
         
         [HttpPost("revoke")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken)
         {
             // Read expired token and find subject (account GUID).
@@ -210,8 +213,10 @@ namespace PubHub.API.Controllers
 
             // Remove token.
             _context.Set<AccountRefreshToken>().Remove(storedRefreshToken);
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
             {
+                _logger.LogError("Couldn't save changes to the database when removing refresh token.");
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,

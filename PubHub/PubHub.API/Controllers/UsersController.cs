@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
@@ -15,9 +16,11 @@ namespace PubHub.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
-    public sealed class UsersController(PubHubContext context) : Controller
+    public sealed class UsersController(ILogger<UsersController> logger, PubHubContext context) : Controller
     {
+        private readonly ILogger<UsersController> _logger = logger;
         private readonly PubHubContext _context = context;
 
         /// <summary>
@@ -49,19 +52,22 @@ namespace PubHub.API.Controllers
 
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.Equals(AccountTypeConstants.USER_ACCOUNT_TYPE, StringComparison.InvariantCultureIgnoreCase))
+                .Where(a => a.Name.ToLower() == AccountTypeConstants.USER_ACCOUNT_TYPE)
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
-
             if (accountTypeId == INVALID_ENTITY_ID)
+            {
+                _logger.LogError("Unable to get account type: {TypeName}", AccountTypeConstants.USER_ACCOUNT_TYPE);
+
                 return Results.Problem(
-                    statusCode: UnprocessableEntitySpecification.STATUS_CODE,
-                    title: UnprocessableEntitySpecification.TITLE,
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
                     detail: $"Unable to find account type.",
                     extensions: new Dictionary<string, object?>
                     {
                         { "AccountType", AccountTypeConstants.USER_ACCOUNT_TYPE }
                     });
+            }
 
             // Create user account.
             // TODO (SIA): Add more account related data to fully set up an account.
@@ -80,8 +86,10 @@ namespace PubHub.API.Controllers
             await _context.Set<User>()
                 .AddAsync(newUser);
 
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
             {
+                _logger.LogError("Couldn't save changes to the database when adding user.");
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -243,8 +251,10 @@ namespace PubHub.API.Controllers
             };
 
             _context.Set<User>().Update(user);
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
             {
+                _logger.LogError("Couldn't save changes to the database when updating user: {UserId}", user.Id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -323,6 +333,8 @@ namespace PubHub.API.Controllers
 
             if (accountTypeId == INVALID_ENTITY_ID)
             {
+                _logger.LogError("Unable to get account type: {TypeName}", AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -356,6 +368,8 @@ namespace PubHub.API.Controllers
                 .ExecuteUpdateAsync(u => u.SetProperty(u => u.AccountTypeId, accountTypeId));
             if (updatedRows == 0)
             {
+                _logger.LogError("Unable to set account type: {TypeId}", accountTypeId);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,

@@ -16,10 +16,12 @@ namespace PubHub.API.Controllers
     public class GenresController : ControllerBase
     {
         private readonly PubHubContext _context;
+        private readonly ILogger<GenresController> _logger;
 
-        public GenresController(PubHubContext context)
+        public GenresController(ILogger<GenresController> logger, PubHubContext context)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet()]
@@ -86,6 +88,9 @@ namespace PubHub.API.Controllers
             await _context.Set<Genre>().AddAsync(genre);
 
             if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when adding genre.");
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -94,7 +99,7 @@ namespace PubHub.API.Controllers
                     {
                         { "Genre", genreModel.Name }
                     });
-
+            }
             entityGenre = await _context.Set<Genre>()
                 .FirstOrDefaultAsync(genre => genre.Name.ToUpper() == genreModel.Name.ToUpper());
 
@@ -126,6 +131,9 @@ namespace PubHub.API.Controllers
             _context.Set<Genre>().Remove(entityGenre);
 
             if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when deleting genre: {GenreId}", entityGenre.Id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -134,6 +142,7 @@ namespace PubHub.API.Controllers
                     {
                         { "Id", id }
                     });
+            }
 
             return Results.Ok();
         }
