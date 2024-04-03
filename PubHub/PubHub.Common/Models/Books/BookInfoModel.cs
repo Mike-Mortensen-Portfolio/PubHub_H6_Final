@@ -1,5 +1,6 @@
-﻿using PubHub.Common.Models.Genres;
 ﻿using PubHub.Common.Models.Authors;
+using PubHub.Common.Models.ContentTypes;
+using PubHub.Common.Models.Genres;
 
 namespace PubHub.Common.Models.Books
 {
