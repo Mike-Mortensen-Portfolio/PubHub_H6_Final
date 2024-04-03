@@ -17,4 +17,8 @@
     <Folder Include="wwwroot\sample-data\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PubHub.Common\PubHub.Common.csproj" />
+  </ItemGroup>
+
 </Project>
