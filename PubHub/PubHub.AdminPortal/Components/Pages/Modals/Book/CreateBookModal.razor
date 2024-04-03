@@ -34,7 +34,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="createBookContent" class="form-label"><b>Book content:</b></label>
-                                <InputFile id="createBookContent" class="form-control">Content</InputFile>
+                                <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
                             </div>
                         </div>
                     </div>
@@ -122,10 +122,10 @@
     }
 
     // TODO (JBN): Not working as we intend, fix this when we know more.
-    //private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
-    //{
-    //    bookCreateForm.BookContent = await FileHandler.FileToByteArray(inputFileChange.File);
-    //}
+    private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
+    {
+        bookCreateForm.BookContent = await FileHandler.FileToByteArray(inputFileChange.File);
+    }
 
     private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)
     {

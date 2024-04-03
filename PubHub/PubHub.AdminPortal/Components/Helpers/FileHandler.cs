@@ -11,18 +11,19 @@ namespace PubHub.AdminPortal.Components.Helpers
         /// <returns>A <see cref="byte[]"/> of the file.</returns>
         public async Task<byte[]> FileToByteArray(IBrowserFile file)
         {
-            long maxFilesSize = 1024 * 1024 * 5;
+            var bufferSize = 1024 * 1024; // 1 MB buffer size
+            await using var outputStream = new MemoryStream();
+            await using var stream = file.OpenReadStream(maxAllowedSize: 51200000);
 
-            using (var stream = file.OpenReadStream(maxFilesSize))
+            var buffer = new byte[bufferSize];
+            int readBytes;
+            // Continue reading from the file stream until no more data is available.
+            while ((readBytes = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
             {
-                var bytes = new byte[stream.Length];
-
-                using (var memoryStream = new MemoryStream(bytes))
-                {
-                    await stream.CopyToAsync(memoryStream);
-                    return memoryStream.ToArray();
-                }
+                await outputStream.WriteAsync(buffer, 0, readBytes);
             }
+
+            return outputStream.ToArray();
         }
 
         /// <summary>

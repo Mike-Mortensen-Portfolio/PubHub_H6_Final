@@ -44,7 +44,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="updateBookLength" class="form-label"><b>Book length:</b></label>
-                                <input @bind-value="bookUpdateform.Length" id="updateBookLength" class="form-control" placeholder="@BookInfo.Length" />
+                                <input @bind-value="bookUpdateform.Length" type="text" id="updateBookLength" class="form-control" placeholder="@BookInfo.Length" />
                             </div>
                             <div class="col-md-6">
                                 <label for="updateIsBookHidden" class="form-label"><b>Accessability:</b></label>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="form-group mb-2">
                         <label for="updateBookGenres" class="form-label"><b>Genres:</b></label>
-                        <RadzenDropDown Data="@genres" TextProperty="Name" ValueProperty="Id" AllowFiltering="true" @bind-Value="multipleGenres" Change="@GenreOnChange" Multiple="true" Placeholder="Select genres" Chips="true" AllowClear="true" Name="DropDownMultipleChips" Style="width: 100%; " />
+                        <RadzenDropDown Data="@genres" TextProperty="Name" ValueProperty="Id" AllowFiltering="true" @bind-Value="bookGenres" Change="@GenreOnChange" Multiple="true" Placeholder="Select genres" Chips="true" AllowClear="true" Name="DropDownMultipleChips" Style="width: 100%; " />
                     </div>
                     <div class="form-group mb-2">
                         <label for="updateBookAuthors" class="form-label"><b>Authors:</b></label>
@@ -81,7 +81,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="updatePublicationYear" class="form-label"><b>Publication year:</b></label>
-                                <input id="updatePublicationYear" type="datetime" class="form-control" placeholder="Type in the date this will be published..." />
+                                <input id="updatePublicationYear" type="datetime-local" class="form-control" placeholder="Type in the date this will be published..." />
                             </div>
                         </div>
                     </div>
@@ -108,20 +108,25 @@
     private List<AuthorInfoModel> authors = new();
     string? authorName;
     IEnumerable<GenreInfoModel>? genres;
-    IEnumerable<Guid>? multipleGenres;
+    //IEnumerable<Guid>? multipleGenres;
+    List<Guid> bookGenres = new();
 
     protected override async Task OnInitializedAsync()
     {
         contentTypes = await ContentTypeService.GetContentTypes();
         genres = await GenreService.GetGenres();
         authors = await AuthorService.GetAuthors();
+        foreach (var genre in BookInfo.Genres)
+        {
+            bookGenres.Add(genre.Id);
+        }
     }
 
     void GenreOnChange(object genre)
     {
         var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
 
-        bookUpdateform.GenreIds = multipleGenres.ToList();
+        bookUpdateform.GenreIds = bookGenres.ToList();
     }
 
     private void UpdateBook()
