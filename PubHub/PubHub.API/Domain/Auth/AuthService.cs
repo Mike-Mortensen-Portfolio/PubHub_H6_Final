@@ -27,9 +27,9 @@ namespace PubHub.API.Domain.Auth
 
             return new()
             {
-                RefreshToken = refreshToken,
                 Token = token,
-                Success = !string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(token)
+                RefreshToken = refreshToken,
+                Success = !string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(refreshToken)
             };
         }
 

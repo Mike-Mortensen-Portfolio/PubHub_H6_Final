@@ -44,27 +44,19 @@ namespace PubHub.API.Controllers
                     });
             }
 
-            // Validate user email.
+            // Validate user email and password.
+            bool passwordIsCorrect = false;
             var account = await _userManager.FindByEmailAsync(email);
-            if (account == null)
+            if (account != null)
             {
-                return Results.Problem(
-                    statusCode: UnauthorizedSpecification.STATUS_CODE,
-                    title: UnauthorizedSpecification.TITLE,
-                    detail: "Email doesn't exist.",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        { "Email", email }
-                    });
+                passwordIsCorrect = await _userManager.CheckPasswordAsync(account, password);
             }
-
-            // Validate user password.
-            if (!(await _userManager.CheckPasswordAsync(account, password)))
+            if (account == null || !passwordIsCorrect)
             {
                 return Results.Problem(
                     statusCode: UnauthorizedSpecification.STATUS_CODE,
                     title: UnauthorizedSpecification.TITLE,
-                    detail: "Provided password is incorrect.");
+                    detail: "The provided credentials were incorrect.");
             }
 
             // Create token.
@@ -74,7 +66,7 @@ namespace PubHub.API.Controllers
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
-                    detail: "Something went wrong and no a token couldn't be created for the given account. Please try again.",
+                    detail: "Something went wrong and no token could be created for the given account. Please try again.",
                     extensions: new Dictionary<string, object?>
                     {
                         { "Id", account.Id }
