@@ -1,4 +1,4 @@
-﻿namespace PubHub.Common.Models.Books
+﻿namespace PubHub.Common.Models.ContentTypes
 {
     public class ContentTypeInfoModel
     {
