@@ -1,18 +1,32 @@
-using PubHub.AdminPortal.Components;
+﻿using PubHub.AdminPortal.Components;
+using PubHub.AdminPortal.Components.Helpers;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddCircuitOptions(options =>
+    {
+        options.DetailedErrors = true;
+    });
 
-builder.Services.AddPubHubServices(new ApiOptions
+builder.Services.AddPubHubServices(options =>
 {
-    Address = builder.Configuration.GetSection(ApiConstants.API_ENDPOINT).ToString()!,
-    HttpClientName = ApiConstants.HTTPCLIENT_NAME
+    string address = builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT);
+    if (address == null)
+        throw new ArgumentNullException(nameof(address), "Api base address couldn't be found.");
+
+    options.Address = address;
+    options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
 });
+
+builder.Services.AddRadzenComponents();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<FileHandler>();
 
 var app = builder.Build();
 

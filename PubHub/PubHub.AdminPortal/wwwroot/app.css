@@ -22,6 +22,14 @@ a, .btn-link {
     display: block;
 }
 
+.rz-notification-message.rz-growl {
+    position: fixed !important;
+    width: 30% !important;
+    bottom: 30px !important;
+    right: 15px !important;
+    top: unset !important;
+}
+
 .admin-portal {
     color: gray;
     font-size: 12px;

@@ -1,0 +1,121 @@
+﻿@inject PubHub.Common.Services.IBookService BookService
+@inject Radzen.NotificationService NotificationService
+
+<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Updating: book title</h4>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+            </div>
+            <EditForm Model="MyEditForm">
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="updateBookTitleInput" class="form-label"><b>Book title:</b></label>
+                        <input @bind-value="BookInfo.Title" id="updateBookTitleInput" class="form-control" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="updateSelectContentType" class="form-label"><b>Bind to Content type:</b></label>
+                                <select id="updateSelectContentType" class="form-select">
+                                    <option>E-book</option>
+                                    <option>Audio book</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateBookContent" class="form-label"><b>Book content:</b></label>
+                                <InputFile id="updateBookContent" class="form-control">Bind to book Content</InputFile>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="updateBookCoverImg" class="form-label"><b>Bind to Cover image:</b></label>
+                        <InputFile id="updateBookCoverImg" class="form-control">Cover image</InputFile>
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="updateBookLength" class="form-label"><b>Book length:</b></label>
+                                <input id="updateBookLength" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateIsBookHidden" class="form-label"><b>Accessability:</b></label>
+                                <div class="row">
+                                    <div class="col-md-8 mt-2">
+                                        <label class="form-label">Should the book be accessable?</label>
+                                    </div>
+                                    <div class="col-md-4 mt-2">
+                                        <input id="updateIsBookHidden" type="checkbox" class="form-check" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="updateBookGenres" class="form-label"><b>Bind to Genres:</b></label>
+                        <select id="updateBookGenres" class="form-select">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="updateBookAuthors" class="form-label"><b>Bind to Authors:</b></label>
+                        <input id="updateBookAuthors" class="form-control" placeholder="Make this a searchable input to look through already existing authors" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="updatePublisherInput" class="form-label"><b>Publisher:</b></label>
+                                <input id="updatePublisherInput" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updatePublicationYear" class="form-label"><b>Publication year:</b></label>
+                                <input @bind-value="BookInfo.PublicationDate" id="updatePublicationYear" type="datetime" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning">Update</button>
+                <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    [Parameter]
+    public BookInfoModel? BookInfo { get; set; }
+
+    public EditForm MyEditForm { get; set; } = new();
+    private BookForm bookUpdateform = new();
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    private void UpdateBook()
+    {
+        var result = BookService.UpdateBook(BookInfo.Id, bookUpdateform.UpdateBookModel());
+        if (result.Result.StatusCode == ResponseCodeConstants.OK_CODE)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.Result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            ModalOptions(false);
+        }
+        else
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.Result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+        }
+    }
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}

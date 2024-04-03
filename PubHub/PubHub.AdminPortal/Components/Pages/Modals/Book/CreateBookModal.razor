@@ -1,0 +1,130 @@
+﻿@inject PubHub.Common.Services.IBookService BookService
+@inject PubHub.Common.Services.IPublisherService PublisherService
+@inject PubHub.AdminPortal.Components.Helpers.FileHandler FileHandler
+@inject Radzen.NotificationService NotificationService
+
+<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create a new book</h4>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+            </div>
+            <EditForm Model="bookCreateForm" OnSubmit="() => CreateBook()">
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="createBookTitleInput" class="form-label"><b>Book title:</b></label>
+                        <input @bind-value="bookCreateForm.Title" id="createBookTitleInput" class="form-control" placeholder="Type in the book title..." />
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="createSelectContentType" class="form-label"><b>Content type:</b></label>
+                                <select id="createSelectContentType" class="form-select">
+                                    <option>E-book</option>
+                                    <option>Audio book</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createBookContent" class="form-label"><b>Book content:</b></label>
+                                <InputFile id="createBookContent" class="form-control">Content</InputFile>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createBookCoverImg" class="form-label"><b>Cover image:</b></label>
+                        <InputFile OnChange="@BookCoverImgFileChanged" id="createBookCoverImg" class="form-control">Cover image</InputFile>
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="createBookLength" class="form-label"><b>Book length:</b></label>
+                                <input @bind-value="bookCreateForm.Length" id="createBookLength" class="form-control" placeholder="Type in the length of the book..." />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createIsBookHidden" class="form-label"><b>Accessability:</b></label>
+                                <div class="row">
+                                    <div class="col-md-8 mt-2">
+                                        <label class="form-label">Should the book be accessable?</label>
+                                    </div>
+                                    <div class="col-md-4 mt-2">
+                                        <input @bind-value="bookCreateForm.IsHidden" id="createIsBookHidden" type="checkbox" class="form-check" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createBookGenres" class="form-label"><b>Genres:</b></label>
+                        <RadzenDropDown TValue="int" Multiple="true" Placeholder="Select genres" Chips="true" Name="DropDownMultipleChips"></RadzenDropDown>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createBookAuthors" class="form-label"><b>Authors:</b></label>
+                        <input id="createBookAuthors" list="authorList" class="form-control" placeholder="Type in author name" />
+                        <datalist id="authorList">
+                            <option>Hola </option>
+                            <option>Comes estas</option>
+                            <option>Por favor</option>
+                        </datalist>
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="createPublisherInput" class="form-label"><b>Publisher:</b></label>
+                                <input id="createPublisherInput" class="form-control" disabled placeholder="Insert signed in publisher here..." />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createPublicationYear" class="form-label"><b>Publication year:</b></label>
+                                <input id="createPublicationYear" type="datetime" class="form-control" placeholder="Type in the date this will be published..." />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Create</button>
+                    <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private EditForm editForm { get; set; } = new();
+
+    private BookForm bookCreateForm = new();
+
+    // TODO (JBN): Not working, fix when BookContent have been talked about with the group.
+    //private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
+    //{
+    //    bookCreateForm.BookContent = await FileHandler.FileToByteArray(inputFileChange.File);
+    //}
+
+    private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)
+    {
+        bookCreateForm.CoverImage = await FileHandler.FileToByteArray(inputFileChange.File);
+    }
+
+    private void CreateBook()
+    {
+        var result = BookService.AddBook(bookCreateForm.CreateBookModel());
+        if (result.Result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.Result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            ModalOptions(false);
+        }
+        else
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.Result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+        }
+    }
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}
