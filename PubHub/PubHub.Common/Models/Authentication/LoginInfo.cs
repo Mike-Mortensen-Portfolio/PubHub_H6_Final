@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PubHub.Common.Models
+namespace PubHub.Common.Models.Authentication
 {
     public class LoginInfo
     {
