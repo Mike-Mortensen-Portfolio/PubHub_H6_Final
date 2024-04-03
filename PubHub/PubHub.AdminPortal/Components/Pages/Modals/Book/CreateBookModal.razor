@@ -1,5 +1,8 @@
 ﻿@inject PubHub.Common.Services.IBookService BookService
 @inject PubHub.Common.Services.IPublisherService PublisherService
+@inject PubHub.Common.Services.IContentTypeService ContentTypeService
+@inject PubHub.Common.Services.IGenreService GenreService
+@inject PubHub.Common.Services.IAuthorService AuthorService
 @inject PubHub.AdminPortal.Components.Helpers.FileHandler FileHandler
 @inject Radzen.NotificationService NotificationService
 
@@ -21,14 +24,17 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="createSelectContentType" class="form-label"><b>Content type:</b></label>
-                                <select id="createSelectContentType" class="form-select">
-                                    <option>E-book</option>
-                                    <option>Audio book</option>
+                                <select @onchange="@(async value => { bookCreateForm.ContentTypeId = new Guid(value.Value!.ToString()!); })" id="createSelectContentType" class="form-select">
+                                    <option value="0">Nothing selected</option>
+                                    @foreach (var contentType in contentTypes)
+                                    {
+                                        <option value="@contentType.Id">@contentType.Name</option>
+                                    }
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="createBookContent" class="form-label"><b>Book content:</b></label>
-                                <InputFile id="createBookContent" class="form-control">Content</InputFile>
+                                <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
                             </div>
                         </div>
                     </div>
@@ -57,22 +63,23 @@
                     </div>
                     <div class="form-group mb-2">
                         <label for="createBookGenres" class="form-label"><b>Genres:</b></label>
-                        <RadzenDropDown TValue="int" Multiple="true" Placeholder="Select genres" Chips="true" Name="DropDownMultipleChips"></RadzenDropDown>
+                        <RadzenDropDown Data="@genres" TextProperty="Name" ValueProperty="Id" AllowFiltering="true" @bind-Value="multipleGenres" Change="@GenreOnChange" Multiple="true" Placeholder="Select genres" Chips="true" AllowClear="true" Name="DropDownMultipleChips" Style="width: 100%; " />
                     </div>
                     <div class="form-group mb-2">
                         <label for="createBookAuthors" class="form-label"><b>Authors:</b></label>
-                        <input id="createBookAuthors" list="authorList" class="form-control" placeholder="Type in author name" />
+                        <input @bind-value="authorName" type="text" class="form-control" list="authorList" placeholder="Type in author" />
                         <datalist id="authorList">
-                            <option>Hola </option>
-                            <option>Comes estas</option>
-                            <option>Por favor</option>
+                            @foreach (var author in authors)
+                            {
+                                <option>@author.Name</option>
+                            }
                         </datalist>
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="createPublisherInput" class="form-label"><b>Publisher:</b></label>
-                                <input id="createPublisherInput" class="form-control" disabled placeholder="Insert signed in publisher here..." />
+                                <input id="createPublisherInput" class="form-control" disabled placeholder="@Publisher.Name" />
                             </div>
                             <div class="col-md-6">
                                 <label for="createPublicationYear" class="form-label"><b>Publication year:</b></label>
@@ -94,11 +101,29 @@
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
 
+    [Parameter]
+    public PublisherInfoModel Publisher { get; set; }
+
     private EditForm editForm { get; set; } = new();
 
     private BookForm bookCreateForm = new();
+    private Guid createSelectContentType = Guid.Empty;
+    private bool addAnotherAuthor = false;
 
-    // TODO (JBN): Not working, fix when BookContent have been talked about with the group.
+    private List<ContentTypeInfoModel> contentTypes = new();
+    private List<AuthorInfoModel> authors = new();
+    string? authorName;
+    IEnumerable<GenreInfoModel>? genres;
+    IEnumerable<Guid>? multipleGenres;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contentTypes = await ContentTypeService.GetContentTypes();
+        genres = await GenreService.GetGenres();
+        authors = await AuthorService.GetAuthors();
+    }
+
+    // TODO (JBN): Not working as we intend, fix this when we know more.
     //private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
     //{
     //    bookCreateForm.BookContent = await FileHandler.FileToByteArray(inputFileChange.File);
@@ -109,8 +134,25 @@
         bookCreateForm.CoverImage = await FileHandler.FileToByteArray(inputFileChange.File);
     }
 
-    private void CreateBook()
+    void GenreOnChange(object genre)
     {
+        var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
+
+        bookCreateForm.GenreIds = multipleGenres.ToList();
+    }
+
+    private async void CreateBook()
+    {
+        var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
+        if (authorExists == null && authorName != null)
+        {
+            AuthorCreateModel authorCreateModel = new() { Name = authorName };
+            var authorResult = await AuthorService.AddAuthor(authorCreateModel);
+            var updatedListAuthors = await AuthorService.GetAuthors();
+            authorExists = updatedListAuthors.Where(x => x.Name == authorResult.Instance.Name).FirstOrDefault();
+        }
+        bookCreateForm.AuthorIds.Add(authorExists.Id);
+        bookCreateForm.PublisherId = Publisher.Id;
         var result = BookService.AddBook(bookCreateForm.CreateBookModel());
         if (result.Result.StatusCode == ResponseCodeConstants.CREATED_CODE)
         {

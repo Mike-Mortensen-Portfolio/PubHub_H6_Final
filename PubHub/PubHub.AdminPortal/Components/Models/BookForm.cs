@@ -27,8 +27,8 @@ namespace PubHub.AdminPortal.Components.Models
         [Required]
         public double Length { get; set; }
         public bool IsHidden { get; set; } = false;
-        public Guid[] AuthorIds { get; set; } = [];
-        public Guid[] GenreIds { get; set; } = [];
+        public List<Guid> AuthorIds { get; set; } = [];
+        public List<Guid> GenreIds { get; set; } = new();
 
         // TODO (JBN): Remove the test hard-coded values.
         public BookCreateModel CreateBookModel()
@@ -39,11 +39,11 @@ namespace PubHub.AdminPortal.Components.Models
                 Length = Length,
                 PublicationDate = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day),
                 BookContent = BookContent,
-                PublisherId = new Guid("7bf64e8c-9a22-8299-8575-018e8ede1d91"),
-                ContentTypeId = new Guid("484F3814-65DE-8400-8574-018E8EDE1D91"),
+                PublisherId = PublisherId,
+                ContentTypeId = ContentTypeId,
                 CoverImage = CoverImage,
-                AuthorIds = AuthorIds,
-                GenreIds = GenreIds,
+                AuthorIds = AuthorIds.ToArray(),
+                GenreIds = GenreIds.ToArray(),
                 IsHidden = IsHidden
             };
         }
@@ -56,11 +56,11 @@ namespace PubHub.AdminPortal.Components.Models
                 Length = Length,
                 PublicationDate = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day),
                 BookContent = BookContent,
-                PublisherId = new Guid("7bf64e8c-9a22-8299-8575-018e8ede1d91"),
-                ContentTypeId = new Guid("484F3814-65DE-8400-8574-018E8EDE1D91"),
+                PublisherId = TestData.PUBLISHER_ID,
+                ContentTypeId =ContentTypeId,
                 CoverImage = CoverImage,
-                AuthorIds = AuthorIds,
-                GenreIds = GenreIds,
+                AuthorIds = AuthorIds.ToArray(),
+                GenreIds = GenreIds.ToArray(),
                 IsHidden = IsHidden
             };
         }

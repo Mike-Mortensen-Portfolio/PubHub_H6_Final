@@ -5,55 +5,57 @@
 
 <PageTitle>Publisher's books</PageTitle>
 
-<div class="container">
-
-    <div class="row">
-        <div class="col-md-10">
-            <h1 class="text-center">Publisher name's books</h1>
+@if (Publisher != null)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <h1 class="text-center">@Publisher.Name books</h1>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
+            </div>
+            @if (showCreateModal)
+            {
+                <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
+            }
         </div>
-        <div class="col-md-2">
-            <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
+        <div class="row text-center">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Publication year</th>
+                        <th scope="col">Administration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        @foreach (var item in BookInfos)
+                        {
+                            <td>@item.Title</td>
+                            <td>@item.PublicationDate</td>
+                            <td>
+                                <div class="combined-item">
+                                    <button class="btn btn-warning me-2" @onclick="() => showUpdateModal = true">Update</button>
+                                    @if (showUpdateModal)
+                                    {
+                                        <UpdateBookModal OnClose="() => OnUpdateDialogClose()" BookInfo="@item"></UpdateBookModal>
+                                    }
+                                    <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
+                                    @if (showRemoveModal)
+                                    {
+                                        <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@item.Id" BookTitle="@item.Title"></RemoveBookModal>
+                                    }
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        @if (showCreateModal)
-        {
-            <CreateBookModal OnClose="() => OnCreateDialogClose()"></CreateBookModal>
-        }               
     </div>
-    <div class="row text-center">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Publication year</th>
-                    <th scope="col">Administration</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    @foreach (var item in BookInfos)
-                    {
-                        <td>@item.Title</td>
-                        <td>@item.PublicationDate</td>
-                        <td>
-                            <div class="combined-item">
-                                <button class="btn btn-warning me-2" @onclick="() => showUpdateModal = true">Update</button>
-                                @if (showUpdateModal)
-                                {
-                                    <UpdateBookModal OnClose="() => OnUpdateDialogClose()" BookInfo="@item"></UpdateBookModal>
-                                }
-                                <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
-                                @if (showRemoveModal)
-                                {
-                                    <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@item.Id" BookTitle="@item.Title"></RemoveBookModal>
-                                }
-                            </div>
-                        </td>
-                    }
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+}
 
 @code {
     bool showCreateModal;
@@ -62,12 +64,15 @@
     public EventCallback<bool> OnClose { get; set; }
 
     public List<BookInfoModel>? BookInfos { get; set; } = new();
-    // TODO (JBN): Remove the test hard-coded values.
-    public Guid PublisherGuid { get; set; } = new Guid("7bf64e8c-9a22-8299-8575-018e8ede1d91");
+    private PublisherInfoModel? Publisher { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        BookInfos = await PublisherService.GetPublisherBooks(PublisherGuid);
+        Publisher = await PublisherService.GetPublisherInfo(TestData.PUBLISHER_ID);
+        if (Publisher != null)
+        {
+            BookInfos = await PublisherService.GetPublisherBooks(Publisher.Id);
+        }
     }
 
     #region Dialog closing methods.
