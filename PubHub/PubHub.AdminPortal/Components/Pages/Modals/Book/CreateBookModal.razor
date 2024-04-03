@@ -34,7 +34,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="createBookContent" class="form-label"><b>Book content:</b></label>
-                                <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
+                                <InputFile id="createBookContent" class="form-control">Content</InputFile>
                             </div>
                         </div>
                     </div>
@@ -107,8 +107,6 @@
     private EditForm editForm { get; set; } = new();
 
     private BookForm bookCreateForm = new();
-    private Guid createSelectContentType = Guid.Empty;
-    private bool addAnotherAuthor = false;
 
     private List<ContentTypeInfoModel> contentTypes = new();
     private List<AuthorInfoModel> authors = new();

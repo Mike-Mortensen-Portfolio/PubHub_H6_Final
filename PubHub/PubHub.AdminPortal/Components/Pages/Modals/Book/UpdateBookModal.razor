@@ -1,44 +1,50 @@
 ﻿@inject PubHub.Common.Services.IBookService BookService
+@inject PubHub.Common.Services.IContentTypeService ContentTypeService
+@inject PubHub.Common.Services.IGenreService GenreService
+@inject PubHub.Common.Services.IAuthorService AuthorService
 @inject Radzen.NotificationService NotificationService
 
-<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+<div class="modal fade show" id="updateBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Updating: book title</h4>
+                <h4 class="modal-title">Updating: @BookInfo.Title</h4>
                 <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
             </div>
-            <EditForm Model="MyEditForm">
+            <EditForm Model="bookUpdateform" OnSubmit="() => UpdateBook()">
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <label for="updateBookTitleInput" class="form-label"><b>Book title:</b></label>
-                        <input @bind-value="BookInfo.Title" id="updateBookTitleInput" class="form-control" />
+                        <input @bind-value="bookUpdateform.Title" id="updateBookTitleInput" class="form-control" placeholder="@BookInfo.Title" />
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="updateSelectContentType" class="form-label"><b>Bind to Content type:</b></label>
-                                <select id="updateSelectContentType" class="form-select">
-                                    <option>E-book</option>
-                                    <option>Audio book</option>
+                                <label for="updateSelectContentType" class="form-label"><b>Content type:</b></label>
+                                <select @onchange="@(async value => { bookUpdateform.ContentTypeId = new Guid(value.Value!.ToString()!); })" id="updateSelectContentType" class="form-select">
+                                    <option value="0">Nothing selected</option>
+                                    @foreach (var contentType in contentTypes)
+                                    {
+                                        <option value="@contentType.Id">@contentType.Name</option>
+                                    }
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="updateBookContent" class="form-label"><b>Book content:</b></label>
-                                <InputFile id="updateBookContent" class="form-control">Bind to book Content</InputFile>
+                                <InputFile id="updateBookContent" class="form-control">Content</InputFile>
                             </div>
                         </div>
                     </div>
                     <div class="form-group mb-2">
-                        <label for="updateBookCoverImg" class="form-label"><b>Bind to Cover image:</b></label>
+                        <label for="updateBookCoverImg" class="form-label"><b>Cover image:</b></label>
                         <InputFile id="updateBookCoverImg" class="form-control">Cover image</InputFile>
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="updateBookLength" class="form-label"><b>Book length:</b></label>
-                                <input id="updateBookLength" class="form-control" />
+                                <input @bind-value="bookUpdateform.Length" id="updateBookLength" class="form-control" placeholder="@BookInfo.Length" />
                             </div>
                             <div class="col-md-6">
                                 <label for="updateIsBookHidden" class="form-label"><b>Accessability:</b></label>
@@ -47,40 +53,44 @@
                                         <label class="form-label">Should the book be accessable?</label>
                                     </div>
                                     <div class="col-md-4 mt-2">
-                                        <input id="updateIsBookHidden" type="checkbox" class="form-check" />
+                                        <input @bind-value="bookUpdateform.IsHidden" id="updateIsBookHidden" type="checkbox" class="form-check" />
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group mb-2">
-                        <label for="updateBookGenres" class="form-label"><b>Bind to Genres:</b></label>
-                        <select id="updateBookGenres" class="form-select">
-                            <option></option>
-                        </select>
+                        <label for="updateBookGenres" class="form-label"><b>Genres:</b></label>
+                        <RadzenDropDown Data="@genres" TextProperty="Name" ValueProperty="Id" AllowFiltering="true" @bind-Value="multipleGenres" Change="@GenreOnChange" Multiple="true" Placeholder="Select genres" Chips="true" AllowClear="true" Name="DropDownMultipleChips" Style="width: 100%; " />
                     </div>
                     <div class="form-group mb-2">
-                        <label for="updateBookAuthors" class="form-label"><b>Bind to Authors:</b></label>
-                        <input id="updateBookAuthors" class="form-control" placeholder="Make this a searchable input to look through already existing authors" />
+                        <label for="updateBookAuthors" class="form-label"><b>Authors:</b></label>
+                        <input @bind-value="authorName" type="text" class="form-control" list="authorList" placeholder="Type in author" />
+                        <datalist id="authorList">
+                            @foreach (var author in authors)
+                            {
+                                <option>@author.Name</option>
+                            }
+                        </datalist>
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="updatePublisherInput" class="form-label"><b>Publisher:</b></label>
-                                <input id="updatePublisherInput" class="form-control" disabled />
+                                <input id="updatePublisherInput" class="form-control" disabled placeholder="@BookInfo.Publisher.Name" />
                             </div>
                             <div class="col-md-6">
                                 <label for="updatePublicationYear" class="form-label"><b>Publication year:</b></label>
-                                <input @bind-value="BookInfo.PublicationDate" id="updatePublicationYear" type="datetime" class="form-control" />
+                                <input id="updatePublicationYear" type="datetime" class="form-control" placeholder="Type in the date this will be published..." />
                             </div>
                         </div>
                     </div>
                 </div>
-            </EditForm>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-warning">Update</button>
-                <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Update</button>
+                    <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                </div>
+            </EditForm>            
         </div>
     </div>
 </div>
@@ -94,10 +104,24 @@
 
     public EditForm MyEditForm { get; set; } = new();
     private BookForm bookUpdateform = new();
+    private List<ContentTypeInfoModel> contentTypes = new();
+    private List<AuthorInfoModel> authors = new();
+    string? authorName;
+    IEnumerable<GenreInfoModel>? genres;
+    IEnumerable<Guid>? multipleGenres;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        return base.OnInitializedAsync();
+        contentTypes = await ContentTypeService.GetContentTypes();
+        genres = await GenreService.GetGenres();
+        authors = await AuthorService.GetAuthors();
+    }
+
+    void GenreOnChange(object genre)
+    {
+        var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
+
+        bookUpdateform.GenreIds = multipleGenres.ToList();
     }
 
     private void UpdateBook()
