@@ -13,7 +13,7 @@ namespace PubHub.Common.Services
 #pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
-        internal BookService(IHttpClientService clientService, string clientName) : base(clientService, clientName)
+        public BookService(IHttpClientService clientService) : base(clientService)
         {
             _serializerOptions = new JsonSerializerOptions
             {
@@ -195,7 +195,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteUser(Guid bookId)
+        public async Task<ServiceResult> DeleteBook(Guid bookId)
         {
             try
             {

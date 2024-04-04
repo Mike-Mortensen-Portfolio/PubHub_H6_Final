@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using PubHub.Common.ApiService;
 using PubHub.Common.Services;
 
@@ -23,15 +22,6 @@ namespace PubHub.Common.Extensions
             if (apiOptions == null)
                 throw new ArgumentNullException(nameof(services), "Options cannot be empty.");
 
-            services
-                .AddScopedApiService<IUserService, UserService>(apiOptions)
-                .AddScopedApiService<IBookService, BookService>(apiOptions)
-                .AddScopedApiService<IPublisherService, PublisherService>(apiOptions)
-                .AddScopedApiService<IAuthorService, AuthorService>(apiOptions)
-                .AddScopedApiService<IGenreService, GenreService>(apiOptions)
-                .AddScopedApiService<IAuthenticationService, AuthenticationService>(apiOptions)
-                .AddScopedApiService<IContentTypeService, ContentTypeService>(apiOptions);
-
             // Add HttpClient for specified platform.
             var uri = new Uri(apiOptions.Address);
             if (apiOptions.ConfigureForMobile)
@@ -40,22 +30,30 @@ namespace PubHub.Common.Extensions
             }
             else
             {
-                services.AddHttpClient(apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME, options => { options.BaseAddress = uri; });
-                services.AddScoped<IHttpClientService>(sp => new HttpClientService(services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>().CreateClient()));
+                var clientName = apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME;
+                services.AddScoped<IHttpClientService>(sp => new HttpClientService(services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>().CreateClient(clientName)));
+                services.AddHttpClient(clientName, options => { options.BaseAddress = uri; });
             }
 
-            return services;
+            return services
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IBookService, BookService>()
+                .AddScoped<IPublisherService, PublisherService>()
+                .AddScoped<IAuthorService, AuthorService>()
+                .AddScoped<IGenreService, GenreService>()
+                .AddScoped<IAuthenticationService, AuthenticationService>()
+                .AddScoped<IContentTypeService, ContentTypeService>();
         }
 
-        private static IServiceCollection AddScopedApiService<TService, TConcrete>(this IServiceCollection services, ApiOptions apiOptions) where TConcrete : ServiceRoot, TService where TService : class
-        {
-            return services.AddScoped<TService, TConcrete>(provider =>
-            {
-                var factory = provider.GetRequiredService<IHttpClientFactory>();
-                var instance = Activator.CreateInstance(typeof(TConcrete), [factory, apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME]) as TConcrete;
+        //private static IServiceCollection AddScopedApiService<TService, TConcrete>(this IServiceCollection services, ApiOptions apiOptions) where TConcrete : ServiceRoot, TService where TService : class
+        //{
+        //    return services.AddScoped<TService, TConcrete>(provider =>
+        //    {
+        //        var factory = provider.GetRequiredService<IHttpClientFactory>();
+        //        var instance = Activator.CreateInstance(typeof(TConcrete), [factory, apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME]) as TConcrete;
 
-                return instance!;
-            });
-        }
+        //        return instance!;
+        //    });
+        //}
     }    
 }

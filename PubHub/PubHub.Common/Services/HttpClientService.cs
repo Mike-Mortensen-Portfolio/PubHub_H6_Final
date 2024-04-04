@@ -1,6 +1,5 @@
 ﻿using Polly;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace PubHub.Common.Services
 {
