@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
@@ -8,18 +9,22 @@ using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
 using PubHub.Common.Models.Genres;
+using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class BooksController : ControllerBase
     {
+        private readonly ILogger<BooksController> _logger;
         private readonly PubHubContext _context;
 
-        public BooksController(PubHubContext context)
+        public BooksController(ILogger<BooksController> logger, PubHubContext context)
         {
+            _logger = logger;
             _context = context;
         }
 
@@ -224,7 +229,10 @@ namespace PubHub.API.Controllers
 
             await books.AddAsync(createdBook);
 
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when adding book.");
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -233,6 +241,7 @@ namespace PubHub.API.Controllers
                     {
                         { "Book", createdBook }
                     });
+            }
 
             var bookInfo = await books
                 .Include(book => book.ContentType)
@@ -322,7 +331,10 @@ namespace PubHub.API.Controllers
             existingBook.PublisherId = updateModel.PublisherId;
             existingBook.Title = updateModel.Title;
 
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when updating book: {BookId}", existingBook.Id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -333,6 +345,7 @@ namespace PubHub.API.Controllers
                         { "GenresIds", updateModel.GenreIds },
                         { "AuthorIds", updateModel.AuthorIds }
                     });
+            }
 
             //foreach (var genreId in updateModel.GenreIds)
             //{
@@ -376,15 +389,19 @@ namespace PubHub.API.Controllers
 
             books.Update(existingBook);
 
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when updating book: {BookId}", existingBook.Id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
                     detail: "Something went wrong and the book couldn't be created. Please try again.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Book", existingBook }
+                        { "Id", existingBook.Id }
                     });
+            }
 
             var bookInfo = await books
                 .Include(book => book.ContentType)
@@ -446,7 +463,10 @@ namespace PubHub.API.Controllers
 
             _context.Set<Book>().Remove(book);
 
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when deleting book: {BookId}", book.Id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -455,6 +475,7 @@ namespace PubHub.API.Controllers
                     {
                         { "Book", book }
                     });
+            }
 
             return Results.Ok();
         }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PubHub.Common.ApiService
+﻿namespace PubHub.Common.ApiService
 {
     public class ApiOptions
     {
@@ -16,5 +10,9 @@ namespace PubHub.Common.ApiService
         /// The name of the <see langword="internal"/> <see cref="HttpClient"/>
         /// </summary>
         public string? HttpClientName { get; set; }
+        /// <summary>
+        /// Whether services (incl. the <see cref="HttpClient"/>) should be configured for use on mobile.
+        /// </summary>
+        public bool ConfigureForMobile { get; set; } = false;
     }
 }

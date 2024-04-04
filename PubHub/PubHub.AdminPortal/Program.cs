@@ -1,4 +1,4 @@
-﻿using PubHub.AdminPortal.Components;
+using PubHub.AdminPortal.Components;
 using PubHub.AdminPortal.Components.Helpers;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
@@ -16,11 +16,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddPubHubServices(options =>
 {
-    string address = builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT);
-    if (address == null)
-        throw new ArgumentNullException(nameof(address), "Api base address couldn't be found.");
-
-    options.Address = address;
+    options.Address = builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT) ?? throw new NullReferenceException("API base address couldn't be found.");
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
 });
 

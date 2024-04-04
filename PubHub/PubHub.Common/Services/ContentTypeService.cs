@@ -11,7 +11,7 @@ namespace PubHub.Common.Services
 #pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public ContentTypeService(IHttpClientFactory clientFactory, string clientName) : base(clientFactory, clientName)
+        public ContentTypeService(IHttpClientService clientService) : base(clientService)
         {
             _serializerOptions = new JsonSerializerOptions
             {
