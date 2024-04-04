@@ -35,6 +35,8 @@
                             <div class="col-md-6">
                                 <label for="createBookContent" class="form-label"><b>Book content:</b></label>
                                 <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
+                                <progress class="mt-2" max="100" value="@progressValue"></progress>
+                                <span>@($"{progressValue}%")</span>
                             </div>
                         </div>
                     </div>
@@ -122,6 +124,8 @@
     IEnumerable<GenreInfoModel>? genres;
     IEnumerable<Guid>? multipleGenres;
 
+    private int progressValue;
+
     protected override async Task OnInitializedAsync()
     {
         contentTypes = await ContentTypeService.GetContentTypes();
@@ -129,9 +133,32 @@
         authors = await AuthorService.GetAuthors();
     }
 
+    /// <summary>
+    /// Reads the uploaded file in chunks to calgulate the progress for updating the UI, to then save the Content of a book to a <see cref="byte[]"/>.
+    /// </summary>
+    /// <param name="inputFileChange"></param>
+    /// <returns></returns>
     private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
     {
-        bookCreateForm.BookContent = await FileHandler.FileToByteArray(inputFileChange.File);
+        var bufferSize = 1024 * 1024; // 1 MB buffer size
+        await using var outputStream = new MemoryStream();
+        await using var stream = inputFileChange.File.OpenReadStream(maxAllowedSize: 1024 * 1024 * 1024);
+
+        var buffer = new byte[bufferSize];
+        int readBytes;
+        long totalBytesRead = 0;
+        long fileSize = stream.Length;
+
+        // Iterate through the bytes being read and add onto with the extra bytes; get the progress value in percentage and then update Blazor UI.
+        while ((readBytes = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        {
+            await outputStream.WriteAsync(buffer, 0, readBytes);
+            totalBytesRead += readBytes;
+            progressValue = (int)((totalBytesRead * 100) / fileSize);
+            StateHasChanged(); 
+        }
+
+        bookCreateForm.BookContent = outputStream.ToArray();
     }
 
     private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)

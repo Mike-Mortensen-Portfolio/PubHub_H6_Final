@@ -14,7 +14,7 @@ namespace PubHub.AdminPortal.Components.Helpers
         {
             var bufferSize = 1024 * 1024; // 1 MB buffer size
             await using var outputStream = new MemoryStream();
-            await using var stream = file.OpenReadStream(maxAllowedSize: 51200000);
+            await using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 1024);
 
             var buffer = new byte[bufferSize];
             int readBytes;
@@ -24,7 +24,8 @@ namespace PubHub.AdminPortal.Components.Helpers
                 await outputStream.WriteAsync(buffer, 0, readBytes);
             }
 
-            return outputStream.ToArray();
+            var output = outputStream.ToArray();
+            return output;
         }
 
         /// <summary>
