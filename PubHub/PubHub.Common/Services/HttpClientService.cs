@@ -18,111 +18,75 @@ namespace PubHub.Common.Services
         public HttpClient Client => _client;
 
         /// <inheritdoc/>
-        public async Task<HttpResponseMessage?> GetAsync(string uri)
+        public async Task<HttpResponseMessage> GetAsync(string uri)
         {
-            try
-            {
-                CheckNetwork();
+            CheckNetwork();
 
-                return await Policy
-                    .HandleResult(_retryPredicate)
-                    .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                    {
-                        Debug.WriteLine($"{nameof(GetAsync)}: Retrying in {time} ...");
-                    })
-                    .ExecuteAsync(async () =>
-                    {
-                        Debug.WriteLine($"{nameof(GetAsync)}: {Client.BaseAddress}{uri}");
-                        return await Client.GetAsync(uri);
-                    });
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{nameof(GetAsync)} failed: {ex.Message}");
-            }
-
-            return null;
+            return await Policy
+                .HandleResult(_retryPredicate)
+                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
+                {
+                    Debug.WriteLine($"{nameof(GetAsync)}: Retrying in {time} ...");
+                })
+                .ExecuteAsync(async () =>
+                {
+                    Debug.WriteLine($"{nameof(GetAsync)}: {Client.BaseAddress}{uri}");
+                    return await Client.GetAsync(uri);
+                });
         }
 
         /// <inheritdoc/>
-        public async Task<HttpResponseMessage?> PostAsync(string uri, HttpContent? httpContent = null)
+        public async Task<HttpResponseMessage> PostAsync(string uri, HttpContent? httpContent = null)
         {
-            try
-            {
-                CheckNetwork();
+            CheckNetwork();
 
-                return await Policy
-                    .HandleResult(_retryPredicate)
-                    .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                    {
-                        Debug.WriteLine($"{nameof(PostAsync)}: Retrying in {time} ...");
-                    })
-                    .ExecuteAsync(async () =>
-                    {
-                        Debug.WriteLine($"{nameof(PostAsync)}: {Client.BaseAddress}{uri}");
-                        return await Client.PostAsync(uri, httpContent);
-                    });
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{nameof(PostAsync)} failed: {ex.Message}");
-            }
-
-            return null;
+            return await Policy
+                .HandleResult(_retryPredicate)
+                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
+                {
+                    Debug.WriteLine($"{nameof(PostAsync)}: Retrying in {time} ...");
+                })
+                .ExecuteAsync(async () =>
+                {
+                    Debug.WriteLine($"{nameof(PostAsync)}: {Client.BaseAddress}{uri}");
+                    return await Client.PostAsync(uri, httpContent);
+                });
         }
 
         /// <inheritdoc/>
-        public async Task<HttpResponseMessage?> PutAsync(string uri, HttpContent? httpContent = null)
+        public async Task<HttpResponseMessage> PutAsync(string uri, HttpContent? httpContent = null)
         {
-            try
-            {
-                CheckNetwork();
+            CheckNetwork();
 
-                return await Policy
-                    .HandleResult(_retryPredicate)
-                    .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                    {
-                        Debug.WriteLine($"{nameof(PutAsync)}: Retrying in {time} ...");
-                    })
-                    .ExecuteAsync(async () =>
-                    {
-                        Debug.WriteLine($"{nameof(PutAsync)}: {Client.BaseAddress}{uri}");
-                        return await Client.PutAsync(uri, httpContent);
-                    });
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{nameof(PutAsync)} failed: {ex.Message}");
-            }
-
-            return null;
+            return await Policy
+                .HandleResult(_retryPredicate)
+                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
+                {
+                    Debug.WriteLine($"{nameof(PutAsync)}: Retrying in {time} ...");
+                })
+                .ExecuteAsync(async () =>
+                {
+                    Debug.WriteLine($"{nameof(PutAsync)}: {Client.BaseAddress}{uri}");
+                    return await Client.PutAsync(uri, httpContent);
+                });
         }
 
         /// <inheritdoc/>
-        public async Task<HttpResponseMessage?> DeleteAsync(string uri)
+        public async Task<HttpResponseMessage> DeleteAsync(string uri)
         {
-            try
-            {
-                CheckNetwork();
+            CheckNetwork();
 
-                return await Policy
-                    .HandleResult(_retryPredicate)
-                    .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                    {
-                        Debug.WriteLine($"{nameof(DeleteAsync)}: Retrying in {time} ...");
-                    })
-                    .ExecuteAsync(async () =>
-                    {
-                        Debug.WriteLine($"{nameof(DeleteAsync)}: {Client.BaseAddress}{uri}");
-                        return await Client.DeleteAsync(uri);
-                    });
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{nameof(DeleteAsync)} failed: {ex.Message}");
-            }
-
-            return null;
+            return await Policy
+                .HandleResult(_retryPredicate)
+                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
+                {
+                    Debug.WriteLine($"{nameof(DeleteAsync)}: Retrying in {time} ...");
+                })
+                .ExecuteAsync(async () =>
+                {
+                    Debug.WriteLine($"{nameof(DeleteAsync)}: {Client.BaseAddress}{uri}");
+                    return await Client.DeleteAsync(uri);
+                });
         }
 
         /// <summary>
