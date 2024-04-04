@@ -2,17 +2,15 @@
 {
     public interface IHttpClientService
     {
-        public HttpClient Client { get; }
-
         /// <summary>
-        /// Send a GET message using the base address of <see cref="Client"/>.
+        /// Send a GET message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="uri">URI (must NOT start with '/').</param>
         /// <returns>HTTP response.</returns>
         public Task<HttpResponseMessage> GetAsync(string uri);
 
         /// <summary>
-        /// Send a POST message using the base address of <see cref="Client"/>.
+        /// Send a POST message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="uri">URI (must NOT start with '/').</param>
         /// <param name="httpContent">Content of the POST message.</param>
@@ -20,7 +18,7 @@
         public Task<HttpResponseMessage> PostAsync(string uri, HttpContent? httpContent = null);
 
         /// <summary>
-        /// Send a PUT message using the base address of <see cref="Client"/>.
+        /// Send a PUT message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="uri">URI (must NOT start with '/').</param>
         /// <param name="httpContent">Content of the PUT message.</param>
@@ -28,7 +26,7 @@
         public Task<HttpResponseMessage> PutAsync(string uri, HttpContent? httpContent = null);
 
         /// <summary>
-        /// Send a DELETE message using the base address of <see cref="Client"/>.
+        /// Send a DELETE message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="uri">URI (must NOT start with '/').</param>
         /// <returns>HTTP response.</returns>

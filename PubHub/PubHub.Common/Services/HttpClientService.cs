@@ -15,8 +15,6 @@ namespace PubHub.Common.Services
             _client = new HttpClient() { BaseAddress = new Uri(apiBaseUrl) };
         }
 
-        public HttpClient Client => _client;
-
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> GetAsync(string uri)
         {
@@ -30,8 +28,8 @@ namespace PubHub.Common.Services
                 })
                 .ExecuteAsync(async () =>
                 {
-                    Debug.WriteLine($"{nameof(GetAsync)}: {Client.BaseAddress}{uri}");
-                    return await Client.GetAsync(uri);
+                    Debug.WriteLine($"{nameof(GetAsync)}: {_client.BaseAddress}{uri}");
+                    return await _client.GetAsync(uri);
                 });
         }
 
@@ -48,8 +46,8 @@ namespace PubHub.Common.Services
                 })
                 .ExecuteAsync(async () =>
                 {
-                    Debug.WriteLine($"{nameof(PostAsync)}: {Client.BaseAddress}{uri}");
-                    return await Client.PostAsync(uri, httpContent);
+                    Debug.WriteLine($"{nameof(PostAsync)}: {_client.BaseAddress}{uri}");
+                    return await _client.PostAsync(uri, httpContent);
                 });
         }
 
@@ -66,8 +64,8 @@ namespace PubHub.Common.Services
                 })
                 .ExecuteAsync(async () =>
                 {
-                    Debug.WriteLine($"{nameof(PutAsync)}: {Client.BaseAddress}{uri}");
-                    return await Client.PutAsync(uri, httpContent);
+                    Debug.WriteLine($"{nameof(PutAsync)}: {_client.BaseAddress}{uri}");
+                    return await _client.PutAsync(uri, httpContent);
                 });
         }
 
@@ -84,8 +82,8 @@ namespace PubHub.Common.Services
                 })
                 .ExecuteAsync(async () =>
                 {
-                    Debug.WriteLine($"{nameof(DeleteAsync)}: {Client.BaseAddress}{uri}");
-                    return await Client.DeleteAsync(uri);
+                    Debug.WriteLine($"{nameof(DeleteAsync)}: {_client.BaseAddress}{uri}");
+                    return await _client.DeleteAsync(uri);
                 });
         }
 
