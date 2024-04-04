@@ -6,7 +6,7 @@ namespace PubHub.Common.Services
     {
         Task<List<AuthorInfoModel>> GetAuthors();
         Task<AuthorInfoModel?> GetAuthor(Guid authorId);
-        Task<ServiceInstanceResult<AuthorCreateModel>> AddAuthor(AuthorCreateModel authorCreateModel);
+        Task<ServiceInstanceResult<AuthorInfoModel>> AddAuthor(AuthorCreateModel authorCreateModel);
         Task<ServiceResult> DeleteAuthor(Guid authorId);
     }
 }

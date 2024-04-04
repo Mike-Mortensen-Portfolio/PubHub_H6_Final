@@ -1,5 +1,6 @@
 ﻿@inject PubHub.Common.Services.IBookService BookService
 @inject Radzen.NotificationService NotificationService
+@inject Radzen.DialogService DialogService
 
 <div class="modal fade show" id="removeBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
@@ -7,7 +8,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">You're about to remove: <b>@BookTitle</b></h4>
-                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+                <button type="button" class="btn close" @onclick="@((args) => DialogService.Close(true))">x</button>
             </div>
             <div class="modal-body">
                 <div class="form-group mb-2">
@@ -16,7 +17,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" @onclick="() => RemoveBook()">Remove</button>
-                <button type="button" class="btn btn-success" @onclick="() => ModalOptions(false)">Cancel</button>
+                <button type="button" class="btn btn-success" @onclick="@((args) => DialogService.Close(true))">Cancel</button>
                 @if (unsuccessfulResult)
                 {
                     <label class="text-danger">Unable to remove the book.</label>
@@ -38,18 +39,17 @@
 
     private bool unsuccessfulResult = false;
 
-    // TODO (JBN): Add alert boxes instead, depending on the result.
-    private void RemoveBook()
+    private async Task RemoveBook()
     {
-        var result = BookService.DeleteBook(BookId);
-        if (result.Result.StatusCode == ResponseCodeConstants.OK_CODE)
+        var result = await BookService.DeleteBook(BookId);
+        if (result.StatusCode == ResponseCodeConstants.OK_CODE)
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.Result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
             ModalOptions(false);
         }
         else
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.Result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
             unsuccessfulResult = true;
         }
     }

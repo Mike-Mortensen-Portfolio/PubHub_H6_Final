@@ -37,7 +37,7 @@ namespace PubHub.AdminPortal.Components.Models
             {
                 Title = Title,
                 Length = Length,
-                PublicationDate = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day),
+                PublicationDate = PublicationDate,
                 BookContent = BookContent,
                 PublisherId = PublisherId,
                 ContentTypeId = ContentTypeId,
@@ -54,7 +54,7 @@ namespace PubHub.AdminPortal.Components.Models
             {
                 Title = Title,
                 Length = Length,
-                PublicationDate = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day),
+                PublicationDate = PublicationDate,
                 BookContent = BookContent,
                 PublisherId = TestData.PUBLISHER_ID,
                 ContentTypeId =ContentTypeId,

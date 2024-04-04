@@ -67,13 +67,19 @@
                     </div>
                     <div class="form-group mb-2">
                         <label for="createBookAuthors" class="form-label"><b>Authors:</b></label>
-                        <input @bind-value="authorName" type="text" class="form-control" list="authorList" placeholder="Type in author" />
-                        <datalist id="authorList">
-                            @foreach (var author in authors)
-                            {
-                                <option>@author.Name</option>
-                            }
-                        </datalist>
+                        @{ int i = 0; }
+                        @foreach (var authorName in authorNames)
+                        {
+                            var index = i++;
+                            <InputText @bind-Value="@authorNames[index]" type="text" class="form-control mt-2" list="authorList" placeholder="Type in author name..." />
+                            <datalist id="authorList">
+                                @foreach (var author in authors)
+                                {
+                                    <option>@author.Name</option>
+                                }
+                            </datalist>
+                        }
+                        <button type="button" class="btn btn-info mt-2" @onclick="AddMoreAuthors">Add another author</button>
                     </div>
                     <div class="form-group mb-2">
                         <div class="row">
@@ -83,7 +89,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="createPublicationYear" class="form-label"><b>Publication year:</b></label>
-                                <input id="createPublicationYear" type="datetime" class="form-control" placeholder="Type in the date this will be published..." />
+                                <InputDate class="form-control" TValue="DateOnly" @bind-Value:format="dd/MM/yyyy" @bind-Value="@bookCreateForm.PublicationDate"></InputDate>
                             </div>
                         </div>
                     </div>
@@ -104,13 +110,15 @@
     [Parameter]
     public PublisherInfoModel Publisher { get; set; }
 
-    private EditForm editForm { get; set; } = new();
-
     private BookForm bookCreateForm = new();
 
     private List<ContentTypeInfoModel> contentTypes = new();
     private List<AuthorInfoModel> authors = new();
-    string? authorName;
+
+    List<string> authorNames = new() { string.Empty };
+
+    public EventCallback<string> ValueChanged { get; set; }
+
     IEnumerable<GenreInfoModel>? genres;
     IEnumerable<Guid>? multipleGenres;
 
@@ -121,7 +129,6 @@
         authors = await AuthorService.GetAuthors();
     }
 
-    // TODO (JBN): Not working as we intend, fix this when we know more.
     private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
     {
         bookCreateForm.BookContent = await FileHandler.FileToByteArray(inputFileChange.File);
@@ -139,27 +146,38 @@
         bookCreateForm.GenreIds = multipleGenres.ToList();
     }
 
-    private async void CreateBook()
+    async void AddMoreAuthors()
     {
-        var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
-        if (authorExists == null && authorName != null)
+        authorNames.Add(string.Empty);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CreateBook()
+    {
+        bookCreateForm.AuthorIds.Clear();
+        foreach (var authorName in authorNames)
         {
-            AuthorCreateModel authorCreateModel = new() { Name = authorName };
-            var authorResult = await AuthorService.AddAuthor(authorCreateModel);
-            var updatedListAuthors = await AuthorService.GetAuthors();
-            authorExists = updatedListAuthors.Where(x => x.Name == authorResult.Instance.Name).FirstOrDefault();
+            var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
+            if (authorExists == null && authorName != null && authorName != string.Empty)
+            {
+                AuthorCreateModel authorCreateModel = new() { Name = authorName };
+                authorExists = (await AuthorService.AddAuthor(authorCreateModel)).Instance;
+            }
+            if (authorName != string.Empty && authorExists != null)
+            {
+                bookCreateForm.AuthorIds.Add(authorExists.Id);
+            }
         }
-        bookCreateForm.AuthorIds.Add(authorExists.Id);
         bookCreateForm.PublisherId = Publisher.Id;
-        var result = BookService.AddBook(bookCreateForm.CreateBookModel());
-        if (result.Result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+        var result = await BookService.AddBook(bookCreateForm.CreateBookModel());
+        if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.Result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
             ModalOptions(false);
         }
         else
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.Result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
         }
     }
 

@@ -2,6 +2,7 @@
 @inherits ComponentBase
 @inject PubHub.Common.Services.IPublisherService PublisherService
 @inject Radzen.NotificationService NotificationService
+@inject Radzen.DialogService DialogService
 
 <PageTitle>Publisher's books</PageTitle>
 
@@ -30,23 +31,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in BookInfos)
+                    @foreach (var bookInfo in BookInfos)
                     {
                         <tr>
-                            <td>@item.Title</td>
-                            <td>@item.PublicationDate</td>
+                            <td>@bookInfo.Title</td>
+                            <td>@bookInfo.PublicationDate</td>
                             <td>
                                 <div class="combined-item">
-                                    <button class="btn btn-warning me-2" @onclick="() => showUpdateModal = true">Update</button>
-                                    @if (showUpdateModal)
-                                    {
-                                        <UpdateBookModal OnClose="() => OnUpdateDialogClose()" BookInfo="@item"></UpdateBookModal>
-                                    }
+                                    <button class="btn btn-warning me-2" @onclick="() => OpenUpdateModal(bookInfo)">Update</button>
                                     <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
-                                    @if (showRemoveModal)
-                                    {
-                                        <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@item.Id" BookTitle="@item.Title"></RemoveBookModal>
-                                    }
                                 </div>
                             </td>
                         </tr>
@@ -73,6 +66,20 @@
         {
             BookInfos = await PublisherService.GetPublisherBooks(Publisher.Id);
         }
+    }
+
+    public async Task OpenUpdateModal(BookInfoModel bookInfo)
+    {
+        await DialogService.OpenAsync<UpdateBookModal>(string.Empty,
+               new Dictionary<string, object>() { { "BookInfoModel", bookInfo } },
+               new Radzen.DialogOptions() { Width = "0", Height = "0" });
+    }
+
+    public async Task OpenRemoveModal(BookInfoModel bookInfo)
+    {
+        await DialogService.OpenAsync<RemoveBookModal>(string.Empty,
+               new Dictionary<string, object>() { { "BookId", bookInfo.Id }, { "BookTitle", bookInfo.Title } },
+               new Radzen.DialogOptions() { Width = "0", Height = "0" });
     }
 
     #region Dialog closing methods.

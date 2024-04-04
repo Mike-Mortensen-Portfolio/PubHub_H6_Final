@@ -102,7 +102,7 @@ namespace PubHub.Common.Services
         /// <returns>A status telling if an author was successfully added to the database.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<AuthorCreateModel>> AddAuthor(AuthorCreateModel authorCreateModel)
+        public async Task<ServiceInstanceResult<AuthorInfoModel>> AddAuthor(AuthorCreateModel authorCreateModel)
         {
             try
             {
@@ -119,6 +119,7 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.PostAsync("authors", httpContent);
                 string content = await response.Content.ReadAsStringAsync();
 
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -128,12 +129,16 @@ namespace PubHub.Common.Services
                     throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
                 }
 
-                return new ServiceInstanceResult<AuthorCreateModel>(response.StatusCode, authorCreateModel, $"Successfully added the author: {authorCreateModel.Name}");
+                var authorInfo = JsonSerializer.Deserialize<AuthorInfoModel>(content, _serializerOptions);
+                if (authorInfo == null)
+                    throw new NullReferenceException($"Unable to handle the author model, status code: {response.StatusCode}");
+
+                return new ServiceInstanceResult<AuthorInfoModel>(response.StatusCode, authorInfo, $"Successfully added the author: {authorCreateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the author: {authorCreateModel.Name}, ", ex.Message);
-                return new ServiceInstanceResult<AuthorCreateModel>(HttpStatusCode.Unused, authorCreateModel, $"Failed to add the author: {authorCreateModel.Name}");
+                return new ServiceInstanceResult<AuthorInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the author: {authorCreateModel.Name}");
             }
         }
 
