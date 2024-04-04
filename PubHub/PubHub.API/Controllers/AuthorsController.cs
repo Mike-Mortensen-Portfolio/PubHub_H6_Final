@@ -15,10 +15,12 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class AuthorsController : ControllerBase
     {
+        private readonly ILogger<AuthorsController> _logger;
         private readonly PubHubContext _context;
 
-        public AuthorsController(PubHubContext context)
+        public AuthorsController(ILogger<AuthorsController> logger, PubHubContext context)
         {
+            _logger = logger;
             _context = context;
         }
 
@@ -86,6 +88,9 @@ namespace PubHub.API.Controllers
             await _context.Set<Author>().AddAsync(author);
 
             if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when adding author.");
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -94,6 +99,8 @@ namespace PubHub.API.Controllers
                     {
                         { "Author", authorModel.Name }
                     });
+            }
+                
 
             entityAuthor = await _context.Set<Author>()
                 .FirstOrDefaultAsync(author => author.Name.ToUpper() == authorModel.Name.ToUpper());
@@ -126,6 +133,9 @@ namespace PubHub.API.Controllers
             _context.Set<Author>().Remove(entityAuthor);
 
             if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when removing author: {AuthorId}", entityAuthor.Id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -134,6 +144,7 @@ namespace PubHub.API.Controllers
                     {
                         { "Id", id }
                     });
+            }
 
             return Results.Ok();
         }
