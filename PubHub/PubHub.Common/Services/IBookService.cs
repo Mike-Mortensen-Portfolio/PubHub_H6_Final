@@ -8,6 +8,6 @@ namespace PubHub.Common.Services
         Task<BookInfoModel?> GetBook(Guid bookId);
         Task<ServiceInstanceResult<BookCreateModel>> AddBook(BookCreateModel bookCreateModel);
         Task<ServiceInstanceResult<BookUpdateModel>> UpdateBook(Guid bookId, BookUpdateModel bookUpdateModel);
-        Task<ServiceResult> DeleteUser(Guid bookId);
+        Task<ServiceResult> DeleteBook(Guid bookId);
     }
 }

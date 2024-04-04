@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using PubHub.Common.ApiService;
+using PubHub.Common.Extensions;
 
 namespace PubHub.BookMobile
 {
@@ -19,6 +22,14 @@ namespace PubHub.BookMobile
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddPubHubServices(options =>
+            {
+                // TODO (SIA): Use appsettings.json
+                options.Address = "https://localhost:7097/{0}";//builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT) ?? throw new NullReferenceException("API base address couldn't be found.");
+                options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
+                options.ConfigureForMobile = true;
+            });
 
             return builder.Build();
         }
