@@ -1,5 +1,6 @@
 ﻿using Polly;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace PubHub.Common.Services
 {
@@ -10,9 +11,9 @@ namespace PubHub.Common.Services
         private readonly HttpClient _client;
         private readonly Func<HttpResponseMessage, bool> _retryPredicate = res => res.IsSuccessStatusCode;
 
-        public HttpClientService(string apiBaseUrl)
+        public HttpClientService(HttpClient client)
         {
-            _client = new HttpClient() { BaseAddress = new Uri(apiBaseUrl) };
+            _client = client;
         }
 
         /// <inheritdoc/>
