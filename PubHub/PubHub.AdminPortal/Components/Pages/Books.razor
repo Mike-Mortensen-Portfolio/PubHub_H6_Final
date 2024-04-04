@@ -20,6 +20,10 @@
             {
                 <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
             }
+            @if (showRemoveModal)
+            {
+                <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@bookInfoModel.Id" BookTitle="@bookInfoModel.Title"></RemoveBookModal>
+            }
         </div>
         <div class="row text-center">
             <table class="table table-striped">
@@ -38,8 +42,8 @@
                             <td>@bookInfo.PublicationDate</td>
                             <td>
                                 <div class="combined-item">
-                                    <button class="btn btn-warning me-2" @onclick="() => OpenUpdateModal(bookInfo)">Update</button>
-                                    <button class="btn btn-danger" @onclick="() => showRemoveModal = true">Remove</button>
+                                    <button class="btn btn-secondary me-2" disabled @onclick="() => OpenUpdateModal(bookInfo)">Update</button>
+                                    <button class="btn btn-danger" @onclick="() => OpenRemoveModal(bookInfo)">Remove</button>
                                 </div>
                             </td>
                         </tr>
@@ -59,6 +63,8 @@
     public List<BookInfoModel>? BookInfos { get; set; } = new();
     private PublisherInfoModel? Publisher { get; set; }
 
+    private BookInfoModel bookInfoModel;
+
     protected async override Task OnInitializedAsync()
     {
         Publisher = await PublisherService.GetPublisherInfo(TestData.PUBLISHER_ID);
@@ -68,18 +74,18 @@
         }
     }
 
+    // This method is currently disabled until we figured out what to do with the Book content.
     public async Task OpenUpdateModal(BookInfoModel bookInfo)
     {
         await DialogService.OpenAsync<UpdateBookModal>(string.Empty,
-               new Dictionary<string, object>() { { "BookInfoModel", bookInfo } },
+               new Dictionary<string, object>() { { "BookInfoModel", bookInfo }, { "OnClose", () => OnRemoveDialogClose() } },
                new Radzen.DialogOptions() { Width = "0", Height = "0" });
     }
 
-    public async Task OpenRemoveModal(BookInfoModel bookInfo)
+    public void OpenRemoveModal(BookInfoModel bookInfo)
     {
-        await DialogService.OpenAsync<RemoveBookModal>(string.Empty,
-               new Dictionary<string, object>() { { "BookId", bookInfo.Id }, { "BookTitle", bookInfo.Title } },
-               new Radzen.DialogOptions() { Width = "0", Height = "0" });
+        bookInfoModel = bookInfo;
+        showRemoveModal = true;
     }
 
     #region Dialog closing methods.

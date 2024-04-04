@@ -4,6 +4,7 @@ namespace PubHub.AdminPortal.Components.Helpers
 {
     public class FileHandler
     {
+        // TODO (JBN): Figure out how to handle big amount of files, as we currently cannot handle big files.
         /// <summary>
         /// Converting the <see cref="IBrowserFile"/> to a <see cref="byte[]"/>.
         /// </summary>

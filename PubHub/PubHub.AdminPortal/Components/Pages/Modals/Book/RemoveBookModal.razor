@@ -4,11 +4,11 @@
 
 <div class="modal fade show" id="removeBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
      aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">You're about to remove: <b>@BookTitle</b></h4>
-                <button type="button" class="btn close" @onclick="@((args) => DialogService.Close(true))">x</button>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
             </div>
             <div class="modal-body">
                 <div class="form-group mb-2">
@@ -17,7 +17,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" @onclick="() => RemoveBook()">Remove</button>
-                <button type="button" class="btn btn-success" @onclick="@((args) => DialogService.Close(true))">Cancel</button>
+                <button type="button" class="btn btn-success" @onclick="() => ModalOptions(false)">Cancel</button>
                 @if (unsuccessfulResult)
                 {
                     <label class="text-danger">Unable to remove the book.</label>
@@ -45,7 +45,7 @@
         if (result.StatusCode == ResponseCodeConstants.OK_CODE)
         {
             NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
-            ModalOptions(false);
+            await ModalOptions(false);
         }
         else
         {
