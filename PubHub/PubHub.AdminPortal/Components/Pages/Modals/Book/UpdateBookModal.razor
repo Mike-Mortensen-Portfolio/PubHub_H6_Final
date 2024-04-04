@@ -124,9 +124,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        contentTypes = await ContentTypeService.GetContentTypes();
-        genres = await GenreService.GetGenres();
-        authors = await AuthorService.GetAuthors();
+        contentTypes = await ContentTypeService.GetContentTypesAsync();
+        genres = await GenreService.GetGenresAsync();
+        authors = await AuthorService.GetAuthorsAsync();
         foreach (var author in BookInfoModel.Authors)
         {
             authorNames.Add(author.Name);
@@ -165,7 +165,7 @@
 
     private async Task UpdateBook()
     {
-        var result = await BookService.UpdateBook(BookInfoModel.Id, bookUpdateform.UpdateBookModel());
+        var result = await BookService.UpdateBookAsync(BookInfoModel.Id, bookUpdateform.UpdateBookModel());
         if (result.StatusCode == ResponseCodeConstants.OK_CODE)
         {
             NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });

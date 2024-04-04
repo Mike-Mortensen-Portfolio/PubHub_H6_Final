@@ -27,7 +27,7 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
-        public async Task<List<BookInfoModel>> GetBooks(BookQuery queryOptions)
+        public async Task<List<BookInfoModel>> GetBooksAsync(BookQuery queryOptions)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="BookInfoModel"/> with a book's information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<BookInfoModel?> GetBook(Guid bookId)
+        public async Task<BookInfoModel?> GetBookAsync(Guid bookId)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace PubHub.Common.Services
         /// <returns>A status telling if a book was successfully added to the database.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<BookCreateModel>> AddBook(BookCreateModel bookCreateModel)
+        public async Task<ServiceInstanceResult<BookCreateModel>> AddBookAsync(BookCreateModel bookCreateModel)
         {
             try
             {
@@ -150,7 +150,7 @@ namespace PubHub.Common.Services
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<BookUpdateModel>> UpdateBook(Guid bookId, BookUpdateModel bookUpdateModel)
+        public async Task<ServiceInstanceResult<BookUpdateModel>> UpdateBookAsync(Guid bookId, BookUpdateModel bookUpdateModel)
         {
             try
             {
@@ -195,7 +195,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteBook(Guid bookId)
+        public async Task<ServiceResult> DeleteBookAsync(Guid bookId)
         {
             try
             {

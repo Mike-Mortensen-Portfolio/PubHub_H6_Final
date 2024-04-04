@@ -67,10 +67,10 @@
 
     protected async override Task OnInitializedAsync()
     {
-        Publisher = await PublisherService.GetPublisherInfo(TestData.PUBLISHER_ID);
+        Publisher = await PublisherService.GetPublisherInfoAsync(TestData.PUBLISHER_ID);
         if (Publisher != null)
         {
-            BookInfos = await PublisherService.GetPublisherBooks(Publisher.Id);
+            BookInfos = await PublisherService.GetPublisherBooksAsync(Publisher.Id);
         }
     }
 

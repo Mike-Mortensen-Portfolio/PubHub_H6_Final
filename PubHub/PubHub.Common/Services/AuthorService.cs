@@ -26,7 +26,7 @@ namespace PubHub.Common.Services
         /// Calls the API enpoint to retrieve all authors through the <see cref="AuthorInfoModel"/>.
         /// </summary>
         /// <returns>A list of <see cref="AuthorInfoModel"/></returns>
-        public async Task<List<AuthorInfoModel>> GetAuthors()
+        public async Task<List<AuthorInfoModel>> GetAuthorsAsync()
         {
             try
             {
@@ -63,7 +63,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="AuthorInfoModel"/> with an author's information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<AuthorInfoModel?> GetAuthor(Guid authorId)
+        public async Task<AuthorInfoModel?> GetAuthorAsync(Guid authorId)
         {
             try
             {
@@ -102,7 +102,7 @@ namespace PubHub.Common.Services
         /// <returns>A status telling if an author was successfully added to the database.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<AuthorInfoModel>> AddAuthor(AuthorCreateModel authorCreateModel)
+        public async Task<ServiceInstanceResult<AuthorInfoModel>> AddAuthorAsync(AuthorCreateModel authorCreateModel)
         {
             try
             {
@@ -149,7 +149,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteAuthor(Guid authorId)
+        public async Task<ServiceResult> DeleteAuthorAsync(Guid authorId)
         {
             try
             {

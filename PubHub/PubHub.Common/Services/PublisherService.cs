@@ -30,7 +30,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<PublisherCreateModel>> AddPublisher(PublisherCreateModel publisherCreateModel)
+        public async Task<ServiceInstanceResult<PublisherCreateModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<List<BookInfoModel>> GetPublisherBooks(Guid publisherId)
+        public async Task<List<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="PublisherInfoModel"/> with the users information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<PublisherInfoModel?> GetPublisherInfo(Guid publisherId)
+        public async Task<PublisherInfoModel?> GetPublisherInfoAsync(Guid publisherId)
         {
             try
             {
@@ -152,7 +152,7 @@ namespace PubHub.Common.Services
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<PublisherUpdateModel>> UpdatePublisher(Guid publisherId, PublisherUpdateModel publisherUpdateModel)
+        public async Task<ServiceInstanceResult<PublisherUpdateModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel)
         {
             try
             {
@@ -197,7 +197,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeletePublisher(Guid publisherId)
+        public async Task<ServiceResult> DeletePublisherAsync(Guid publisherId)
         {
             try
             {

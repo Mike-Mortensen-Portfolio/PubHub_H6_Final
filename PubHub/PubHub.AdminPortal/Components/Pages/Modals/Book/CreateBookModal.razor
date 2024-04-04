@@ -128,9 +128,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        contentTypes = await ContentTypeService.GetContentTypes();
-        genres = await GenreService.GetGenres();
-        authors = await AuthorService.GetAuthors();
+        contentTypes = await ContentTypeService.GetContentTypesAsync();
+        genres = await GenreService.GetGenresAsync();
+        authors = await AuthorService.GetAuthorsAsync();
     }
 
     /// <summary>
@@ -188,7 +188,7 @@
             if (authorExists == null && authorName != null && authorName != string.Empty)
             {
                 AuthorCreateModel authorCreateModel = new() { Name = authorName };
-                authorExists = (await AuthorService.AddAuthor(authorCreateModel)).Instance;
+                authorExists = (await AuthorService.AddAuthorAsync(authorCreateModel)).Instance;
             }
             if (authorName != string.Empty && authorExists != null)
             {
@@ -196,7 +196,7 @@
             }
         }
         bookCreateForm.PublisherId = Publisher.Id;
-        var result = await BookService.AddBook(bookCreateForm.CreateBookModel());
+        var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
         if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
         {
             NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
