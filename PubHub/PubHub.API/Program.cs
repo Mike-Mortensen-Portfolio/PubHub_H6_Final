@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.ConfigureLogging();
+
 // Add services to the container.
 builder.Services.ConfigureDatabase(builder.Configuration, "Local");
 builder.Services.AddAuthentication();

@@ -10,6 +10,7 @@ using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Identity;
+using Serilog;
 
 namespace PubHub.API
 {
@@ -134,7 +135,7 @@ namespace PubHub.API
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
-                        //Log.Error($"Something went wrong: {contextFeature.Error}");
+                        Log.Error($"Something went wrong: {contextFeature.Error}");
                         await context.Response.WriteAsync(JsonConvert.SerializeObject(new
                         {
                             type = "https://datatracker.ietf.org/doc/html/rfc9110#name-500-internal-server-error",

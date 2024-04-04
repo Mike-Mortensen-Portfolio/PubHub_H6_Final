@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
@@ -17,9 +18,11 @@ namespace PubHub.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
-    public class PublishersController(PubHubContext context) : Controller
+    public class PublishersController(ILogger<PublishersController> logger, PubHubContext context) : Controller
     {
+        private readonly ILogger<PublishersController> _logger = logger;
         private readonly PubHubContext _context = context;
 
         /// <summary>
@@ -57,6 +60,8 @@ namespace PubHub.API.Controllers
                 .FirstOrDefaultAsync();
             if (accountTypeId == Guid.Empty)
             {
+                _logger.LogError("Unable to get account type: {TypeName}", AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -80,8 +85,10 @@ namespace PubHub.API.Controllers
             };
             await _context.Set<Publisher>()
                 .AddAsync(addedPublisher);
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
             {
+                _logger.LogError("Couldn't save changes to the database when adding publisher.");
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -253,8 +260,10 @@ namespace PubHub.API.Controllers
             };
 
             _context.Set<Publisher>().Update(publisher);
-            if (!(await _context.SaveChangesAsync() > 0))
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
             {
+                _logger.LogError("Couldn't save changes to the database when updating publisher: {PublisherId}", publisher.Id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
@@ -318,7 +327,8 @@ namespace PubHub.API.Controllers
                 .ExecuteUpdateAsync(u => u.SetProperty(u => u.DeletedDate, DateTime.UtcNow));
             if (updatedRows < 1)
             {
-                // Unable to delete; report back.
+                _logger.LogError("Couldn't save changes to the database when deleting account (ID: {AccountId}) of publisher (ID: {PublisherId}).", accountId, id);
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
