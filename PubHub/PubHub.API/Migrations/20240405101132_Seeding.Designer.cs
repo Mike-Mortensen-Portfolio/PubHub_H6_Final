@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PubHub.API.Domain;
 
@@ -11,9 +12,11 @@ using PubHub.API.Domain;
 namespace PubHub.API.Migrations
 {
     [DbContext(typeof(PubHubContext))]
-    partial class PubHubContextModelSnapshot : ModelSnapshot
+    [Migration("20240405101132_Seeding")]
+    partial class Seeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

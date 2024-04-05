@@ -20,7 +20,9 @@ namespace PubHub.API.Domain.Seeding
             builder.HasData(
                 new BookAuthor { BookId = _bookSeed.Seeds[0].Id, AuthorId = _authorSeed.Seeds[0].Id },
                 new BookAuthor { BookId = _bookSeed.Seeds[1].Id, AuthorId = _authorSeed.Seeds[1].Id },
-                new BookAuthor { BookId = _bookSeed.Seeds[1].Id, AuthorId = _authorSeed.Seeds[2].Id });
+                new BookAuthor { BookId = _bookSeed.Seeds[1].Id, AuthorId = _authorSeed.Seeds[2].Id },
+                new BookAuthor { BookId = _bookSeed.Seeds[2].Id, AuthorId = _authorSeed.Seeds[1].Id },
+                new BookAuthor { BookId = _bookSeed.Seeds[2].Id, AuthorId = _authorSeed.Seeds[2].Id });
         }
     }
 }
