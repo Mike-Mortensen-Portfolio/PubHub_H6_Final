@@ -1,27 +1,5 @@
 ﻿@page "/"
-@inject PubHub.Common.Services.IAuthenticationService AuthService
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
-
-<button type="button" @onclick="() => OnClick()">Click me</button>
-
-@code {
-    async void OnClick()
-    {
-        UserCreateModel user = new()
-        {
-            Account = new AccountCreateModel()
-            {
-                Email = "jasmin@email.com",
-                Password = "P@$$w0rd!"
-            },
-            Birthday = new DateOnly(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day),
-            Name = "Jasmin",
-            Surname = "Nielsen"
-        };
-
-        var result = await AuthService.RegisterUserAsync(user);
-    }
-}
