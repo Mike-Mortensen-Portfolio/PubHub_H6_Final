@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Retry;
+using Polly.Simmy;
 using PubHub.Common.ApiService;
 using PubHub.Common.Services;
 
@@ -33,14 +34,14 @@ namespace PubHub.Common.Extensions
             {
                 services.AddSingleton<IHttpClientService>(sp => new HttpClientService(
                     new HttpClient() { BaseAddress = uri },
-                    services.BuildServiceProvider().GetRequiredKeyedService<ResiliencePipeline>(POLLY_PIPELINE)));
+                    services.BuildServiceProvider().GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)));
             }
             else
             {
                 var clientName = apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME;
                 services.AddScoped<IHttpClientService>(sp => new HttpClientService(
                     services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>().CreateClient(clientName),
-                    services.BuildServiceProvider().GetRequiredKeyedService<ResiliencePipeline>(POLLY_PIPELINE)));
+                    services.BuildServiceProvider().GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)));
                 services.AddHttpClient(clientName, options => { options.BaseAddress = uri; });
             }
 
@@ -68,14 +69,14 @@ namespace PubHub.Common.Extensions
 
         private static IServiceCollection AddPolly(this IServiceCollection services)
         {
-            services.AddResiliencePipeline(POLLY_PIPELINE, builder =>
+            services.AddResiliencePipeline<string, HttpResponseMessage>(POLLY_PIPELINE, builder =>
             {
-                builder.AddRetry(new RetryStrategyOptions()
+                // Configure Polly.
+                builder.AddRetry(new()
                 {
                     ShouldHandle = static args =>
                     {
-                        if (args.Outcome.Result is HttpResponseMessage responseMessage &&
-                            responseMessage.IsSuccessStatusCode)
+                        if (args.Outcome.Result?.IsSuccessStatusCode ?? false)
                         {
                             // Request succeeded.
                             return new ValueTask<bool>(false);
@@ -93,6 +94,13 @@ namespace PubHub.Common.Extensions
                         return default;
                     }
                 });
+
+                // Configure Simmy.
+                const double INJECTION_RATE = 0.10; // 10% of invocations will be injected with chaos
+                builder
+                    .AddChaosLatency(INJECTION_RATE, TimeSpan.FromSeconds(10))
+                    .AddChaosFault(INJECTION_RATE, () => new InvalidOperationException("Injected by chaos strategy!"))
+                    .AddChaosOutcome(INJECTION_RATE, () => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError));
             });
 
             return services;

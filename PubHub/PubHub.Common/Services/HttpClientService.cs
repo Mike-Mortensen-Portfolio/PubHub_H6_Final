@@ -5,9 +5,9 @@ namespace PubHub.Common.Services
     public class HttpClientService : IHttpClientService
     {
         private readonly HttpClient _client;
-        private readonly ResiliencePipeline _resiliencePipeline;
+        private readonly ResiliencePipeline<HttpResponseMessage> _resiliencePipeline;
 
-        public HttpClientService(HttpClient client, ResiliencePipeline resiliencePipeline)
+        public HttpClientService(HttpClient client, ResiliencePipeline<HttpResponseMessage> resiliencePipeline)
         {
             _client = client;
             _resiliencePipeline = resiliencePipeline;
