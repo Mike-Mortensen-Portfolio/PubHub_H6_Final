@@ -123,7 +123,7 @@ namespace PubHub.API.Controllers
                     detail: "Something went wrong and the user couldn't be created. Please try again.");
             }
 
-            // Respond with newly added user.
+            // Retreive newly added user.
             var userInfo = await _context.GetUserInfoAsync(newUser.Id);
             if (userInfo == null)
             {
@@ -137,7 +137,25 @@ namespace PubHub.API.Controllers
                     });
             }
 
-            return Results.Created($"users/{userInfo.Id}", userInfo);
+            // Create token.
+            var tokenResult = await _authService.CreateTokenPairAsync(account);
+            if (!tokenResult.Success)
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and no token could be created for the given account. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", account.Id }
+                    });
+            }
+
+            return Results.Created($"users/{userInfo.Id}", new UserCreatedResponseModel()
+            {
+                TokenResponseModel = new(tokenResult.Token, tokenResult.RefreshToken),
+                UserInfo = userInfo
+            });
         }
 
         [HttpPost("token")]
