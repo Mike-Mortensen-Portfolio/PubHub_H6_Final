@@ -11,14 +11,14 @@
     <div class="container">
         <div class="row">
             <div class="col-md-10">
-                <h1 class="text-center">@Publisher.Name books</h1>
+                <h1 class="text-center">@Publisher.Instance.Name books</h1>
             </div>
             <div class="col-md-2">
                 <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
             </div>
             @if (showCreateModal)
             {
-                <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
+                <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher.Instance"></CreateBookModal>
             }
             @if (showRemoveModal)
             {
@@ -60,8 +60,8 @@
     bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
 
-    public List<BookInfoModel>? BookInfos { get; set; } = new();
-    private PublisherInfoModel? Publisher { get; set; }
+    public IReadOnlyList<BookInfoModel>? BookInfos { get; set; }
+    private ServiceResult<PublisherInfoModel> Publisher { get; set; }
 
     private BookInfoModel bookInfoModel;
 
@@ -70,7 +70,7 @@
         Publisher = await PublisherService.GetPublisherInfoAsync(TestData.PUBLISHER_ID);
         if (Publisher != null)
         {
-            BookInfos = await PublisherService.GetPublisherBooksAsync(Publisher.Id);
+            BookInfos = await PublisherService.GetPublisherBooksAsync(Publisher.Instance.Id);
         }
     }
 

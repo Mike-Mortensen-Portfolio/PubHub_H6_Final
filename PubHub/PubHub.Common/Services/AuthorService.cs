@@ -26,7 +26,7 @@ namespace PubHub.Common.Services
         /// Calls the API enpoint to retrieve all authors through the <see cref="AuthorInfoModel"/>.
         /// </summary>
         /// <returns>A list of <see cref="AuthorInfoModel"/></returns>
-        public async Task<List<AuthorInfoModel>> GetAuthorsAsync()
+        public async Task<IReadOnlyList<AuthorInfoModel>> GetAuthorsAsync()
         {
             try
             {
@@ -39,10 +39,10 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
-                List<AuthorInfoModel>? authorInfoModel = JsonSerializer.Deserialize<List<AuthorInfoModel>>(content, _serializerOptions);
+                var authorInfoModel = JsonSerializer.Deserialize<List<AuthorInfoModel>>(content, _serializerOptions);
 
                 if (authorInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
@@ -63,7 +63,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="AuthorInfoModel"/> with an author's information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<AuthorInfoModel?> GetAuthorAsync(Guid authorId)
+        public async Task<ServiceResult<AuthorInfoModel>> GetAuthorAsync(Guid authorId)
         {
             try
             {
@@ -79,19 +79,19 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
-                AuthorInfoModel? authorInfoModel = JsonSerializer.Deserialize<AuthorInfoModel>(content, _serializerOptions);
+                var authorInfoModel = JsonSerializer.Deserialize<AuthorInfoModel>(content, _serializerOptions);
                 if (authorInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
-                return authorInfoModel!;
+                return new ServiceResult<AuthorInfoModel>(response.StatusCode, authorInfoModel, $"Successfully retrieved the author: {authorInfoModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Get author info failed:", ex.Message);
-                return null;
+                return new ServiceResult<AuthorInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve the author.");
             }
         }
 
@@ -102,7 +102,7 @@ namespace PubHub.Common.Services
         /// <returns>A status telling if an author was successfully added to the database.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<AuthorInfoModel>> AddAuthorAsync(AuthorCreateModel authorCreateModel)
+        public async Task<ServiceResult<AuthorInfoModel>> AddAuthorAsync(AuthorCreateModel authorCreateModel)
         {
             try
             {
@@ -126,19 +126,19 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var authorInfo = JsonSerializer.Deserialize<AuthorInfoModel>(content, _serializerOptions);
                 if (authorInfo == null)
                     throw new NullReferenceException($"Unable to handle the author model, status code: {response.StatusCode}");
 
-                return new ServiceInstanceResult<AuthorInfoModel>(response.StatusCode, authorInfo, $"Successfully added the author: {authorCreateModel.Name}");
+                return new ServiceResult<AuthorInfoModel>(response.StatusCode, authorInfo, $"Successfully added the author: {authorCreateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the author: {authorCreateModel.Name}, ", ex.Message);
-                return new ServiceInstanceResult<AuthorInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the author: {authorCreateModel.Name}");
+                return new ServiceResult<AuthorInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the author: {authorCreateModel.Name}");
             }
         }
 
@@ -165,7 +165,7 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 return new ServiceResult(response.StatusCode, $"Successfully deleted the author: {authorId}");

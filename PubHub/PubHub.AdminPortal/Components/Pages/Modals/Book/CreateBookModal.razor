@@ -128,9 +128,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        contentTypes = await ContentTypeService.GetContentTypesAsync();
+        var readContentTypes = await ContentTypeService.GetContentTypesAsync();
+        contentTypes = readContentTypes.ToList();
         genres = await GenreService.GetGenresAsync();
-        authors = await AuthorService.GetAuthorsAsync();
+        var readAuthors = await AuthorService.GetAuthorsAsync();
+        authors = readAuthors.ToList();
     }
 
     /// <summary>

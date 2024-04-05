@@ -11,10 +11,10 @@ namespace PubHub.Common.Services
 {
     public interface IPublisherService
     {
-        Task<ServiceInstanceResult<PublisherCreateModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel);
-        Task<PublisherInfoModel?> GetPublisherInfoAsync(Guid publisherId);
-        Task<List<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId);
-        Task<ServiceInstanceResult<PublisherUpdateModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel);
+        Task<ServiceResult<PublisherInfoModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel);
+        Task<ServiceResult<PublisherInfoModel>> GetPublisherInfoAsync(Guid publisherId);
+        Task<IReadOnlyList<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId);
+        Task<ServiceResult<PublisherInfoModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel);
         Task<ServiceResult> DeletePublisherAsync(Guid publisherId);
     }
 }

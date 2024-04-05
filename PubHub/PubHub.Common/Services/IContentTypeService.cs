@@ -4,6 +4,6 @@ namespace PubHub.Common.Services
 {
     public interface IContentTypeService
     {
-        Task<List<ContentTypeInfoModel>> GetContentTypesAsync();
+        Task<IReadOnlyList<ContentTypeInfoModel>> GetContentTypesAsync();
     }
 }

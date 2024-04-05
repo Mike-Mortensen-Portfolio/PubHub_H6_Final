@@ -111,9 +111,9 @@
     public BookInfoModel BookInfoModel { get; set; }
 
     private BookForm bookUpdateform = new();
-    private List<ContentTypeInfoModel> contentTypes = new();
+    private IReadOnlyList<ContentTypeInfoModel> contentTypes;
 
-    private List<AuthorInfoModel> authors = new();
+    private IReadOnlyList<AuthorInfoModel> authors;
     List<string> authorNames = new();
     string? authorName;
     string booklength;

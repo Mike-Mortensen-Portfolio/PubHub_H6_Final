@@ -2,6 +2,6 @@
 {
     public static class TestData
     {
-        public static Guid PUBLISHER_ID = new Guid("7BF64E8C-9A22-8299-8575-018E8EDE1D91");
+        public static Guid PUBLISHER_ID = new Guid("D18153B4-2AF0-85C4-81BE-018EADBDF94B");
     }
 }
