@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
@@ -12,6 +13,7 @@ using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
 using PubHub.Common.Models.Genres;
 using PubHub.Common.Models.Publishers;
+using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
@@ -20,10 +22,11 @@ namespace PubHub.API.Controllers
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
-    public class PublishersController(ILogger<PublishersController> logger, PubHubContext context) : Controller
+    public class PublishersController(ILogger<PublishersController> logger, PubHubContext context, UserManager<Account> userManager) : Controller
     {
         private readonly ILogger<PublishersController> _logger = logger;
         private readonly PubHubContext _context = context;
+        private readonly UserManager<Account> _userManager = userManager;
 
         /// <summary>
         /// Get a list of all publishers.
@@ -41,7 +44,6 @@ namespace PubHub.API.Controllers
             // Check if a publisher like this already exists.
             var existingPublisher = await _context.Users.
                 FirstOrDefaultAsync(account => account.NormalizedEmail == publisherCreateModel.Account.Email.ToUpperInvariant());
-
             if (existingPublisher is not null)
                 return Results.Problem(
                     type: DuplicateProblemSpecification.TYPE,
@@ -50,7 +52,7 @@ namespace PubHub.API.Controllers
                     detail: "A matching publisher already exists",
                     extensions: new Dictionary<string, object?>
                     {
-                        {"Id", existingPublisher.Id}
+                        { "Id", existingPublisher.Id }
                     });
 
             // Get account type ID.
@@ -73,15 +75,27 @@ namespace PubHub.API.Controllers
             }
 
             // Create publisher account.
-            // TODO (SIA): Add more account related data to fully set up an account.
+            Account account = new()
+            {
+                Email = publisherCreateModel.Account.Email,
+                AccountTypeId = accountTypeId
+            };
+            var createIdentityResult = await _userManager.CreateAsync(account, publisherCreateModel.Account.Password);
+            if (!createIdentityResult.Succeeded)
+            {
+                _logger.LogError("Unable to create account with type ID: {AccountTypeId}", accountTypeId);
+
+                return Results.Problem(
+                    statusCode: UnprocessableEntitySpecification.STATUS_CODE,
+                    title: UnprocessableEntitySpecification.TITLE,
+                    detail: $"Unable to create user account.");
+            }
+
+            // Create publisher associated with the account.
             var addedPublisher = new Publisher()
             {
                 Name = publisherCreateModel.Name,
-                Account = new()
-                {
-                    Email = publisherCreateModel.Account.Email,
-                    AccountTypeId = accountTypeId
-                }
+                Account = account
             };
             await _context.Set<Publisher>()
                 .AddAsync(addedPublisher);
@@ -89,16 +103,28 @@ namespace PubHub.API.Controllers
             {
                 _logger.LogError("Couldn't save changes to the database when adding publisher.");
 
+                // Attempt to delete account.
+                var deleteIdentityResult = await _userManager.DeleteAsync(account);
+                if (!deleteIdentityResult.Succeeded)
+                {
+                    _logger.LogError("Failed to delete account: {Account}", account.Id);
+                }
+
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
                     detail: $"Unable to save changes to the database.");
             }
 
-            // Retrieve newly added publisher.
-            var publisherInfo = await GetPublisherInfoAsync(addedPublisher.Id);
+            // Respond with newly added publisher.
+            PublisherInfoModel publisherInfo = new()
+            {
+                Id = addedPublisher.Id,
+                Email = addedPublisher.Account.Email,
+                Name = addedPublisher.Name
+            };
 
-            return Results.Created($"publishers/{publisherInfo!.Id}", publisherInfo);
+            return Results.Created($"publishers/{publisherInfo.Id}", publisherInfo);
         }
 
         /// <summary>
@@ -112,7 +138,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetPublisherAsync(Guid id)
         {
-            var publisherModel = await GetPublisherInfoAsync(id);
+            var publisherModel = await _context.GetPublisherInfoAsync(id);
             if (publisherModel == null)
             {
                 return Results.Problem(
@@ -275,7 +301,7 @@ namespace PubHub.API.Controllers
             }
 
             // Retreive newly updated publisher.
-            var publisherInfo = await GetPublisherInfoAsync(id);
+            var publisherInfo = await _context.GetPublisherInfoAsync(id);
 
             return Results.Ok(publisherInfo);
         }
@@ -342,17 +368,5 @@ namespace PubHub.API.Controllers
 
             return Results.Ok();
         }
-
-        private async Task<PublisherInfoModel?> GetPublisherInfoAsync(Guid id) =>
-            await _context.Set<Publisher>()
-                .Include(p => p.Account)
-                .Select(p => new PublisherInfoModel()
-                {
-                    Id = p.Id,
-                    Email = p.Account!.Email ?? string.Empty,
-                    Name = p.Name
-                })
-                .FirstOrDefaultAsync(p => p.Id == id);
-
     }
 }

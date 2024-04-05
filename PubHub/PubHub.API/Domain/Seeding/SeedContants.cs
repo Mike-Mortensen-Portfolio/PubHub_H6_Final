@@ -19,5 +19,8 @@
         public const string SUBSCIBER_ACCESS_TYPE = "Subscriber";
         public const string BORROWER_ACCESS_TYPE = "Borrower";
         public const string EXPIRED_ACCESS_TYPE = "Expired";
+
+        public const string HORSE_COVER_PATH = "Domain\\Seeding\\Files\\horse.jpg";
+        public const string EXQUISITE_COVER_PATH = "Domain\\Seeding\\Files\\exquisite.jpeg";
     }
 }
