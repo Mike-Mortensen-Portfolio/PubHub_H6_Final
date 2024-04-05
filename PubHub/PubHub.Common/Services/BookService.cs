@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
+using PubHub.Common.Extensions;
 using PubHub.Common.Models.Books;
 using static PubHub.Common.IntegrityConstants;
 
@@ -34,7 +35,7 @@ namespace PubHub.Common.Services
                 if (queryOptions == null)
                     throw new NullReferenceException($"The search query wasn't valid: {queryOptions}");
 
-                HttpResponseMessage response = await Client.GetAsync($"books");
+                HttpResponseMessage response = await Client.GetAsync($"books?{queryOptions.ToQuery()}");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
