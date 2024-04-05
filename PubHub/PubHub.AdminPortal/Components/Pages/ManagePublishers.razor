@@ -1,0 +1,69 @@
+﻿@page "/ManagePublishers"
+@inherits ComponentBase
+@inject PubHub.Common.Services.IPublisherService PublisherService
+@inject Radzen.NotificationService NotificationService
+@inject Radzen.DialogService DialogService
+
+<PageTitle>Publishers</PageTitle>
+
+@if (Publishers != null)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <h1 class="text-center">Publishers</h1>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add publisher</button>
+            </div>
+            @if (showCreateModal)
+            {
+                <CreatePublisherModal OnClose="() => OnCreateDialogClose()"></CreatePublisherModal>
+            }
+        </div>
+        <div class="row text-center">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var publisher in Publishers)
+                    {
+                        <tr>
+                            <td>@publisher.Name</td>
+                            <td>@publisher.Email</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    bool showCreateModal;
+    bool showUpdateModal;
+    bool showRemoveModal;
+    public EventCallback<bool> OnClose { get; set; }
+
+    private List<PublisherInfoModel>? Publishers { get; set; }
+
+    private PublisherQuery publisherQuery = new() { OrderBy = OrderPublisherBy.Name };
+
+    protected async override Task OnInitializedAsync()
+    {
+        Publishers = await PublisherService.GetPublishersAsync(publisherQuery);
+    }
+
+    #region Dialog closing methods.
+    private async Task OnCreateDialogClose()
+    {
+        showCreateModal = false;
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+    #endregion
+}

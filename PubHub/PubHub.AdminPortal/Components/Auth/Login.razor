@@ -1,0 +1,53 @@
+﻿@page "/login"
+@inject PubHub.Common.Services.IAuthenticationService AuthService
+@inject Radzen.NotificationService NotificationService
+
+<PageTitle>Login</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <h4>You're already logged in as @context.User.Identity?.Name.</h4>
+    </Authorized>
+    <NotAuthorized>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Sign in</h5>
+                <div class="form-group m-2">
+                    <label class="form-label" for="email">Email:</label>
+                    <input type="email" @bind-value="loginInfo.Email" id="email" class="card-text form-control" placeholder="Enter your email address..." />
+                </div>
+                <div class="form-group m-2">
+                    <label class="form-label" for="password">Password:</label>
+                    <input type="password" @bind-value="loginInfo.Password" id="password" class="card-text form-control" placeholder="Enter your password..." />
+                </div>
+                <div class="form-group m-2">
+                    <button type="button" class="btn btn-primary" @onclick="() => LoginAsync()">Sign in</button>
+                </div>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private LoginInfo loginInfo = new();
+
+    // TODO (JBN): Test this when everything is set up regarding authentication.
+    public async Task LoginAsync()
+    {
+        if (string.IsNullOrWhiteSpace(loginInfo.Email))
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Email is required.", Duration = 5000 });
+
+        if (string.IsNullOrWhiteSpace(loginInfo.Password))
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Password is required.", Duration = 5000 });
+
+        if (!string.IsNullOrWhiteSpace(loginInfo.Email) && !string.IsNullOrWhiteSpace(loginInfo.Password))
+        {
+            var result = await AuthService.LoginAsync(loginInfo);
+
+            if (result.IsSuccess)
+            {
+                // TODO (JBN): Save the returned tokens in either a cookie or localstorage.
+            }
+        }
+    }
+}

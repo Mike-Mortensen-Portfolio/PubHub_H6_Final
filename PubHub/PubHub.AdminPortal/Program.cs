@@ -1,3 +1,4 @@
+﻿using Blazored.LocalStorage;
 using PubHub.AdminPortal.Components;
 using PubHub.AdminPortal.Components.Helpers;
 using PubHub.Common.ApiService;
@@ -23,6 +24,7 @@ builder.Services.AddPubHubServices(options =>
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<FileHandler>();
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 
@@ -38,6 +40,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
