@@ -8,7 +8,7 @@ namespace PubHub.Common.Services
         private const int RETRY_COUNT = 5;
 
         private readonly HttpClient _client;
-        private readonly Func<HttpResponseMessage, bool> _retryPredicate = res => res.IsSuccessStatusCode;
+        private readonly Func<HttpResponseMessage, bool> _retryPredicate = res => !res.IsSuccessStatusCode;
 
         public HttpClientService(HttpClient client)
         {
