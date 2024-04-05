@@ -48,19 +48,7 @@
         <div class="navbar-collapse justify-content-end">
             <ul class="navbar-nav">
                 <li class="nav-item p-2">
-                    @* TODO (JBN): Add check if user is logged in (AuthorizeView -> Microsoft.AspNetCore.Components.Authorization) *@
-                    @if (true)
-                    {
-                        <NavLink class="nav-link text-dark" href="login" Match="NavLinkMatch.All">
-                            <span class="oi oi-home" aria-hidden="true"></span> Sign in
-                        </NavLink>
-                    }
-                    else
-                    {
-                        <NavLink class="nav-link text-dark" href="signout" Match="NavLinkMatch.All">
-                            <span class="oi oi-home" aria-hidden="true"></span> Sign in
-                        </NavLink>
-                    }
+                    <SignInOrOut />
                 </li>
             </ul>
         </div>

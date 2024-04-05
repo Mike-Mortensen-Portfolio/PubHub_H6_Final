@@ -1,0 +1,27 @@
+﻿@inject ILocalStorageService LocalStorage;
+@inject CustomAuthStateProvider CustomAuthProvider
+
+<AuthorizeView>
+    <Authorized>
+        <button type="button" class="btn btn-primary" @onclick="SignOut">Sign out</button>
+    </Authorized>
+    <NotAuthorized>
+        <button type="button" class="btn btn-primary" @onclick="SignIn">Sign in</button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    void SignIn()
+    {
+        // TODO (JBN): Implement navigation.
+    }
+
+    async Task SignOut()
+    {
+        await LocalStorage.RemoveItemAsync("token");
+        await CustomAuthProvider.GetAuthenticationStateAsync();
+
+        // TODO (JBN): Implement navigation.
+    }
+}

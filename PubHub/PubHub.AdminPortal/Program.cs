@@ -1,5 +1,8 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Authorization;
 using PubHub.AdminPortal.Components;
+using PubHub.AdminPortal.Components.Auth;
 using PubHub.AdminPortal.Components.Helpers;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
@@ -24,7 +27,14 @@ builder.Services.AddPubHubServices(options =>
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<FileHandler>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddBlazoredLocalStorage();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+});
 
 var app = builder.Build();
 
@@ -41,7 +51,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

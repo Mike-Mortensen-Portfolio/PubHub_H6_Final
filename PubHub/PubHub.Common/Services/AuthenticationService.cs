@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Accounts;
@@ -35,7 +36,7 @@ namespace PubHub.Common.Services
                 if (loginInfo == null)
                     throw new ArgumentNullException($"The login info wasn't valid.");
                 
-                HttpContent httpContent = new StringContent(string.Empty);
+                HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("Email", loginInfo.Email);
                 httpContent.Headers.Add("Password", loginInfo.Password);
 
