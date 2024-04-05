@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.Common", "PubHub.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.AdminPortal", "PubHub.AdminPortal\PubHub.AdminPortal.csproj", "{450BDB50-E29E-4AC6-A8D4-787B30A292DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubHub.BookMobile", "PubHub.BookMobile\PubHub.BookMobile.csproj", "{D88D1AC5-EA77-46D8-95ED-2F3D606E803F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.BookMobile", "PubHub.BookMobile\PubHub.BookMobile.csproj", "{D88D1AC5-EA77-46D8-95ED-2F3D606E803F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

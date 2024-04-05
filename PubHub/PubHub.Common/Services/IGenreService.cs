@@ -9,9 +9,9 @@ namespace PubHub.Common.Services
 {
     public interface IGenreService
     {
-        Task<List<GenreInfoModel>> GetGenres();
-        Task<GenreInfoModel?> GetGenre(Guid genreId);
-        Task<ServiceInstanceResult<GenreCreateModel>> AddGenre(GenreCreateModel genreCreateModel);
-        Task<ServiceResult> DeleteGenre(Guid genreId);
+        Task<List<GenreInfoModel>> GetGenresAsync();
+        Task<GenreInfoModel?> GetGenreAsync(Guid genreId);
+        Task<ServiceInstanceResult<GenreCreateModel>> AddGenreAsync(GenreCreateModel genreCreateModel);
+        Task<ServiceResult> DeleteGenreAsync(Guid genreId);
     }
 }

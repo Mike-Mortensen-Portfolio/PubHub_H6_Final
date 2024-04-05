@@ -27,7 +27,7 @@ namespace PubHub.Common.Services
         /// Calls the API enpoint to retrieve all genres through the <see cref="GenreInfoModel"/>.
         /// </summary>
         /// <returns>A list of <see cref="GenreInfoModel"/></returns>
-        public async Task<List<GenreInfoModel>> GetGenres()
+        public async Task<List<GenreInfoModel>> GetGenresAsync()
         {
             try
             {
@@ -64,7 +64,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="GenreInfoModel"/> with a genre's information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<GenreInfoModel?> GetGenre(Guid genreId)
+        public async Task<GenreInfoModel?> GetGenreAsync(Guid genreId)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace PubHub.Common.Services
         /// <returns>A status telling if a genre was successfully added to the database.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<GenreCreateModel>> AddGenre(GenreCreateModel genreCreateModel)
+        public async Task<ServiceInstanceResult<GenreCreateModel>> AddGenreAsync(GenreCreateModel genreCreateModel)
         {
             try
             {
@@ -145,7 +145,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteGenre(Guid genreId)
+        public async Task<ServiceResult> DeleteGenreAsync(Guid genreId)
         {
             try
             {

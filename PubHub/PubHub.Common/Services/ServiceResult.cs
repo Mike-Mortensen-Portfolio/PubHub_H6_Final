@@ -10,6 +10,7 @@ namespace PubHub.Common.Services
             ErrorDescriptor = errorDescriptor;
         }
 
+        public bool IsSuccess => ((int)StatusCode >= 200) && ((int)StatusCode <= 299);
         public HttpStatusCode StatusCode { get; }
         public string ErrorDescriptor { get; }
 

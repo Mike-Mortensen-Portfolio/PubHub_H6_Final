@@ -1,0 +1,215 @@
+﻿@inject PubHub.Common.Services.IBookService BookService
+@inject PubHub.Common.Services.IPublisherService PublisherService
+@inject PubHub.Common.Services.IContentTypeService ContentTypeService
+@inject PubHub.Common.Services.IGenreService GenreService
+@inject PubHub.Common.Services.IAuthorService AuthorService
+@inject PubHub.AdminPortal.Components.Helpers.FileHandler FileHandler
+@inject Radzen.NotificationService NotificationService
+
+<div class="modal fade show" id="createBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create a new book</h4>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+            </div>
+            <EditForm Model="bookCreateForm" OnSubmit="() => CreateBook()">
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="createBookTitleInput" class="form-label"><b>Book title:</b></label>
+                        <input @bind-value="bookCreateForm.Title" id="createBookTitleInput" class="form-control" placeholder="Type in the book title..." />
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="createSelectContentType" class="form-label"><b>Content type:</b></label>
+                                <select @onchange="@(async value => { bookCreateForm.ContentTypeId = new Guid(value.Value!.ToString()!); })" id="createSelectContentType" class="form-select">
+                                    <option value="0">Nothing selected</option>
+                                    @foreach (var contentType in contentTypes)
+                                    {
+                                        <option value="@contentType.Id">@contentType.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createBookContent" class="form-label"><b>Book content:</b></label>
+                                <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
+                                <progress class="mt-2" max="100" value="@progressValue"></progress>
+                                <span>@($"{progressValue}%")</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createBookCoverImg" class="form-label"><b>Cover image:</b></label>
+                        <InputFile OnChange="@BookCoverImgFileChanged" id="createBookCoverImg" class="form-control">Cover image</InputFile>
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="createBookLength" class="form-label"><b>Book length:</b></label>
+                                <input @bind-value="bookCreateForm.Length" id="createBookLength" class="form-control" placeholder="Type in the length of the book..." />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createIsBookHidden" class="form-label"><b>Accessability:</b></label>
+                                <div class="row">
+                                    <div class="col-md-8 mt-2">
+                                        <label class="form-label">Should the book be accessable?</label>
+                                    </div>
+                                    <div class="col-md-4 mt-2">
+                                        <input @bind-value="bookCreateForm.IsHidden" id="createIsBookHidden" type="checkbox" class="form-check" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createBookGenres" class="form-label"><b>Genres:</b></label>
+                        <RadzenDropDown Data="@genres" TextProperty="Name" ValueProperty="Id" AllowFiltering="true" @bind-Value="multipleGenres" Change="@GenreOnChange" Multiple="true" Placeholder="Select genres" Chips="true" AllowClear="true" Name="DropDownMultipleChips" Style="width: 100%; " />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createBookAuthors" class="form-label"><b>Authors:</b></label>
+                        @{ int i = 0; }
+                        @foreach (var authorName in authorNames)
+                        {
+                            var index = i++;
+                            <InputText @bind-Value="@authorNames[index]" type="text" class="form-control mt-2" list="authorList" placeholder="Type in author name..." />
+                            <datalist id="authorList">
+                                @foreach (var author in authors)
+                                {
+                                    <option>@author.Name</option>
+                                }
+                            </datalist>
+                        }
+                        <button type="button" class="btn btn-info mt-2" @onclick="AddMoreAuthors">Add another author</button>
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="createPublisherInput" class="form-label"><b>Publisher:</b></label>
+                                <input id="createPublisherInput" class="form-control" disabled placeholder="@Publisher.Name" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="createPublicationYear" class="form-label"><b>Publication year:</b></label>
+                                <InputDate class="form-control" TValue="DateOnly" @bind-Value:format="dd/MM/yyyy" @bind-Value="@bookCreateForm.PublicationDate"></InputDate>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Create</button>
+                    <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    [Parameter]
+    public PublisherInfoModel Publisher { get; set; }
+
+    private BookForm bookCreateForm = new();
+
+    private List<ContentTypeInfoModel> contentTypes = new();
+    private List<AuthorInfoModel> authors = new();
+
+    List<string> authorNames = new() { string.Empty };
+
+    public EventCallback<string> ValueChanged { get; set; }
+
+    IEnumerable<GenreInfoModel>? genres;
+    IEnumerable<Guid>? multipleGenres;
+
+    private int progressValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contentTypes = await ContentTypeService.GetContentTypesAsync();
+        genres = await GenreService.GetGenresAsync();
+        authors = await AuthorService.GetAuthorsAsync();
+    }
+
+    /// <summary>
+    /// Reads the uploaded file in chunks to calgulate the progress for updating the UI, to then save the Content of a book to a <see cref="byte[]"/>.
+    /// </summary>
+    /// <param name="inputFileChange"></param>
+    /// <returns></returns>
+    private async Task BookContentFileChanged(InputFileChangeEventArgs inputFileChange)
+    {
+        var bufferSize = 1024 * 1024; // 1 MB buffer size
+        await using var outputStream = new MemoryStream();
+        await using var stream = inputFileChange.File.OpenReadStream(maxAllowedSize: 1024 * 1024 * 1024);
+
+        var buffer = new byte[bufferSize];
+        int readBytes;
+        long totalBytesRead = 0;
+        long fileSize = stream.Length;
+
+        // Iterate through the bytes being read and add onto with the extra bytes; get the progress value in percentage and then update Blazor UI.
+        while ((readBytes = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        {
+            await outputStream.WriteAsync(buffer, 0, readBytes);
+            totalBytesRead += readBytes;
+            progressValue = (int)((totalBytesRead * 100) / fileSize);
+            StateHasChanged(); 
+        }
+
+        bookCreateForm.BookContent = outputStream.ToArray();
+    }
+
+    private async Task BookCoverImgFileChanged(InputFileChangeEventArgs inputFileChange)
+    {
+        bookCreateForm.CoverImage = await FileHandler.FileToByteArray(inputFileChange.File);
+    }
+
+    void GenreOnChange(object genre)
+    {
+        var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
+
+        bookCreateForm.GenreIds = multipleGenres.ToList();
+    }
+
+    async void AddMoreAuthors()
+    {
+        authorNames.Add(string.Empty);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CreateBook()
+    {
+        bookCreateForm.AuthorIds.Clear();
+        foreach (var authorName in authorNames)
+        {
+            var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
+            if (authorExists == null && authorName != null && authorName != string.Empty)
+            {
+                AuthorCreateModel authorCreateModel = new() { Name = authorName };
+                authorExists = (await AuthorService.AddAuthorAsync(authorCreateModel)).Instance;
+            }
+            if (authorName != string.Empty && authorExists != null)
+            {
+                bookCreateForm.AuthorIds.Add(authorExists.Id);
+            }
+        }
+        bookCreateForm.PublisherId = Publisher.Id;
+        var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
+        if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            ModalOptions(false);
+        }
+        else
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+        }
+    }
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}

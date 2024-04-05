@@ -4,9 +4,9 @@ namespace PubHub.Common.Services
 {
     public interface IAuthorService
     {
-        Task<List<AuthorInfoModel>> GetAuthors();
-        Task<AuthorInfoModel?> GetAuthor(Guid authorId);
-        Task<ServiceInstanceResult<AuthorCreateModel>> AddAuthor(AuthorCreateModel authorCreateModel);
-        Task<ServiceResult> DeleteAuthor(Guid authorId);
+        Task<List<AuthorInfoModel>> GetAuthorsAsync();
+        Task<AuthorInfoModel?> GetAuthorAsync(Guid authorId);
+        Task<ServiceInstanceResult<AuthorInfoModel>> AddAuthorAsync(AuthorCreateModel authorCreateModel);
+        Task<ServiceResult> DeleteAuthorAsync(Guid authorId);
     }
 }

@@ -25,7 +25,7 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="ContentTypeInfoModel"/></returns>
-        public async Task<List<ContentTypeInfoModel>> GetContentTypes()
+        public async Task<List<ContentTypeInfoModel>> GetContentTypesAsync()
         {
             try
             {

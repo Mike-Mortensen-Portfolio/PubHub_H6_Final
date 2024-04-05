@@ -30,7 +30,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<UserCreateModel>> AddUser(UserCreateModel userCreateModel)
+        public async Task<ServiceInstanceResult<UserCreateModel>> AddUserAsync(UserCreateModel userCreateModel)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="UserInfoModel"/> with the users information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<UserInfoModel?> GetUserInfo(Guid userId)
+        public async Task<UserInfoModel?> GetUserInfoAsync(Guid userId)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<List<BookInfoModel>> GetUserBooks(Guid userId)
+        public async Task<List<BookInfoModel>> GetUserBooksAsync(Guid userId)
         {
             try
             {
@@ -152,7 +152,7 @@ namespace PubHub.Common.Services
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUser(Guid userId, UserUpdateModel userUpdateModel)
+        public async Task<ServiceInstanceResult<UserUpdateModel>> UpdateUserAsync(Guid userId, UserUpdateModel userUpdateModel)
         {
             try
             {
@@ -197,7 +197,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteUser(Guid userId)
+        public async Task<ServiceResult> DeleteUserAsync(Guid userId)
         {
             try
             {
@@ -232,7 +232,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> SuspendUser(Guid userId)
+        public async Task<ServiceResult> SuspendUserAsync(Guid userId)
         {
             try
             {

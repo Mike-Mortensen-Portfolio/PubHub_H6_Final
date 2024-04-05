@@ -4,10 +4,10 @@ namespace PubHub.Common.Services
 {
     public interface IBookService
     {
-        Task<List<BookInfoModel>> GetBooks(BookQuery queryOptions);
-        Task<BookInfoModel?> GetBook(Guid bookId);
-        Task<ServiceInstanceResult<BookCreateModel>> AddBook(BookCreateModel bookCreateModel);
-        Task<ServiceInstanceResult<BookUpdateModel>> UpdateBook(Guid bookId, BookUpdateModel bookUpdateModel);
-        Task<ServiceResult> DeleteBook(Guid bookId);
+        Task<List<BookInfoModel>> GetBooksAsync(BookQuery queryOptions);
+        Task<BookInfoModel?> GetBookAsync(Guid bookId);
+        Task<ServiceInstanceResult<BookCreateModel>> AddBookAsync(BookCreateModel bookCreateModel);
+        Task<ServiceInstanceResult<BookUpdateModel>> UpdateBookAsync(Guid bookId, BookUpdateModel bookUpdateModel);
+        Task<ServiceResult> DeleteBookAsync(Guid bookId);
     }
 }
