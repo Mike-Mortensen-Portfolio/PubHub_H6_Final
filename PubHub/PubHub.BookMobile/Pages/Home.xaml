@@ -3,13 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PubHub.BookMobile.Pages.Home"
              xmlns:pages="clr-namespace:PubHub.BookMobile.Pages"
-             x:DataType="pages:Home"
+             xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
+             x:DataType="viewModels:HomeViewModel"
              Title="Home">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions=".5*, .5*"
               Padding="0,0,20,0">
-            <Label Grid.Column="0"
+            <Label x:DataType="pages:Home"
+                   Grid.Column="0"
                    VerticalTextAlignment="Center"
                    FontSize="{StaticResource Subheader}"
                    FontAttributes="Bold"
@@ -19,9 +21,12 @@
                     Text="Sign In"
                     FontAttributes="Bold"
                     VerticalOptions="Center"
-                    HorizontalOptions="End"/>
+                    HorizontalOptions="End"
+                    Command="{Binding NavigateToPageCommand}"
+                    CommandParameter="Login"/>
         </Grid>
     </Shell.TitleView>
+    
     <ScrollView>
         <StackLayout Margin="0,20,0,0"
                      Orientation="Vertical"
@@ -30,12 +35,12 @@
                    FontAttributes="Bold"
                    HorizontalTextAlignment="Center">PubHub news</Label>
 
-            <CarouselView ItemsSource="{x:Static pages:Home.Items}"
+            <CarouselView ItemsSource="{Binding Items}"
                           HeightRequest="450"
                           IndicatorView="indicator">
                 <CarouselView.ItemTemplate>
                     <DataTemplate>
-                        <Frame x:DataType="pages:Item"
+                        <Frame x:DataType="viewModels:Item"
                                Margin="10,30,10,0"
                                BorderColor="{StaticResource Primary}"
                                BackgroundColor="{StaticResource WarmWhite}">

@@ -45,9 +45,9 @@ namespace PubHub.API.Domain.Extensions
             var normalizedSearchKey = searchTerms.SearchKey?.ToUpper();
             query = query.Where(b =>
             (normalizedSearchKey == null ||
-                b.BookAuthors.Any(ba => ba.Author != null && ba.Author.Name.ToUpperInvariant().Contains(normalizedSearchKey)) ||
-                b.Title.ToUpperInvariant().Contains(normalizedSearchKey) ||
-                (b.Publisher != null && b.Publisher.Name.ToUpperInvariant().Contains(normalizedSearchKey))));
+                b.BookAuthors.Any(ba => ba.Author != null && ba.Author.Name.ToUpper().Contains(normalizedSearchKey)) ||
+                b.Title.ToUpper().Contains(normalizedSearchKey) ||
+                (b.Publisher != null && b.Publisher.Name.ToUpper().Contains(normalizedSearchKey))));
 
             if (searchTerms.Genres != null && searchTerms.Genres.Length > 0)
                 query = query.Where(b => b.BookGenres.Select(bg => bg.GenreId).Intersect(searchTerms.Genres).Any());
