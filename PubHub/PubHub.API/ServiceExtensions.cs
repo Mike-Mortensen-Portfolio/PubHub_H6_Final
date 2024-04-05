@@ -95,6 +95,13 @@ namespace PubHub.API
                     options.SwaggerDoc(doc.Version, doc);
                 }
 
+                // Map DateOnly from string.
+                options.MapType<DateOnly>(() => new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "date"
+                });
+
                 // Uncommment to include XML documentation (Remember to add XML Doc file in Properties > Build > Output > Documentation File)
                 //var xmlDocPath = Path.Combine(AppContext.BaseDirectory, "PubHub.API.xml");
                 //options.IncludeXmlComments(xmlDocPath);
