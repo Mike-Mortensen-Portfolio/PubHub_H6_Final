@@ -12,6 +12,7 @@ namespace PubHub.Common.Services
     public interface IPublisherService
     {
         Task<ServiceInstanceResult<PublisherCreateModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel);
+        Task<List<PublisherInfoModel>> GetPublishersAsync(PublisherQuery queryOptions);
         Task<PublisherInfoModel?> GetPublisherInfoAsync(Guid publisherId);
         Task<List<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId);
         Task<ServiceInstanceResult<PublisherUpdateModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel);

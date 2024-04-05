@@ -1,10 +1,11 @@
 ﻿using System.Security.Claims;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace PubHub.AdminPortal.Components.Auth
 {
-    public class CustomAuthStateProvider : AuthenticationStateProvider
+    public class CustomAuthStateProvider 
     {
         private readonly ILocalStorageService _localStorage;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -14,11 +15,6 @@ namespace PubHub.AdminPortal.Components.Auth
         {
             _localStorage = localStorage;
             _httpClientFactory = httpClientFactory;
-        }
-
-        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-        {
-            var claims = await 
         }
     }
 }
