@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Authors;
@@ -25,89 +26,6 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context = context;
 
         /// <summary>
-        /// Add a new user account to PubHub.
-        /// </summary>
-        /// <param name="userCreateModel">User information.</param>
-        /// <response code="200">Success. A new user account was created.</response>
-        /// <response code="400">Invalid model data or format.</response>
-        [HttpPost()]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserInfoModel))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
-        public async Task<IResult> AddUserAsync([FromBody] UserCreateModel userCreateModel)
-        {
-            // TODO (SIA): Validate model.
-
-            var existingUser = await _context.Users.
-                FirstOrDefaultAsync(account => account.NormalizedEmail == userCreateModel.Account.Email.ToUpperInvariant());
-
-            if (existingUser is not null)
-                return Results.Problem(
-                    type: DuplicateProblemSpecification.TYPE,
-                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
-                    title: DuplicateProblemSpecification.TITLE,
-                    detail: "A matching user already exists",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        {"Id", existingUser.Id}
-                    });
-
-            // Get account type ID.
-            var accountTypeId = await _context.Set<AccountType>()
-                .Where(a => a.Name.ToLower() == AccountTypeConstants.USER_ACCOUNT_TYPE)
-                .Select(a => a.Id)
-                .FirstOrDefaultAsync();
-            if (accountTypeId == INVALID_ENTITY_ID)
-            {
-                _logger.LogError("Unable to get account type: {TypeName}", AccountTypeConstants.USER_ACCOUNT_TYPE);
-
-                return Results.Problem(
-                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                    title: InternalServerErrorSpecification.TITLE,
-                    detail: $"Unable to find account type.",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        { "AccountType", AccountTypeConstants.USER_ACCOUNT_TYPE }
-                    });
-            }
-
-            // Create user account.
-            // TODO (SIA): Add more account related data to fully set up an account.
-            var newUser = new User()
-            {
-                Name = userCreateModel.Name,
-                Surname = userCreateModel.Surname,
-                Birthday = userCreateModel.Birthday,
-                Account = new()
-                {
-                    Email = userCreateModel.Account.Email,
-                    AccountTypeId = accountTypeId
-                }
-            };
-
-            await _context.Set<User>()
-                .AddAsync(newUser);
-
-            if (await _context.SaveChangesAsync() == NO_CHANGES)
-            {
-                _logger.LogError("Couldn't save changes to the database when adding user.");
-
-                return Results.Problem(
-                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
-                    title: InternalServerErrorSpecification.TITLE,
-                    detail: "Something went wrong and the user couldn't be created. Please try again.",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        { "User", newUser }
-                    });
-            }
-
-            // Get newly added user.
-            var userInfo = await GetUserInfoAsync(newUser.Id);
-
-            return Results.Created($"users/{userInfo!.Id}", userInfo);
-        }
-
-        /// <summary>
         /// Get all general information about a specific user.
         /// </summary>
         /// <param name="id">ID of user.</param>
@@ -118,7 +36,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetUserAsync(Guid id)
         {
-            var userInfo = await GetUserInfoAsync(id);
+            var userInfo = await _context.GetUserInfoAsync(id);
             if (userInfo == null)
             {
                 return Results.Problem(
@@ -383,20 +301,5 @@ namespace PubHub.API.Controllers
 
             return Results.Ok();
         }
-
-        private async Task<UserInfoModel?> GetUserInfoAsync(Guid id) =>
-            await _context.Set<User>()
-                .Include(u => u.Account)
-                    .ThenInclude(a => a!.AccountType)
-                .Select(u => new UserInfoModel()
-                {
-                    Id = u.Id,
-                    Email = u.Account!.Email,
-                    Name = u.Name,
-                    Surname = u.Surname,
-                    Birthday = u.Birthday,
-                    AccountType = u.Account!.AccountType!.Name
-                })
-                .FirstOrDefaultAsync(u => u.Id == id);
     }
 }

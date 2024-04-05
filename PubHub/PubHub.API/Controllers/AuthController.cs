@@ -7,8 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
+using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
+using PubHub.Common;
 using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
@@ -32,6 +36,108 @@ namespace PubHub.API.Controllers
             _context = context;
             _userManager = userManager;
             _authService = authService;
+        }
+
+        [HttpPost("user")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserInfoModel))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
+        public async Task<IResult> RegisterUserAsync([FromBody] UserCreateModel userCreateModel)
+        {
+            // TODO (SIA): Validate model.
+
+            // Check if user already exists.
+            var existingUser = await _context.Users.
+                FirstOrDefaultAsync(account => account.NormalizedEmail == userCreateModel.Account.Email.ToUpper());
+            if (existingUser is not null)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching user already exists",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"Id", existingUser.Id}
+                    });
+
+            // Get account type ID.
+            var accountTypeId = await _context.Set<AccountType>()
+                .Where(a => a.Name.ToLower() == AccountTypeConstants.USER_ACCOUNT_TYPE)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+            if (accountTypeId == INVALID_ENTITY_ID)
+            {
+                _logger.LogError("Unable to get account type: {TypeName}", AccountTypeConstants.USER_ACCOUNT_TYPE);
+
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: $"Unable to find account type.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "AccountType", AccountTypeConstants.USER_ACCOUNT_TYPE }
+                    });
+            }
+
+            // Create user account.
+            Account account = new()
+            {
+                Email = userCreateModel.Account.Email,
+                AccountTypeId = accountTypeId
+            };
+            var createIdentityResult = await _userManager.CreateAsync(account, userCreateModel.Account.Password);
+            if (!createIdentityResult.Succeeded)
+            {
+                _logger.LogError("Unable to create account with type ID: {AccountTypeId}", accountTypeId);
+
+                return Results.Problem(
+                    statusCode: UnprocessableEntitySpecification.STATUS_CODE,
+                    title: UnprocessableEntitySpecification.TITLE,
+                    detail: $"Unable to create user account.");
+            }
+
+            // Create user associated with the account.
+            var newUser = new User()
+            {
+                Name = userCreateModel.Name,
+                Surname = userCreateModel.Surname,
+                Birthday = userCreateModel.Birthday,
+                Account = account
+            };
+            await _context.Set<User>()
+                .AddAsync(newUser);
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when adding user.");
+
+                // Attempt to delete account.
+                var deleteIdentityResult = await _userManager.DeleteAsync(account);
+                if (!deleteIdentityResult.Succeeded)
+                {
+                    _logger.LogError("Failed to delete account: {Account}", account.Id);
+                }
+
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the user couldn't be created. Please try again.");
+            }
+
+            // Respond with newly added user.
+            var userInfo = await _context.GetUserInfoAsync(newUser.Id);
+            if (userInfo == null)
+            {
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "Unable to retreive information of new user.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id" , newUser.Id }
+                    });
+            }
+
+            return Results.Created($"users/{userInfo.Id}", userInfo);
         }
 
         [HttpPost("token")]
