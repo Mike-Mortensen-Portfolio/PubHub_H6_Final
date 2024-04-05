@@ -1,0 +1,58 @@
+﻿@inject PubHub.Common.Services.IPublisherService PublisherService
+@inject Radzen.NotificationService NotificationService
+
+<div class="modal fade show" id="createPublisherModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create a new book</h4>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+            </div>
+            <EditForm Model="publisherCreateForm" OnSubmit="() => CreatePublisher()">
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="createPublisherName" class="form-label"><b>Publisher name:</b></label>
+                        <input @bind-value="publisherCreateForm.Name" type="text" id="createPublisherName" class="form-control" placeholder="Type in the publisher name..." />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createPublisherPassword" class="form-label"><b>Publisher email:</b></label>
+                        <input @bind-value="accountCreateForm.Email" type="email" id="createPublisherPassword" class="form-control" placeholder="Type in the publisher email..." />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Create</button>
+                        <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private PublisherForm publisherCreateForm = new();
+    private AccountForm accountCreateForm = new();
+
+    // TODO (JBN): Add and test actual functionality, as well as the account creation.
+    private async Task CreatePublisher()
+    {
+        var result = await PublisherService.AddPublisherAsync(publisherCreateForm.CreatePublisherModel());
+        if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            ModalOptions(false);
+        }
+        else
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+        }
+    }
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}

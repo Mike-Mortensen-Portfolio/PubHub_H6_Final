@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
+using PubHub.Common.Extensions;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
 using static PubHub.Common.IntegrityConstants;
@@ -21,6 +22,44 @@ namespace PubHub.Common.Services
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
             };
+        }
+
+        /// <summary>
+        /// Calls the API enpoint to retrieve all publishers through the <see cref="PublisherInfoModel"/> filtered on the searchQuery.
+        /// </summary>
+        /// <param name="queryOptions">The query options that is requested.</param>
+        /// <returns>A list of <see cref="PublisherInfoModel"/></returns>
+        public async Task<List<PublisherInfoModel>> GetPublishersAsync(PublisherQuery queryOptions)
+        {
+            try
+            {
+                if (queryOptions == null)
+                    throw new NullReferenceException($"The search query wasn't valid: {queryOptions}");
+
+                HttpResponseMessage response = await Client.GetAsync($"publishers?{queryOptions.ToQuery()}");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
+                    if (errorResponse == null)
+                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                }
+
+                List<PublisherInfoModel>? publisherInfoModel = JsonSerializer.Deserialize<List<PublisherInfoModel>>(content, _serializerOptions);
+
+                if (publisherInfoModel == null)
+                    throw new NullReferenceException($"Unable to map the request over to the client.");
+
+                return publisherInfoModel!;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unable to get publishers:", ex.Message);
+                return [];
+            }
         }
 
         /// <summary>

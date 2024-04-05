@@ -1,4 +1,6 @@
-﻿namespace PubHub.Common.Extensions
+﻿using System.Collections;
+
+namespace PubHub.Common.Extensions
 {
     public static class GenericExtensions
     {
@@ -21,6 +23,17 @@
 
                 if (ignoreNull && propertyValue == null)
                     continue;
+
+                if (propertyValue!.GetType().IsArray)
+                {
+                    var propertValueAsCollection = propertyValue as IList;
+                    for (int j = 0; j < propertValueAsCollection!.Count; j++)
+                    {
+                        queryString += $"{propertyName}={propertValueAsCollection[j]?.ToString()}{(((j + 1 < propertValueAsCollection.Count) || i + 1 < properties.Length) ? ("&") : (string.Empty))}";
+                    }
+
+                    continue;
+                }
 
                 queryString += $"{propertyName}={propertyValue}{((i + 1 < properties.Length) ? ("&") : (string.Empty))}";
             }
