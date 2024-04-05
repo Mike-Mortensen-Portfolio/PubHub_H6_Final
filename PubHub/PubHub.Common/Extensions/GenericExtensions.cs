@@ -1,4 +1,6 @@
-﻿namespace PubHub.Common.Extensions
+﻿using System.Collections;
+
+namespace PubHub.Common.Extensions
 {
     public static class GenericExtensions
     {
