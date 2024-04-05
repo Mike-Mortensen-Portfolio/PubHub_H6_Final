@@ -43,7 +43,19 @@ namespace PubHub.AdminPortal.Components.Auth
                 if(!string.IsNullOrWhiteSpace(token))
                     claimsPrincipal = GetClaims(token);
 
-
+                if (claimsPrincipal.Identity != null && claimsPrincipal.Identity.IsAuthenticated)
+                {
+                    return new AuthenticationState(claimsPrincipal);
+                }
+                else
+                {
+                    // Return an anonymous authentication state if the user is not authenticated
+                    return new AuthenticationState(new ClaimsPrincipal());
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Couldn't locate any tokens.");
             }
         }
 
@@ -55,6 +67,7 @@ namespace PubHub.AdminPortal.Components.Auth
             {
                 var jwtToken = tokenHandler.ReadJwtToken(token);
 
+                // Retrieves the claims contained within' the JWT token-
                 var claims = jwtToken.Claims;
 
                 var identity = new ClaimsIdentity(claims, "jwt");
@@ -65,6 +78,11 @@ namespace PubHub.AdminPortal.Components.Auth
             {
                 throw new ArgumentException("Invalid token format");
             }
+        }
+
+        public void NotifyAuthenticationStateChanged()
+        {
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());  
         }
     }
 }
