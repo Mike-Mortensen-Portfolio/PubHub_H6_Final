@@ -5,7 +5,6 @@ using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
-using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Users;
 
 namespace PubHub.Common.Services
@@ -81,8 +80,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (loginInfo == null)
-                    throw new ArgumentNullException($"The login info wasn't valid.");
+                ArgumentNullException.ThrowIfNull(loginInfo);
 
                 HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("Email", loginInfo.Email);

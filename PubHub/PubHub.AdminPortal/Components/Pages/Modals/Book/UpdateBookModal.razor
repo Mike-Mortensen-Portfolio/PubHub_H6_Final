@@ -24,7 +24,7 @@
                             <div class="col-md-6">
                                 <label for="updateSelectContentType" class="form-label"><b>Content type:</b></label>
                                 <select @onchange="@(async value => { bookUpdateform.ContentTypeId = new Guid(value.Value!.ToString()!); })" id="updateSelectContentType" class="form-select">
-                                    @foreach (var contentType in contentTypes)
+                                    @foreach (var contentType in contentTypes!)
                                     {
                                         <option value="@contentType.Id">@contentType.Name</option>
                                     }
@@ -72,7 +72,7 @@
                                 var index = i++;
                                 <InputText @bind-Value="@authorNames[index]" type="text" class="form-control mt-2" list="authorList" placeholder="Type in author name..." />
                                 <datalist id="authorList">
-                                    @foreach (var author in authors)
+                                    @foreach (var author in authors!)
                                     {
                                         <option>@author.Name</option>
                                     }
@@ -111,9 +111,9 @@
     public required BookInfoModel BookInfoModel { get; set; }
 
     private BookForm bookUpdateform = new();
-    private IReadOnlyList<ContentTypeInfoModel> contentTypes;
+    private IReadOnlyList<ContentTypeInfoModel>? contentTypes;
 
-    private IReadOnlyList<AuthorInfoModel> authors;
+    private IReadOnlyList<AuthorInfoModel>? authors;
     List<string> authorNames = new();
     string booklength = "";
 

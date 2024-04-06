@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -21,10 +21,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\js\" />
     <Folder Include="wwwroot\libs\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\PubHub.Common\PubHub.Common.csproj" />
   </ItemGroup>
 
 </Project>
