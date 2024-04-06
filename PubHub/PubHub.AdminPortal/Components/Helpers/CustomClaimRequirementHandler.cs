@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 
-namespace PubHub.AdminPortal.Components
+namespace PubHub.AdminPortal.Components.Helpers
 {
     public class CustomClaimRequirementHandler : AuthorizationHandler<CustomClaimRequirement>
     {
@@ -18,10 +18,10 @@ namespace PubHub.AdminPortal.Components
                 ArgumentNullException.ThrowIfNull(context);
 
                 if (!(context.User != null && context.User.Identity != null && context.User.Identity.IsAuthenticated))
-                    {
-                        context.Fail();
-                        return Task.CompletedTask;
-                    }
+                {
+                    context.Fail();
+                    return Task.CompletedTask;
+                }
 
                 var claim = context.User.Claims.FirstOrDefault(c => c.Type == requirement.ClaimType && c.Value == requirement.ClaimValue.ToLower());
                 if (claim != null)
@@ -37,7 +37,7 @@ namespace PubHub.AdminPortal.Components
                 Debug.WriteLine($"Couldn't handle the Requirement request,", ex.Message);
                 return Task.CompletedTask;
             }
-            
+
         }
     }
 }
