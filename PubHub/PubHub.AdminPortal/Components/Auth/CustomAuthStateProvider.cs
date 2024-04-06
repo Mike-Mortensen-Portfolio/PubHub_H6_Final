@@ -46,9 +46,10 @@ namespace PubHub.AdminPortal.Components.Auth
                     return new AuthenticationState(new ClaimsPrincipal());
                 }
             }
-            catch { return await Task.FromResult(new AuthenticationState(_anonymous)); }
-            
-
+            catch (Exception ex)
+            { 
+                return await Task.FromResult(new AuthenticationState(_anonymous)); 
+            }          
             
         }
 
