@@ -1,7 +1,9 @@
 ﻿@page "/login"
 @inject PubHub.Common.Services.IAuthenticationService AuthService
 @inject Radzen.NotificationService NotificationService
+@inject NavigationManager NavigationManager
 @inject CustomAuthStateProvider CustomAuthProvider
+@inject ILocalStorageService LocalStorage;
 
 <PageTitle>Login</PageTitle>
 
@@ -30,16 +32,18 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@if (isLoggedIn)
-{
-    <p>You are logged in.</p>
-}
-
 
 @code {
+    [CascadingParameter]
+    public AuthenticationState authenticationState { get; set; }
 
-    private LoginInfo loginInfo = new() { Email = "jasmin@email.com", Password = "P@$$w0rd!" };
+    private LoginInfo loginInfo = new() { Email = "Operator@Test.com", Password = "P@ssw0rd" };
     private bool isLoggedIn = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await CustomAuthProvider.GetAuthenticationStateAsync();
+    }
 
     // TODO (JBN): Test this when everything is set up regarding authentication.
     public async Task LoginAsync()
@@ -56,7 +60,9 @@
 
             if (result.IsSuccess)
             {
-                
+                await LocalStorage.SetItemAsync<string>("token", result.Instance.Token);
+
+                NavigationManager.NavigateTo("./ManagePublishers");
             }
         }
     }

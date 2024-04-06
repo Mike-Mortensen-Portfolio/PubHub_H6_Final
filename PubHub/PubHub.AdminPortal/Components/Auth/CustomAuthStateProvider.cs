@@ -17,11 +17,6 @@ namespace PubHub.AdminPortal.Components.Auth
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task SetToken(string token)
-        {
-            await _localStorage.SetItemAsync("token", token);
-        }
-
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var claimsPrincipal = new ClaimsPrincipal();
