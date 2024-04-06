@@ -2,11 +2,14 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-<AuthorizeView>
+<AuthorizeView Policy="Operator">
     <Authorized>
-        <h3>Hi, @context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value</h3>
+        <ManagePublishers/>
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="Publisher">
+    <Authorized>
+        <Books />
     </Authorized>
     <NotAuthorized>
         <h3>You are not logged in.</h3>

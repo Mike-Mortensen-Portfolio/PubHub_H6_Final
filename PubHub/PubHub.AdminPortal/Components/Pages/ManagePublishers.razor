@@ -3,6 +3,7 @@
 @inject PubHub.Common.Services.IPublisherService PublisherService
 @inject Radzen.NotificationService NotificationService
 @inject Radzen.DialogService DialogService
+@attribute [Authorize(Policy = "Operator")]
 
 <PageTitle>Publishers</PageTitle>
 
