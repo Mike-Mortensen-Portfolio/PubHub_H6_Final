@@ -41,11 +41,6 @@
     private LoginInfo loginInfo = new() { Email = "jasmin@email.com", Password = "P@$$w0rd!" };
     private bool isLoggedIn = false;
 
-    protected override async Task OnInitializedAsync()
-    {
-        isLoggedIn = await CustomAuthProvider.LoggedIn();
-    }
-
     // TODO (JBN): Test this when everything is set up regarding authentication.
     public async Task LoginAsync()
     {
@@ -61,12 +56,7 @@
 
             if (result.IsSuccess)
             {
-                // TODO (JBN): Save the returned tokens in either a cookie or localstorage.
-                await CustomAuthProvider.SetToken(result.Instance.Token);
-
-                await CustomAuthProvider.GetAuthenticationStateAsync();
-
-
+                
             }
         }
     }

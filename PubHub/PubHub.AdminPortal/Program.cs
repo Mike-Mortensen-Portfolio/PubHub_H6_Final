@@ -24,17 +24,18 @@ builder.Services.AddPubHubServices(options =>
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
 });
 
-builder.Services.AddRadzenComponents();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<FileHandler>();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-builder.Services.AddBlazoredLocalStorage();
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 });
+
+builder.Services.AddRadzenComponents();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<FileHandler>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddScoped<CustomAuthStateProvider>();
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 

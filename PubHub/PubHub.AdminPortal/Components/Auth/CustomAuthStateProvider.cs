@@ -17,16 +17,6 @@ namespace PubHub.AdminPortal.Components.Auth
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<bool> LoggedIn()
-        {
-            var token = await _localStorage.GetItemAsync<string>("token");
-            if (string.IsNullOrEmpty(token))
-            {
-                return false;
-            }
-            return true;
-        }
-
         public async Task SetToken(string token)
         {
             await _localStorage.SetItemAsync("token", token);
@@ -35,13 +25,16 @@ namespace PubHub.AdminPortal.Components.Auth
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var claimsPrincipal = new ClaimsPrincipal();
-
-            if (await _localStorage.ContainKeyAsync("token"))
+            try
             {
                 var token = await _localStorage.GetItemAsync<string>("token");
 
-                if(!string.IsNullOrWhiteSpace(token))
-                    claimsPrincipal = GetClaims(token);
+                if (string.IsNullOrWhiteSpace(token))
+                    return await Task.FromResult(new AuthenticationState(_anonymous));
+
+                claimsPrincipal = GetClaims(token);
+                if (claimsPrincipal == null)
+                    return await Task.FromResult(new AuthenticationState(claimsPrincipal));
 
                 if (claimsPrincipal.Identity != null && claimsPrincipal.Identity.IsAuthenticated)
                 {
@@ -53,10 +46,10 @@ namespace PubHub.AdminPortal.Components.Auth
                     return new AuthenticationState(new ClaimsPrincipal());
                 }
             }
-            else
-            {
-                throw new ArgumentException("Couldn't locate any tokens.");
-            }
+            catch { return await Task.FromResult(new AuthenticationState(_anonymous)); }
+            
+
+            
         }
 
         public ClaimsPrincipal GetClaims(string token)
@@ -82,7 +75,7 @@ namespace PubHub.AdminPortal.Components.Auth
 
         public void NotifyAuthenticationStateChanged()
         {
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());  
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
     }
 }
