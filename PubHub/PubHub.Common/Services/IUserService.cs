@@ -5,10 +5,9 @@ namespace PubHub.Common.Services
 {
     public interface IUserService
     {
-        Task<ServiceInstanceResult<UserCreateModel>> AddUserAsync(UserCreateModel userCreateModel);
-        Task<UserInfoModel?> GetUserInfoAsync(Guid userId);
-        Task<List<BookInfoModel>> GetUserBooksAsync(Guid userId);
-        Task<ServiceInstanceResult<UserUpdateModel>> UpdateUserAsync(Guid userId, UserUpdateModel userUpdateModel);
+        Task<ServiceResult<UserInfoModel>> GetUserAsync(Guid userId);
+        Task<IReadOnlyList<BookInfoModel>> GetUserBooksAsync(Guid userId);
+        Task<ServiceResult<UserInfoModel>> UpdateUserAsync(Guid userId, UserUpdateModel userUpdateModel);
         Task<ServiceResult> DeleteUserAsync(Guid userId);
         Task<ServiceResult> SuspendUserAsync(Guid userId);
     }

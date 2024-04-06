@@ -69,7 +69,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<PublisherCreateModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel)
+        public async Task<ServiceResult<PublisherInfoModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel)
         {
             try
             {
@@ -92,15 +92,19 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
                 }
 
-                return new ServiceInstanceResult<PublisherCreateModel>(response.StatusCode, publisherCreateModel, $"Successfully added the publisher: {publisherCreateModel.Name}");
+                var publisherInfoModel = JsonSerializer.Deserialize<PublisherInfoModel>(content, _serializerOptions);
+                if (publisherInfoModel == null)
+                    throw new NullReferenceException($"Unable to map the request over to the client.");
+
+                return new ServiceResult<PublisherInfoModel>(response.StatusCode, publisherInfoModel, $"Successfully added the publisher: {publisherInfoModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the publisher: {publisherCreateModel.Name}, ", ex.Message);
-                return new ServiceInstanceResult<PublisherCreateModel>(HttpStatusCode.Unused, publisherCreateModel, $"Failed to add the publisher: {publisherCreateModel.Name}");
+                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the publisher: {publisherCreateModel.Name}");
             }
         }
 
@@ -111,7 +115,7 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<List<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId)
+        public async Task<IReadOnlyList<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId)
         {
             try
             {
@@ -127,7 +131,7 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
                 }
 
                 List<BookInfoModel>? bookInfoModel = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions);
@@ -150,7 +154,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="PublisherInfoModel"/> with the users information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<PublisherInfoModel?> GetPublisherInfoAsync(Guid publisherId)
+        public async Task<ServiceResult<PublisherInfoModel>> GetPublisherInfoAsync(Guid publisherId)
         {
             try
             {
@@ -166,19 +170,19 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
                 }
 
-                PublisherInfoModel? publisherInfoModel = JsonSerializer.Deserialize<PublisherInfoModel>(content, _serializerOptions);
+                var publisherInfoModel = JsonSerializer.Deserialize<PublisherInfoModel>(content, _serializerOptions);
                 if (publisherInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
 
-                return publisherInfoModel!;
+                return new ServiceResult<PublisherInfoModel>(response.StatusCode, publisherInfoModel, $"Successfully retrieved info of the publisher: {publisherInfoModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Get publisher info failed: {publisherId}", ex.Message);
-                return null;
+                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve info of the publisher.");
             }
         }
 
@@ -191,7 +195,7 @@ namespace PubHub.Common.Services
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceInstanceResult<PublisherUpdateModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel)
+        public async Task<ServiceResult<PublisherInfoModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel)
         {
             try
             {
@@ -217,15 +221,19 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
                 }
 
-                return new ServiceInstanceResult<PublisherUpdateModel>(response.StatusCode, publisherUpdateModel, $"Successfully updated the publisher: {publisherUpdateModel.Name}");
+                var publisherInfoModel = JsonSerializer.Deserialize<PublisherInfoModel>(content, _serializerOptions);
+                if (publisherInfoModel == null)
+                    throw new NullReferenceException($"Unable to map the request over to the client.");
+
+                return new ServiceResult<PublisherInfoModel>(response.StatusCode, publisherInfoModel, $"Successfully updated the publisher: {publisherInfoModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to update the publisher: {publisherUpdateModel.Name}, ", ex.Message);
-                return new ServiceInstanceResult<PublisherUpdateModel>(HttpStatusCode.Unused, publisherUpdateModel, $"Failed to update the publisher: {publisherUpdateModel.Name}");
+                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.Unused, null, $"Failed to update the publisher: {publisherUpdateModel.Name}");
             }
         }
 
@@ -252,7 +260,7 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
                 }
 
                 return new ServiceResult(response.StatusCode, $"Successfully deleted the publisher: {publisherId}");

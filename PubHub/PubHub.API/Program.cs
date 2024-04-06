@@ -1,6 +1,9 @@
-﻿using Microsoft.OpenApi.Models;
-using PubHub.API;
+﻿using System.Net;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+using PubHub.API;
+using PubHub.API.Controllers.Problems;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,25 @@ builder.Services.AddControllers()
     });
 
 builder.Services.ConfigureVersioning();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = actionContext =>
+    {
+        var problemDetails = new ValidationProblemDetails(actionContext.ModelState);
+
+        var result = new BadRequestObjectResult(new 
+        {
+            Status = ValidationProblemSpecification.STATUS_CODE,
+            Title = ValidationProblemSpecification.TITLE,
+            Type = ValidationProblemSpecification.TYPE,
+            Extensions = problemDetails.Errors.ToDictionary()
+        });
+        result.ContentTypes.Add("application/problem+json");        
+
+        return result;
+    };
+});
 
 var app = builder.Build();
 

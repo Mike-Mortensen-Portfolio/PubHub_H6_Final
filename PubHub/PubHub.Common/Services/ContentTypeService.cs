@@ -25,7 +25,7 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="ContentTypeInfoModel"/></returns>
-        public async Task<List<ContentTypeInfoModel>> GetContentTypesAsync()
+        public async Task<IReadOnlyList<ContentTypeInfoModel>> GetContentTypesAsync()
         {
             try
             {
@@ -38,10 +38,10 @@ namespace PubHub.Common.Services
                     if (errorResponse == null)
                         throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse!.Detail}");
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
-                List<ContentTypeInfoModel>? contentTypeInfoModel = JsonSerializer.Deserialize<List<ContentTypeInfoModel>>(content, _serializerOptions);
+                var contentTypeInfoModel = JsonSerializer.Deserialize<List<ContentTypeInfoModel>>(content, _serializerOptions);
 
                 if (contentTypeInfoModel == null)
                     throw new NullReferenceException($"Unable to map the request over to the client.");
