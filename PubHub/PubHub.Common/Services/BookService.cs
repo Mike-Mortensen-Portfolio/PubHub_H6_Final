@@ -35,7 +35,7 @@ namespace PubHub.Common.Services
                 if (queryOptions == null)
                     throw new NullReferenceException($"The search query wasn't valid: {queryOptions}");
 
-                HttpResponseMessage response = await Client.GetAsync($"books?{queryOptions.ToQuery()}");
+                HttpResponseMessage response = await Client.GetAsync($"books?{queryOptions.ToQuery(ignoreNull: true)}");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)

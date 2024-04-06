@@ -5,23 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:PubHub.BookMobile.Pages">
 
-    <Shell.FlyoutContent>
-        <DataTemplate>
-            <Grid ColumnDefinitions="3*,4*,3*">
-                <Image Grid.Column="0"
-                       Source="{Binding Icon}"
-                       Margin="5"
-                       HeightRequest="45" />
-                <Label Grid.Column="1"
-                       Text="{Binding Text}"
-                       TextColor="Green"
-                       FontAttributes="Italic"
-                       VerticalTextAlignment="Center" />
-                <Image Grid.Column="2" Source="indicator.png" HeightRequest="45"/>
-            </Grid>
-        </DataTemplate>
-    </Shell.FlyoutContent>
-
     <FlyoutItem Title="Home">
         <FlyoutItem.FlyoutIcon>
             <FontImageSource FontFamily="IcoFont"
@@ -30,12 +13,13 @@
         <ShellContent ContentTemplate="{DataTemplate pages:Home}"
                           Route="Home"/>
     </FlyoutItem>
+    
     <FlyoutItem Title="Search book">
         <FlyoutItem.FlyoutIcon>
             <FontImageSource FontFamily="IcoFont"
                              Glyph="{StaticResource Look}"/>
         </FlyoutItem.FlyoutIcon>
-        <ShellContent ContentTemplate="{DataTemplate pages:Home}"
-                          Route="Home"/>
+        <ShellContent ContentTemplate="{DataTemplate pages:Library}"
+                          Route="Library"/>
     </FlyoutItem>
 </Shell>
