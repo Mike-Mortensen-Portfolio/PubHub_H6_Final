@@ -4,7 +4,7 @@ using AutoFixture;
 
 namespace PubHub.Common.UT.Services
 {
-    public class ServiceTests : IClassFixture<DataGeneratorFixture>
+    public abstract class ServiceTests : IClassFixture<DataGeneratorFixture>
     {
         private readonly JsonSerializerOptions _serializerOptions = new()
         {

@@ -23,22 +23,16 @@ namespace PubHub.API.UT.Controllers
         public async Task GetAllPublishersAsync()
         {
             // Arrange.
-            int count = 15;
-            var publishers = Fixture.CreateMany<Publisher>(count);
+            int publisherCount = 15;
+            var publishers = Fixture.CreateMany<Publisher>(publisherCount);
             await Context.Set<Publisher>().AddRangeAsync(publishers);
             await Context.SaveChangesAsync();
 
-            List<PublisherInfoModel> expectedModels = [];
-            foreach (var publisher in publishers)
-            {
-                expectedModels.Add(new PublisherInfoModel() { Id = publisher.Id, Name = publisher.Name, Email = publisher.Account!.Email });
-            }
+            var expectedModels = publishers.ToInfo().ToList();
 
             var query = new PublisherQuery()
             {
-                OrderBy = OrderPublisherBy.Name,
-                Descending = false,
-                Max = count,
+                Max = publisherCount,
                 Page = 1
             };
 
