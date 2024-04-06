@@ -10,7 +10,6 @@ namespace PubHub.Common.Services
             Instance = instance;
         }
 
-        [MemberNotNullWhen(true, nameof(IsSuccess))]
         public TResult? Instance { get; }
     }
 }

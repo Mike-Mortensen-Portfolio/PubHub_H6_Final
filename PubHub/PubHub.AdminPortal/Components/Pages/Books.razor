@@ -12,14 +12,14 @@
     <div class="container">
         <div class="row">
             <div class="col-md-10">
-                <h1 class="text-center">@Publisher.Instance.Name books</h1>
+                <h1 class="text-center">@Publisher.Name books</h1>
             </div>
             <div class="col-md-2">
                 <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
             </div>
             @if (showCreateModal)
             {
-                <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher.Instance"></CreateBookModal>
+                <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
             }
         </div>
         <div class="row text-center">
@@ -78,12 +78,14 @@
         if (accountClaim != null)
         {
             Guid accountGuid = new Guid(accountClaim.Value.ToString());
-            Publisher = await PublisherService.GetPublisherInfoAsync(accountGuid);
+            var serviceResult = await PublisherService.GetPublisherInfoAsync(accountGuid);
+            Publisher = serviceResult.Instance;
         }
 
         if (Publisher != null)
         {
-            BookInfos = await PublisherService.GetPublisherBooksAsync(Publisher.Instance.Id);
+            var books = await PublisherService.GetPublisherBooksAsync(Publisher.Id);
+            BookInfos = books.ToList();
         }
     }
 
