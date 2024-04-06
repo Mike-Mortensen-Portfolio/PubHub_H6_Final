@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
+using PubHub.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,9 +22,31 @@ namespace PubHub.API.Domain.Auth
             _context = context;
         }
 
-        public async Task<TokenResult> CreateTokenPairAsync(Account account)
+        /// <summary>
+        /// Create an access token and refresh token for an <see cref="Account"/>.
+        /// </summary>
+        /// <param name="account"><see cref="Account"/> with an account type of <see cref="AccountTypeConstants.USER_ACCOUNT_TYPE"/>, <see cref="AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE"/> or <see cref="AccountTypeConstants.OPERATOR_ACCOUNT_TYPE"/>.</param>
+        /// <returns>Access token and refresh token.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<TokenResult> CreateTokenPairAsync(Account account, string accountTypeName) => accountTypeName.ToLowerInvariant() switch
         {
-            var token = CreateToken(account);
+            AccountTypeConstants.USER_ACCOUNT_TYPE => await CreateTokenPairAsync(account, _context.Set<User>().FirstOrDefault(u => u.AccountId == account.Id)?.Id ?? Guid.Empty),
+            AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE => await CreateTokenPairAsync(account, _context.Set<Publisher>().FirstOrDefault(u => u.AccountId == account.Id)?.Id ?? Guid.Empty),
+            AccountTypeConstants.OPERATOR_ACCOUNT_TYPE => await CreateTokenPairAsync(account, _context.Set<Operator>().FirstOrDefault(u => u.AccountId == account.Id)?.Id ?? Guid.Empty),
+            _ => throw new InvalidOperationException()
+        };
+
+        /// <param name="account"><see cref="Account"/> to create tokens for.</param>
+        /// <param name="subjectId">ID of user, publisher or operator.</param>
+        /// <inheritdoc cref="CreateTokenPairAsync(Account)"/>
+        public async Task<TokenResult> CreateTokenPairAsync(Account account, Guid subjectId)
+        {
+            if (subjectId == Guid.Empty)
+            {
+                throw new InvalidOperationException("Subject ID cannot be empty.");
+            }
+
+            var token = CreateToken(account, subjectId);
             var refreshToken = await CreateRefreshTokenAsync(account);
 
             return new()
@@ -38,10 +62,10 @@ namespace PubHub.API.Domain.Auth
         /// </summary>
         /// <param name="account"><see cref="Account"/> to use as subject.</param>
         /// <returns>JWT token; otherwise <see cref="string.Empty"/>.</returns>
-        private string CreateToken(Account account)
+        private string CreateToken(Account account, Guid subjectId)
         {
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authOptions.Key)), SecurityAlgorithms.HmacSha256);
-            var claims = BuildClaimsAsync(account);
+            var claims = BuildClaimsAsync(account, subjectId);
             var jwt = GetJwtToken(signingCredentials, claims);
 
             string token = string.Empty;
@@ -93,13 +117,15 @@ namespace PubHub.API.Domain.Auth
         /// Build claims based on properties of a given <see cref="Account"/>. Claims include claims used for identification as well as audiences to which access is given.
         /// </summary>
         /// <param name="account"><see cref="Account"/> to create claims for.</param>
+        /// <param name="subjectId">ID of the subject i.e. the entity which the <see cref="Account"/> belongs to.</param>
         /// <returns>List of claims for the account.</returns>
-        private List<Claim> BuildClaimsAsync(Account account)
+        private List<Claim> BuildClaimsAsync(Account account, Guid subjectId)
         {
             List<Claim> claims =
             [
-                new("sub", account.Id.ToString()),
-                new(ClaimTypes.Email, account.Email)
+                new("sub", subjectId.ToString()),
+                new(ClaimTypes.Email, account.Email),
+                new("accountType", account.AccountTypeId.ToString())
             ];
 
             foreach (var audience in _authOptions.Audiences)

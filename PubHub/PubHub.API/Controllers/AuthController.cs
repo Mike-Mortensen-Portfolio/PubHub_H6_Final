@@ -138,16 +138,17 @@ namespace PubHub.API.Controllers
             }
 
             // Create token.
-            var tokenResult = await _authService.CreateTokenPairAsync(account);
+            var tokenResult = await _authService.CreateTokenPairAsync(account, userInfo.Id);
             if (!tokenResult.Success)
             {
                 return Results.Problem(
                     statusCode: InternalServerErrorSpecification.STATUS_CODE,
                     title: InternalServerErrorSpecification.TITLE,
-                    detail: "Something went wrong and no token could be created for the given account. Please try again.",
+                    detail: "Something went wrong and no token could be created for the given user account. Please try again.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Id", account.Id }
+                        { "UserId", userInfo.Id },
+                        { "AccountId", account.Id }
                     });
             }
 
@@ -190,8 +191,26 @@ namespace PubHub.API.Controllers
                     detail: "The provided credentials were incorrect.");
             }
 
+            // Get account type name.
+            var accountTypeName = await _context.Set<Account>()
+                .Include(a => a.AccountType)
+                .Where(a => a.Id == account.Id)
+                .Select(a => a.AccountType.Name)
+                .FirstOrDefaultAsync();
+            if (string.IsNullOrEmpty(accountTypeName))
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Unable to resolve account type name.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", account.Id }
+                    });
+            }
+
             // Create token.
-            var tokenResult = await _authService.CreateTokenPairAsync(account);
+            var tokenResult = await _authService.CreateTokenPairAsync(account, accountTypeName);
             if (!tokenResult.Success)
             {
                 return Results.Problem(
@@ -212,8 +231,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken)
         {
-            // Read expired token and find subject (account GUID).
+            // Read expired token.
             JwtSecurityToken jwt = new(expiredToken);
+
+            // Find subject (account holder GUID).
             var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
             if (sub == null)
             {
@@ -227,21 +248,80 @@ namespace PubHub.API.Controllers
                     });
             }
 
-            // Parse subject as GUID.
-            if (!Guid.TryParse(sub, out Guid accountId))
+            // Find account type ID.
+            var accountType = jwt.Claims.FirstOrDefault(c => c.Type == "accountType")?.Value;
+            if (accountType == null)
             {
                 return Results.Problem(
                     statusCode: BadRequestSpecification.STATUS_CODE,
                     title: BadRequestSpecification.TITLE,
-                    detail: "Unable to parse subject as GUID.",
+                    detail: "Unable to extract account type from token.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Subject" , sub }
+                        { "Token" , expiredToken }
                     });
             }
 
-            // Get stored refresh token.
+            // Parse IDs as GUIDs.
+            if (!Guid.TryParse(sub, out Guid subjectId) ||
+                !Guid.TryParse(accountType, out Guid accountTypeId))
+            {
+                return Results.Problem(
+                    statusCode: BadRequestSpecification.STATUS_CODE,
+                    title: BadRequestSpecification.TITLE,
+                    detail: "Unable to parse GUID claims.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "sub" , sub },
+                        { "accountType", accountType }
+                    });
+            }
+
+            // Get account type name.
+            var accountTypeName = (await _context.Set<AccountType>().FirstOrDefaultAsync(at => at.Id == accountTypeId))?.Name;
+            if (string.IsNullOrEmpty(accountTypeName))
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Unable to resolve account type.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", accountTypeId }
+                    });
+            }
+
+            // Get account ID.
+            Guid? accountId = null;
+            var accountTypeNameLower = accountTypeName.ToLowerInvariant();
+            if (AccountTypeConstants.USER_ACCOUNT_TYPE == accountTypeName.ToLowerInvariant())
+            {
+                accountId = (await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == subjectId))?.AccountId;
+            }
+            else if (AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE == accountTypeName.ToLowerInvariant())
+            {
+                accountId = (await _context.Set<Publisher>().FirstOrDefaultAsync(u => u.Id == subjectId))?.AccountId;
+            }
+            else if (AccountTypeConstants.OPERATOR_ACCOUNT_TYPE == accountTypeName.ToLowerInvariant())
+            {
+                accountId = (await _context.Set<Operator>().FirstOrDefaultAsync(u => u.Id == subjectId))?.AccountId;
+            }
+            if (accountId == null)
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "No account for subject with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "AccountType", accountTypeName },
+                        { "Id", subjectId }
+                    });
+            }
+
+            // Get stored refresh token matching passed refresh token.
             var storedRefreshToken = await _context.Set<AccountRefreshToken>()
+                .Include(art => art.Account)
                 .FirstOrDefaultAsync(art => art.AccountId == accountId && art.Value == refreshToken);
             if (storedRefreshToken == null || DateTime.UtcNow > storedRefreshToken.Expiration)
             {
@@ -255,23 +335,8 @@ namespace PubHub.API.Controllers
                     });
             }
 
-            // Get account.
-            var account = await _context.Set<Account>()
-                .FirstOrDefaultAsync(a => a.Id == accountId);
-            if (account == null)
-            {
-                return Results.Problem(
-                    statusCode: NotFoundSpecification.STATUS_CODE,
-                    title: NotFoundSpecification.TITLE,
-                    detail: "No account with the given ID was found.",
-                    extensions: new Dictionary<string, object?>
-                    {
-                        { "Id" , accountId }
-                    });
-            }
-
             // Create new token.
-            var tokenResult = await _authService.CreateTokenPairAsync(account);
+            var tokenResult = await _authService.CreateTokenPairAsync(storedRefreshToken.Account, subjectId);
             if (!tokenResult.Success)
             {
                 return Results.Problem(
@@ -280,7 +345,7 @@ namespace PubHub.API.Controllers
                     detail: "Something went wrong and the token couldn't be updated. Please try again.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Id", accountId }
+                        { "Id", subjectId }
                     });
             }
 
@@ -292,8 +357,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken)
         {
-            // Read expired token and find subject (account GUID).
+            // Read expired token.
             JwtSecurityToken jwt = new(token);
+
+            // Find subject (account holder GUID).
             var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
             if (sub == null)
             {
@@ -307,16 +374,67 @@ namespace PubHub.API.Controllers
                     });
             }
 
-            // Parse subject as GUID.
-            if (!Guid.TryParse(sub, out Guid accountId))
+            // Find account type ID.
+            var accountType = jwt.Claims.FirstOrDefault(c => c.Type == "accountType")?.Value;
+            if (accountType == null)
             {
                 return Results.Problem(
                     statusCode: BadRequestSpecification.STATUS_CODE,
                     title: BadRequestSpecification.TITLE,
-                    detail: "Unable to parse subject as GUID.",
+                    detail: "Unable to extract account type from token.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Subject" , sub }
+                        { "Token" , token }
+                    });
+            }
+
+            // Parse IDs as GUIDs.
+            if (!Guid.TryParse(sub, out Guid subjectId) ||
+                !Guid.TryParse(accountType, out Guid accountTypeId))
+            {
+                return Results.Problem(
+                    statusCode: BadRequestSpecification.STATUS_CODE,
+                    title: BadRequestSpecification.TITLE,
+                    detail: "Unable to parse GUID claims.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "sub" , sub },
+                        { "accountType", accountType }
+                    });
+            }
+
+            // Get account type name.
+            var accountTypeName = (await _context.Set<AccountType>().FirstOrDefaultAsync(at => at.Id == accountTypeId))?.Name;
+            if (accountTypeName == null)
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Unable to resolve account type.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", accountTypeId }
+                    });
+            }
+
+            // Get account ID.
+            var accountId = accountTypeName.ToLowerInvariant() switch
+            {
+                AccountTypeConstants.USER_ACCOUNT_TYPE => (await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == subjectId))?.AccountId,
+                AccountTypeConstants.PUBLISHER_ACCOUNT_TYPE => (await _context.Set<Publisher>().FirstOrDefaultAsync(u => u.Id == subjectId))?.AccountId,
+                AccountTypeConstants.OPERATOR_ACCOUNT_TYPE => (await _context.Set<Operator>().FirstOrDefaultAsync(u => u.Id == subjectId))?.AccountId,
+                _ => null
+            };
+            if (accountId == null)
+            {
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "No account for subject with the given ID was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "AccountType", accountTypeName },
+                        { "Id", subjectId }
                     });
             }
 
