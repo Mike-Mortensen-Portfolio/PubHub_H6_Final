@@ -99,8 +99,7 @@ namespace PubHub.API.Domain.Auth
             List<Claim> claims =
             [
                 new("sub", account.Id.ToString()),
-                new(ClaimTypes.Email, account.Email),
-                new("accountType", account.AccountTypeId.ToString())
+                new(ClaimTypes.Email, account.Email)
             ];
 
             foreach (var audience in _authOptions.Audiences)
