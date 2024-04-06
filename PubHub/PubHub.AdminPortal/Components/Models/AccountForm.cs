@@ -4,11 +4,12 @@ namespace PubHub.AdminPortal.Components.Models
 {
     public class AccountForm
     {
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
 
         public AccountCreateModel CreateAccountModel()
         {
-            return new AccountCreateModel { Email = Email };
+            return new AccountCreateModel { Email = Email, Password = Password };
         }
     }
 }

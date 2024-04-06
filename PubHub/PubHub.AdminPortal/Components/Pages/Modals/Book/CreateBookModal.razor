@@ -202,7 +202,7 @@
         if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
         {
             NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
-            ModalOptions(false);
+            await ModalOptions(false);
         }
         else
         {

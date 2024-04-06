@@ -81,8 +81,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (loginInfo == null)
-                    throw new ArgumentNullException($"The login info wasn't valid.");
+                ArgumentNullException.ThrowIfNull(loginInfo);
 
                 HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("Email", loginInfo.Email);
@@ -124,8 +123,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (tokenInfo == null)
-                    throw new ArgumentNullException($"The token info wasn't valid.");
+                ArgumentNullException.ThrowIfNull(tokenInfo);
 
                 HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("Token", tokenInfo.Token);
@@ -167,8 +165,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (tokenInfo == null)
-                    throw new ArgumentNullException($"The token info wasn't valid.");
+                ArgumentNullException.ThrowIfNull(tokenInfo);
 
                 HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("Token", tokenInfo.Token);
