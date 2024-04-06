@@ -19,9 +19,9 @@ namespace PubHub.AdminPortal.Components.Helpers
             var buffer = new byte[bufferSize];
             int readBytes;
             // Continue reading from the file stream until no more data is available.
-            while ((readBytes = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            while ((readBytes = await stream.ReadAsync(buffer)) > 0)
             {
-                await outputStream.WriteAsync(buffer, 0, readBytes);
+                await outputStream.WriteAsync(buffer.AsMemory(0, readBytes));
             }
 
             var output = outputStream.ToArray();
@@ -37,18 +37,14 @@ namespace PubHub.AdminPortal.Components.Helpers
         {
             long maxFilesSize = 1024 * 1024 * 5;
 
-            using (var stream = file.OpenReadStream(maxFilesSize))
-            {
-                var bytes = new byte[stream.Length];
+            using var stream = file.OpenReadStream(maxFilesSize);
+            var bytes = new byte[stream.Length];
 
-                using (var memoryStream = new MemoryStream(bytes))
-                {
-                    await stream.CopyToAsync(memoryStream);
-                    var filesBytes = memoryStream.ToArray();
-                    var toBaseString = "data:image/png;base64," + Convert.ToBase64String(filesBytes);
-                    return toBaseString;
-                }
-            }
+            using var memoryStream = new MemoryStream(bytes);
+            await stream.CopyToAsync(memoryStream);
+            var filesBytes = memoryStream.ToArray();
+            var toBaseString = "data:image/png;base64," + Convert.ToBase64String(filesBytes);
+            return toBaseString;
         }
     }
 }

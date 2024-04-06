@@ -5,15 +5,16 @@ namespace PubHub.AdminPortal.Components.Models
 {
     public class BookForm
     {
+#pragma warning disable IDE0305 // Simplify collection initialization
         // TODO (JBN): make this fit the new models being created for the Book.
         public Guid ContentTypeId { get; set; }
         [Required]
         public Guid PublisherId { get; set; }
         [Required]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         public byte[]? CoverImage { get; set; }
         [Required]
-        public byte[] BookContent { get; set; }
+        public byte[] BookContent { get; set; } = [];
         [Required]
         public DateOnly PublicationDate { get; set; }
         /// <summary>
@@ -28,11 +29,12 @@ namespace PubHub.AdminPortal.Components.Models
         public double Length { get; set; }
         public bool IsHidden { get; set; } = false;
         public List<Guid> AuthorIds { get; set; } = [];
-        public List<Guid> GenreIds { get; set; } = new();
+        public List<Guid> GenreIds { get; set; } = [];
 
         // TODO (JBN): Remove the test hard-coded values.
         public BookCreateModel CreateBookModel()
         {
+
             return new BookCreateModel()
             {
                 Title = Title,
@@ -46,6 +48,7 @@ namespace PubHub.AdminPortal.Components.Models
                 GenreIds = GenreIds.ToArray(),
                 IsHidden = IsHidden
             };
+
         }
 
         public BookUpdateModel UpdateBookModel()
@@ -65,4 +68,5 @@ namespace PubHub.AdminPortal.Components.Models
             };
         }
     }
+#pragma warning restore IDE0305 // Simplify collection initialization
 }

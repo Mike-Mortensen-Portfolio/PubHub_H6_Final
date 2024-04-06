@@ -45,13 +45,11 @@
 
 @code {
     bool showCreateModal;
-    bool showUpdateModal;
-    bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
 
     private List<PublisherInfoModel>? Publishers { get; set; }
 
-    private PublisherQuery publisherQuery = new() { OrderBy = OrderPublisherBy.Name };
+    private PublisherQuery publisherQuery = new() { OrderBy = OrderPublisherBy.Name, Descending = true, Max = 10, Page = 1 };
 
     protected async override Task OnInitializedAsync()
     {

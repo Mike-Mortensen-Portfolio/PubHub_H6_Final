@@ -110,7 +110,7 @@
     public EventCallback<bool> OnClose { get; set; }
 
     [Parameter]
-    public PublisherInfoModel Publisher { get; set; }
+    public required PublisherInfoModel Publisher { get; set; }
 
     private BookForm bookCreateForm = new();
 
@@ -157,7 +157,7 @@
             await outputStream.WriteAsync(buffer, 0, readBytes);
             totalBytesRead += readBytes;
             progressValue = (int)((totalBytesRead * 100) / fileSize);
-            StateHasChanged(); 
+            StateHasChanged();
         }
 
         bookCreateForm.BookContent = outputStream.ToArray();
@@ -172,7 +172,7 @@
     {
         var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
 
-        bookCreateForm.GenreIds = multipleGenres.ToList();
+        if (multipleGenres != null) { bookCreateForm.GenreIds = multipleGenres.ToList(); }
     }
 
     async void AddMoreAuthors()
@@ -202,7 +202,7 @@
         if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
         {
             NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
-            ModalOptions(false);
+            await ModalOptions(false);
         }
         else
         {
