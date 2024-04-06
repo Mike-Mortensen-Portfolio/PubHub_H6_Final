@@ -44,7 +44,7 @@
         {
             var result = await AuthService.LoginAsync(loginInfo);
 
-            if (result.IsSuccess)
+            if (result.Instance != null)
             {
                 // TODO (JBN): Save the returned tokens in either a cookie or localstorage.
             }
