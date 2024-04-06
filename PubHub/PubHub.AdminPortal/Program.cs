@@ -25,9 +25,12 @@ builder.Services.AddPubHubServices(options =>
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
 });
 
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("Operator", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", "EEA4CE56-9271-8725-83D0-018EADBDF8A6")))
-    .AddPolicy("Publisher", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", "0771B983-8DA0-898D-83CF-018EADBDF8A6")));
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Operator", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", "63A74B4F-C3A5-8267-87E9-018EB4E51304")));
+    options.AddPolicy("Publisher", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", "B6008023-AD79-8F03-87E8-018EB4E51304")));
+});
+    
 
 builder.Services.AddSingleton<IAuthorizationHandler, CustomClaimRequirementHandler>();
 

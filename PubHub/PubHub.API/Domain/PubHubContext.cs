@@ -345,6 +345,7 @@ namespace PubHub.API.Domain
             builder.ApplyConfiguration(books);
             builder.ApplyConfiguration(bookAuthors);
             builder.ApplyConfiguration(bookGenres);
+            builder.ApplyConfiguration(operators);
             builder.ApplyConfiguration(users);
             #endregion
         }
