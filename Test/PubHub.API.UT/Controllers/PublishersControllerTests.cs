@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -24,14 +23,22 @@ namespace PubHub.API.UT.Controllers
         public async Task GetAllPublishersAsync()
         {
             // Arrange.
-            var publisher = Fixture.Create<Publisher>();
+            int count = 15;
+            var publishers = Fixture.CreateMany<Publisher>(count);
+            await Context.Set<Publisher>().AddRangeAsync(publishers);
+            await Context.SaveChangesAsync();
 
-            await Context.Set<Publisher>().AddRangeAsync(publisher);
+            List<PublisherInfoModel> expectedModels = [];
+            foreach (var publisher in publishers)
+            {
+                expectedModels.Add(new PublisherInfoModel() { Id = publisher.Id, Name = publisher.Name, Email = publisher.Account!.Email });
+            }
+
             var query = new PublisherQuery()
             {
                 OrderBy = OrderPublisherBy.Name,
-                Descending = true,
-                Max = 1,
+                Descending = false,
+                Max = count,
                 Page = 1
             };
 
@@ -40,9 +47,9 @@ namespace PubHub.API.UT.Controllers
 
             // Assert.
             var response = Assert.IsAssignableFrom<Ok<PublisherInfoModel[]>>(result);
-            var valueResult = Assert.IsAssignableFrom<IValueHttpResult<PublisherInfoModel[]>>(result);
-
-            // TODO (SIA): Assert value.
+            Assert.NotNull(response.Value);
+            Assert.Equal(expectedModels.Count, response.Value.Length);
+            Assert.Equivalent(expectedModels, response.Value);
         }
     }
 }

@@ -3,7 +3,7 @@ using PubHub.API.UT.Utilities;
 
 namespace PubHub.API.UT.Controllers
 {
-    public abstract class ControllerTests : IClassFixture<DatabaseFixture>, IClassFixture<ApiDataGeneratorFixture>
+    public abstract class ControllerTests : IClassFixture<DatabaseFixture>, IClassFixture<ApiDataGeneratorFixture>, IAsyncDisposable
     {
         protected ControllerTests(DatabaseFixture databaseFixture, ApiDataGeneratorFixture apiDataGeneratorFixture)
         {
@@ -15,5 +15,11 @@ namespace PubHub.API.UT.Controllers
         protected DatabaseFixture DatabaseFixture { get; }
         protected PubHubContext Context { get; }
         protected Fixture Fixture { get; }
+
+        async ValueTask IAsyncDisposable.DisposeAsync()
+        {
+            await DatabaseFixture.CleanUpAsync();
+            GC.SuppressFinalize(this);
+        }
     }
 }

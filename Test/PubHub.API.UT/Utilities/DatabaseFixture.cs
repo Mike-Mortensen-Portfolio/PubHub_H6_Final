@@ -43,13 +43,23 @@ namespace PubHub.API.UT.Utilities
         /// <returns>A new <see cref="PubHubContext"/>.</returns>
         public PubHubContext GetDBContext()
         {
-            return new PubHubContext(_options);
+            return new PubHubContext(_options) { ApplySeed = false };
+        }
+
+        /// <summary>
+        /// Clean up the database after a test.
+        /// </summary>
+        public async Task CleanUpAsync()
+        {
+            using var context = GetDBContext();
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureCreatedAsync();
         }
 
         async ValueTask IAsyncDisposable.DisposeAsync()
         {
-            GC.SuppressFinalize(this);
             await _msSqlContainer.DisposeAsync();
+            GC.SuppressFinalize(this);
         }
     }
 }
