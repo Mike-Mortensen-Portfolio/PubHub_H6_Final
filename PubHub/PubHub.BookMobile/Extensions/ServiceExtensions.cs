@@ -19,7 +19,7 @@ namespace PubHub.BookMobile.Extensions
             services
                 .AddSingletonWithShellRoute<Home, HomeViewModel>("Home")
 
-
+                //  TODO (MSM): Re-add missing class???
                 //.AddTransientWithShellRoute<Login, LoginViewModel>("Login")
                 .AddTransientWithShellRoute<Library, LibraryViewModel>("Library")
                 .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo");
