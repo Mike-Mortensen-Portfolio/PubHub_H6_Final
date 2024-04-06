@@ -3,6 +3,7 @@
 @inject PubHub.Common.Services.IPublisherService PublisherService
 @inject Radzen.NotificationService NotificationService
 @inject Radzen.DialogService DialogService
+@inject CustomAuthStateProvider CustomAuthProvider
 
 <PageTitle>Publisher's books</PageTitle>
 
@@ -19,10 +20,6 @@
             @if (showCreateModal)
             {
                 <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
-            }
-            @if (showRemoveModal)
-            {
-                <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@bookInfoModel.Id" BookTitle="@bookInfoModel.Title"></RemoveBookModal>
             }
         </div>
         <div class="row text-center">
@@ -51,23 +48,39 @@
                 </tbody>
             </table>
         </div>
+        @if (showRemoveModal && bookInfoModel != null)
+        {
+            <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@bookInfoModel.Id" BookTitle="@bookInfoModel.Title"></RemoveBookModal>
+        }
     </div>
 }
 
 @code {
     bool showCreateModal;
-    bool showUpdateModal;
+    // Commented out due to not using the update method yet.
+    // bool showUpdateModal;
     bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
 
-    public List<BookInfoModel>? BookInfos { get; set; } = new();
+    public List<BookInfoModel> BookInfos { get; set; } = new();
     private PublisherInfoModel? Publisher { get; set; }
 
-    private BookInfoModel bookInfoModel;
+    private AuthenticationState? AuthenticationState { get; set; }
+
+    private PublisherQuery publisherQuery = new() { Descending = true, OrderBy = OrderPublisherBy.Name, Max = 10, Page = 1 };
+
+    private BookInfoModel? bookInfoModel;
 
     protected async override Task OnInitializedAsync()
     {
-        Publisher = await PublisherService.GetPublisherInfoAsync(TestData.PUBLISHER_ID);
+        AuthenticationState = await CustomAuthProvider.GetAuthenticationStateAsync();
+        var accountClaim = AuthenticationState.User.Claims.FirstOrDefault(c => c.Type == "sub");
+        if (accountClaim != null)
+        {
+            Guid accountGuid = new Guid(accountClaim.Value.ToString());
+            Publisher = await PublisherService.GetPublisherInfoAsync(accountGuid);
+        }
+
         if (Publisher != null)
         {
             BookInfos = await PublisherService.GetPublisherBooksAsync(Publisher.Id);
@@ -85,7 +98,10 @@
     public void OpenRemoveModal(BookInfoModel bookInfo)
     {
         bookInfoModel = bookInfo;
-        showRemoveModal = true;
+        if (bookInfoModel != null)
+        {
+            showRemoveModal = true;
+        }
     }
 
     #region Dialog closing methods.
@@ -96,12 +112,13 @@
         StateHasChanged();
     }
 
-    private async Task OnUpdateDialogClose()
-    {
-        showUpdateModal = false;
-        await OnInitializedAsync();
-        StateHasChanged();
-    }
+    // Commented out due to not using the update method yet.
+    //private async Task OnUpdateDialogClose()
+    //{
+    //    showUpdateModal = false;
+    //    await OnInitializedAsync();
+    //    StateHasChanged();
+    //}
 
     private async Task OnRemoveDialogClose()
     {

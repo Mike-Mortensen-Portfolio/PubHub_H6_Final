@@ -6,9 +6,9 @@ namespace PubHub.AdminPortal.Components.Models
     public class AccountForm
     {
         [Required, Compare(nameof(Email)), DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
         [Required, Compare(nameof(Password)), DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         public AccountCreateModel CreateAccountModel()
         {

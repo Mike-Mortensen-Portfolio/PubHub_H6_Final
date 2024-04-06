@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Dynamic.Core.Tokenizer;
 using System.Security.Claims;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -8,18 +10,15 @@ namespace PubHub.AdminPortal.Components.Auth
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorage;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+        private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
 
-        public CustomAuthStateProvider(ILocalStorageService localStorage, IHttpClientFactory httpClientFactory)
+        public CustomAuthStateProvider(ILocalStorageService localStorage)
         {
             _localStorage = localStorage;
-            _httpClientFactory = httpClientFactory;
         }
 
-        public async override Task<AuthenticationState> GetAuthenticationStateAsync()
+        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var claimsPrincipal = new ClaimsPrincipal();
             try
             {
                 var token = await _localStorage.GetItemAsync<string>("token");
@@ -27,9 +26,7 @@ namespace PubHub.AdminPortal.Components.Auth
                 if (string.IsNullOrWhiteSpace(token))
                     return await Task.FromResult(new AuthenticationState(_anonymous));
 
-                claimsPrincipal = GetClaims(token);
-                if (claimsPrincipal == null)
-                    return await Task.FromResult(new AuthenticationState(claimsPrincipal));
+                var claimsPrincipal = GetClaims(token);
 
                 if (claimsPrincipal.Identity != null && claimsPrincipal.Identity.IsAuthenticated)
                 {
@@ -42,10 +39,21 @@ namespace PubHub.AdminPortal.Components.Auth
                 }
             }
             catch (Exception ex)
-            { 
+            {
+                Debug.WriteLine("Unable to retrieve the AuthenticationState, ", ex.Message);
                 return await Task.FromResult(new AuthenticationState(_anonymous)); 
             }          
             
+        }
+
+        public void UpdateAuhenticationState(string jwtToken)
+        {
+            var claimsPrincipal = new ClaimsPrincipal();
+            if (!string.IsNullOrEmpty(jwtToken))
+            {
+                claimsPrincipal = GetClaims(jwtToken);
+            }
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
 
         public ClaimsPrincipal GetClaims(string token)

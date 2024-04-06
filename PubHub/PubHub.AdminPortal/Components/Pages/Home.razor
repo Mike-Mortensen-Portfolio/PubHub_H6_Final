@@ -4,4 +4,11 @@
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<AuthorizeView>
+    <Authorized>
+        <h3>Hi, @context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value</h3>
+    </Authorized>
+    <NotAuthorized>
+        <h3>You are not logged in.</h3>
+    </NotAuthorized>
+</AuthorizeView>

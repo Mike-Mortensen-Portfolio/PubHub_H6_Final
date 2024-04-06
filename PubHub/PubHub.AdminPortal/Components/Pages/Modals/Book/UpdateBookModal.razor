@@ -108,15 +108,14 @@
     public EventCallback<bool> OnClose { get; set; }
 
     [Parameter]
-    public BookInfoModel BookInfoModel { get; set; }
+    public required BookInfoModel BookInfoModel { get; set; }
 
     private BookForm bookUpdateform = new();
     private List<ContentTypeInfoModel> contentTypes = new();
 
     private List<AuthorInfoModel> authors = new();
     List<string> authorNames = new();
-    string? authorName;
-    string booklength;
+    string booklength = "";
 
     IEnumerable<GenreInfoModel>? genres;
     List<Guid> bookGenres = new();
@@ -169,7 +168,7 @@
         if (result.StatusCode == ResponseCodeConstants.OK_CODE)
         {
             NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
-            ModalOptions(false);
+            await ModalOptions(false);
         }
         else
         {
