@@ -101,7 +101,8 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             <Grid RowDefinitions="1*, 1*, 1*, 1*"
-                              ColumnDefinitions="2*, 4*">
+                              ColumnDefinitions="2*, 4*"
+                                  Margin="0,0,0,20">
                                 <Border Grid.Row="0"
                                    Grid.RowSpan="4"
                                    Grid.Column="0"

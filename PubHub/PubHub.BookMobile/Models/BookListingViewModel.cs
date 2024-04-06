@@ -1,4 +1,6 @@
-﻿using PubHub.Common.Models.Books;
+﻿using System.Collections.ObjectModel;
+using PubHub.Common.Models.Books;
+using PubHub.Common.Models.Genres;
 
 namespace PubHub.BookMobile.Models
 {
@@ -11,6 +13,7 @@ namespace PubHub.BookMobile.Models
         public DateOnly PublicationDate { get; set; }
         public bool EBookInStock => EBook != null;
         public bool AudiobookInStock => AudioBook != null;
+        public ObservableCollection<GenreInfoModel> Genres => GetGenres();
 
         private ImageSource GetCoverPhoto()
         {
@@ -20,6 +23,13 @@ namespace PubHub.BookMobile.Models
                 return ImageSource.FromFile("stock_image.jpg");
 
             return ImageSource.FromStream(() => new MemoryStream(coverImage));
+        }
+
+        private ObservableCollection<GenreInfoModel> GetGenres()
+        {
+            var genres = ((EBookInStock) ? (EBook?.Genres) : (AudioBook?.Genres)) ?? throw new NullReferenceException("Genres was null. That's not supposed to happen");
+
+            return new ObservableCollection<GenreInfoModel>(genres);
         }
     }
 }

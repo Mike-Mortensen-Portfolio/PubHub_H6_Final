@@ -20,7 +20,7 @@ namespace PubHub.BookMobile.Extensions
                 .AddSingletonWithShellRoute<Home, HomeViewModel>("Home")
 
 
-                .AddTransientWithShellRoute<Login, LoginViewModel>("Login")
+                //.AddTransientWithShellRoute<Login, LoginViewModel>("Login")
                 .AddTransientWithShellRoute<Library, LibraryViewModel>("Library")
                 .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo");
 

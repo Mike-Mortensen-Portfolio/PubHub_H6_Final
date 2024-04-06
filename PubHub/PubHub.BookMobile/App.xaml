@@ -17,6 +17,7 @@
             <!-- Converts -->
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter"/>
             <converters:IsAudiobookConverter x:Key="IsAudiobookConverter"/>
             <converters:IsEbookConverter x:Key="IsEbookConverter"/>
         </ResourceDictionary>
