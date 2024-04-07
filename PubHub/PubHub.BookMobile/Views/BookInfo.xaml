@@ -121,37 +121,55 @@
                         IsReadOnly="True"
                         Text="Kentucky, 1850. An enslaved groom named Jarret and a bay foal forge a bond of understanding that will carry the horse to record-setting victories across the South. When the nation erupts in civil war, an itinerant young artist who has made his name on paintings of the racehorse takes up arms for the Union."/>
 
-                <Label Grid.Row="5"
-                       Grid.Column="0"
-                       Text="By"
-                       FontAttributes="Bold"
-                       HorizontalTextAlignment="Start"
-                       VerticalTextAlignment="Center"
-                       FontSize="{StaticResource Normal}"/>
-                <CollectionView Grid.Row="5"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="2"
-                                ItemsSource="{Binding CurrentViewedItem.Authors}"
-                                VerticalOptions="Center"
-                                HorizontalOptions="FillAndExpand"
-                                Margin="25,0,0,0">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Horizontal"
-                                           ItemSpacing="5"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border x:DataType="authorModels:AuthorInfoModel"
-                                    StrokeShape="RoundRectangle 10,10"
-                                    Stroke="Gray"
-                                    Padding="10,0,10,0">
-                                <Label FontAttributes="Bold"
-                                       FontSize="{StaticResource Small}"
-                                       Text="{Binding Name}"/>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                <StackLayout Grid.Row="5"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="2"
+                             Orientation="Horizontal"
+                             Spacing="10">
+                    <Label Text="By"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Start"
+                           VerticalTextAlignment="Center"
+                           FontSize="{StaticResource Normal}"/>
+                    <CollectionView ItemsSource="{Binding CurrentViewedItem.Authors}"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="FillAndExpand">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal"
+                                               ItemSpacing="5"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:DataType="authorModels:AuthorInfoModel"
+                                        StrokeShape="RoundRectangle 10,10"
+                                        Stroke="Gray"
+                                        Padding="10,0,10,0">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="{StaticResource Small}"
+                                           Text="{Binding Name}"/>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+                <StackLayout Grid.Row="6"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="2"
+                             Orientation="Horizontal"
+                             Spacing="10">
+                    <Label Text="Published by"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Start"
+                           VerticalTextAlignment="Center"
+                           FontSize="{StaticResource Normal}"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            Stroke="Gray"
+                            Padding="10,0,10,0">
+                        <Label FontAttributes="Bold"
+                               FontSize="{StaticResource Small}"
+                               Text="{Binding CurrentViewedItem.Publisher.Name}"/>
+                    </Border>
+                </StackLayout>
             </Grid>
             <!--<Button BackgroundColor="Green" Text="Buy"/>-->
         </StackLayout>
