@@ -73,6 +73,10 @@ namespace PubHub.AdminPortal.Components.Auth
             
         }
 
+        /// <summary>
+        /// Used to update the AuthenticationState.
+        /// </summary>
+        /// <param name="jwtToken"></param>
         public void UpdateAuhenticationState(string jwtToken)
         {
             var claimsPrincipal = new ClaimsPrincipal();
@@ -83,6 +87,12 @@ namespace PubHub.AdminPortal.Components.Auth
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
 
+        /// <summary>
+        /// Retrieving claims from the token saved in <see cref="ILocalStorageService"/>.
+        /// </summary>
+        /// <param name="token">The token which needs to be read and retrieve claims from.</param>
+        /// <returns>A new <see cref="ClaimsPrincipal"/> with an identity.</returns>
+        /// <exception cref="ArgumentException"></exception>
         public ClaimsPrincipal GetClaims(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
