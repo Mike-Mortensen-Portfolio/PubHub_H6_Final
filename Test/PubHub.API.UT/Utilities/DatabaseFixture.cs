@@ -1,49 +1,49 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Respawn;
 using Testcontainers.MsSql;
 
 namespace PubHub.API.UT.Utilities
 {
-    public class DatabaseFixture : IAsyncDisposable
+    public class DatabaseFixture : IAsyncLifetime
     {
         private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder().Build();
-        private readonly Task _containerStartTask;
+
+        /// <summary>
+        /// Whether the <see cref="DatabaseFixture"/> has been configured correctly.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        [MemberNotNullWhen(true, nameof(_connection))]
+        [MemberNotNullWhen(true, nameof(_respawner))]
+        private bool IsConfigured
+        {
+            get
+            {
+                if (_connection != null && _respawner != null)
+                {
+                    return true;
+                }
+
+                throw new InvalidOperationException($"{nameof(DatabaseFixture)} wasn't configured correctly.");
+            }
+        }
 
         private DbContextOptions<PubHubContext> _options = new();
         private SqlConnection? _connection;
-
-        public DatabaseFixture()
-        {
-            _containerStartTask = _msSqlContainer.StartAsync();
-            CreateDatabaseAsync().GetAwaiter().GetResult();
-        }
-
-        public async Task CreateDatabaseAsync()
-        {
-            // Wait until container is started.
-            await _containerStartTask;
-
-            // Connect to database container.
-            _connection ??= new(_msSqlContainer.GetConnectionString());
-            _connection.Open();
-
-            // Create options.
-            _options = new DbContextOptionsBuilder<PubHubContext>()
-                .UseSqlServer(_connection)
-                .Options;
-
-            // Build database schema.
-            using var context = GetDBContext();
-            context.Database.EnsureCreated();
-        }
+        private PubHubContext? _context;
+        private Respawner? _respawner;
 
         /// <summary>
-        /// Get database context to the current test database.
+        /// Database context to the current test database.
         /// </summary>
-        /// <returns>A new <see cref="PubHubContext"/>.</returns>
-        public PubHubContext GetDBContext()
+        public PubHubContext Context => _context ??= new PubHubContext(_options) { ApplySeed = false };
+
+        public async Task InitializeAsync()
         {
-            return new PubHubContext(_options) { ApplySeed = false };
+            await _msSqlContainer.StartAsync();
+            await CreateDatabaseAsync();
+            await ConfigureRespawner();
         }
 
         /// <summary>
@@ -51,15 +51,52 @@ namespace PubHub.API.UT.Utilities
         /// </summary>
         public async Task CleanUpAsync()
         {
-            using var context = GetDBContext();
-            await context.Database.EnsureDeletedAsync();
-            await context.Database.EnsureCreatedAsync();
+            if (IsConfigured)
+            {
+                await _respawner.ResetAsync(_connection);
+            }
         }
 
-        async ValueTask IAsyncDisposable.DisposeAsync()
+        /// <summary>
+        /// Connect to Docker container and create the database.
+        /// </summary>
+        private async Task CreateDatabaseAsync()
         {
+            // Connect to database container.
+            string connectionString = _msSqlContainer.GetConnectionString() + ";Persist Security Info=true";
+            _connection ??= new(connectionString);
+            await _connection.OpenAsync();
+
+            // Create options.
+            _options = new DbContextOptionsBuilder<PubHubContext>()
+                .UseSqlServer(_connection)
+                .Options;
+
+            // Build database schema.
+            await Context.Database.EnsureCreatedAsync();
+        }
+
+        /// <summary>
+        /// Create delete script for reseting.
+        /// </summary>
+        /// <exception cref="NullReferenceException"><see cref="_connection"/> was null.</exception>
+        private async Task ConfigureRespawner()
+        {
+            if (_connection == null)
+            {
+                throw new NullReferenceException("Connection was null when trying to configure Respawner.");
+            }
+
+            _respawner = await Respawner.CreateAsync(_connection, new()
+            {
+                DbAdapter = DbAdapter.SqlServer
+            });
+        }
+
+        async Task IAsyncLifetime.DisposeAsync()
+        {
+            // Remove the Docker container.
             await _msSqlContainer.DisposeAsync();
-            GC.SuppressFinalize(this);
         }
     }
 }

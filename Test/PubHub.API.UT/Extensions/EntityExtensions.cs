@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using PubHub.API.Domain.Entities;
+﻿using PubHub.API.Domain.Entities;
 using PubHub.Common.Models.Publishers;
 
-namespace PubHub.API.UT.Utilities
+namespace PubHub.API.UT.Extensions
 {
-    internal static class ModelMapper
+    internal static class EntityExtensions
     {
         #region Publisher
         public static PublisherInfoModel ToInfo(this Publisher publisher) => new()
