@@ -19,6 +19,11 @@ namespace PubHub.API.Domain
 
         public PubHubContext(DbContextOptions<PubHubContext> options) : base(options) { }
 
+        /// <summary>
+        /// Whether to apply the database seed data or not. Used for testing purposes and when working with migrations.
+        /// </summary>
+        public bool ApplySeed { get; init; } = true;
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -139,7 +144,7 @@ namespace PubHub.API.Domain
 
                 author.TypeToPluralTableName();
             });
-            
+
             builder.Entity<Book>(book =>
             {
                 book.ConfigureId();
@@ -322,31 +327,34 @@ namespace PubHub.API.Domain
             #endregion
 
             #region Seeding
-            var accessTypes = new AccessTypeSeed();
-            var accountTypes = new AccountTypeSeed();
-            var accounts = new AccountSeed(accountTypes);
-            var authors = new AuthorSeed();
-            var contentTypes = new ContentTypeSeed();
-            var publishers = new PublisherSeed(accounts);
-            var genres = new GenreSeed();
-            var books = new BookSeed(contentTypes, publishers);
-            var bookAuthors = new BookAuthorSeed(books, authors);
-            var bookGenres = new BookGenreSeed(books, genres);
-            var operators = new OperatorSeed(accounts);
-            var users = new UserSeed(accounts);
-            
-            builder.ApplyConfiguration(accessTypes);
-            builder.ApplyConfiguration(accountTypes);
-            builder.ApplyConfiguration(accounts);
-            builder.ApplyConfiguration(authors);
-            builder.ApplyConfiguration(contentTypes);
-            builder.ApplyConfiguration(publishers);
-            builder.ApplyConfiguration(genres);
-            builder.ApplyConfiguration(books);
-            builder.ApplyConfiguration(bookAuthors);
-            builder.ApplyConfiguration(bookGenres);
-            builder.ApplyConfiguration(operators);
-            builder.ApplyConfiguration(users);
+            if (ApplySeed)
+            {
+                var accessTypes = new AccessTypeSeed();
+                var accountTypes = new AccountTypeSeed();
+                var accounts = new AccountSeed(accountTypes);
+                var authors = new AuthorSeed();
+                var contentTypes = new ContentTypeSeed();
+                var publishers = new PublisherSeed(accounts);
+                var genres = new GenreSeed();
+                var books = new BookSeed(contentTypes, publishers);
+                var bookAuthors = new BookAuthorSeed(books, authors);
+                var bookGenres = new BookGenreSeed(books, genres);
+                var operators = new OperatorSeed(accounts);
+                var users = new UserSeed(accounts);
+
+                builder.ApplyConfiguration(accessTypes);
+                builder.ApplyConfiguration(accountTypes);
+                builder.ApplyConfiguration(accounts);
+                builder.ApplyConfiguration(authors);
+                builder.ApplyConfiguration(contentTypes);
+                builder.ApplyConfiguration(publishers);
+                builder.ApplyConfiguration(genres);
+                builder.ApplyConfiguration(books);
+                builder.ApplyConfiguration(bookAuthors);
+                builder.ApplyConfiguration(bookGenres);
+                builder.ApplyConfiguration(operators);
+                builder.ApplyConfiguration(users);
+            }
             #endregion
         }
     }
