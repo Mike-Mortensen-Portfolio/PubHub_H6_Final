@@ -58,7 +58,7 @@ namespace PubHub.AdminPortal.Components.Models
                 Length = Length,
                 PublicationDate = PublicationDate,
                 BookContent = BookContent,
-                PublisherId = TestData.PUBLISHER_ID,
+                PublisherId = PublisherId,
                 ContentTypeId =ContentTypeId,
                 CoverImage = CoverImage,
                 AuthorIds = AuthorIds.ToArray(),
