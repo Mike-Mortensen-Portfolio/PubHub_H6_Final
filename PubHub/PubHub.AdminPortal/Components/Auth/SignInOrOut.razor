@@ -4,7 +4,7 @@
 
 <AuthorizeView>
     <Authorized>
-        <NavLink class="nav-link text-dark" href="logout">
+        <NavLink class="nav-link text-dark" href="login">
             <button type="button" class="btn btn-primary" @onclick="SignOut">Sign out</button>
         </NavLink>
     </Authorized>
@@ -25,6 +25,7 @@
     async Task SignOut()
     {
         await LocalStorage.RemoveItemAsync("token");
+        await LocalStorage.RemoveItemAsync("refreshToken");
         await CustomAuthProvider.GetAuthenticationStateAsync();
 
         NavigationManager.NavigateTo("/login", forceLoad: true);

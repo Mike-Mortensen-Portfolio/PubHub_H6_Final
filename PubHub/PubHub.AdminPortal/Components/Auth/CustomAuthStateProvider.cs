@@ -42,7 +42,7 @@ namespace PubHub.AdminPortal.Components.Auth
 
                     var utcExpire = DateTimeOffset.FromUnixTimeSeconds(expireClaim);
                     var expiredate = utcExpire.DateTime;
-
+                    // If the token has expired, then we want to refresh the token and update the existing token and refresh token in our local storage.
                     if (expiredate < DateTime.UtcNow)
                     {
                         var tokenResponse = await _authenticationService.RefreshTokenAsync(tokenInfo);
