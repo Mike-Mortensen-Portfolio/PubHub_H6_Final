@@ -30,9 +30,27 @@ PubHub also offers the service of Second-party stores and markets to makes a par
 
 # Setup
 
+## Admin portal 
+You will have to add user secrets to enable the Authorization part, as there is in the `Program.cs` a section to add policies. This is used so that we can get the authorized views depending on what account is signing into the application.
+
+User secrets will have to contain the following with your own needed values:
+```
+{
+    "<AccountTypeName>": "<AccountTypeId>"
+}
+```
+
+Then in the `Program.cs` we have to read that in when we're adding Authorization, also containing the values you set.
+```
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("<AccountTypeName>", policy => policy.Requirements.Add(new CustomClaimRequirement("<Claim Key>", builder.Configuration.GetValue<string>("<AccountTypeName>") ?? throw new NullReferenceException("<AccountTypeName> couldn't be found."))));
+    options.AddPolicy("<AccountTypeName>", policy => policy.Requirements.Add(new CustomClaimRequirement("<Claim Key>", builder.Configuration.GetValue<string>("<AccountTypeName>") ?? throw new NullReferenceException("<AccountTypeName> couldn't be found."))));
+});
+```
 ---
 
-#PubHub Architecture
+# PubHub Architecture
 
 ![image](https://github.com/Mike-Mortensen-Portfolio/PubHub_H6_Final/assets/61870713/789d6775-c4a0-40fb-ad80-d6d9c465cace)
 
