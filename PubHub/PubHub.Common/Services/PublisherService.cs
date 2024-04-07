@@ -20,7 +20,7 @@ namespace PubHub.Common.Services
             _serializerOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
+                WriteIndented = true
             };
         }
 
