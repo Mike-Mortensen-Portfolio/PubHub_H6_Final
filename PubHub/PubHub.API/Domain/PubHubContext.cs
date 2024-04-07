@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
@@ -18,6 +18,11 @@ namespace PubHub.API.Domain
         }
 
         public PubHubContext(DbContextOptions<PubHubContext> options) : base(options) { }
+
+        /// <summary>
+        /// Whether to apply the database seed data or not. Used for testing purposes and when working with migrations.
+        /// </summary>
+        public bool ApplySeed { get; init; } = true;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
