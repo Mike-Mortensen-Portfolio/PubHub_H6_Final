@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
-using Polly.Retry;
 using Polly.Simmy;
+using Polly.Simmy.Fault;
+using Polly.Simmy.Outcomes;
 using PubHub.Common.ApiService;
 using PubHub.Common.Services;
 
@@ -53,6 +54,7 @@ namespace PubHub.Common.Extensions
                 .AddScoped<IGenreService, GenreService>()
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<IContentTypeService, ContentTypeService>()
+                .AddSingleton<IChaosService, ChaosService>()
                 .AddPolly();
         }
 
@@ -69,7 +71,7 @@ namespace PubHub.Common.Extensions
 
         private static IServiceCollection AddPolly(this IServiceCollection services)
         {
-            services.AddResiliencePipeline<string, HttpResponseMessage>(POLLY_PIPELINE, builder =>
+            services.AddResiliencePipeline<string, HttpResponseMessage>(POLLY_PIPELINE, (builder, context) =>
             {
                 // Configure Polly.
                 builder.AddRetry(new()
@@ -96,11 +98,26 @@ namespace PubHub.Common.Extensions
                 });
 
                 // Configure Simmy.
-                const double INJECTION_RATE = 0.10; // 10% of invocations will be injected with chaos
+                var chaosService = context.ServiceProvider.GetRequiredService<IChaosService>();
                 builder
-                    .AddChaosLatency(INJECTION_RATE, TimeSpan.FromSeconds(10))
-                    .AddChaosFault(INJECTION_RATE, () => new InvalidOperationException("Injected by chaos strategy!"))
-                    .AddChaosOutcome(INJECTION_RATE, () => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError));
+                    .AddChaosLatency(new()
+                    {
+                        EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
+                        InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
+                        Latency = TimeSpan.FromSeconds(10)
+                    })
+                    .AddChaosFault(new()
+                    {
+                        EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
+                        InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
+                        FaultGenerator = new FaultGenerator().AddException(() => new InvalidOperationException("Injected by chaos strategy!"))
+                    })
+                    .AddChaosOutcome(new()
+                    {
+                        EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
+                        InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
+                        OutcomeGenerator = new OutcomeGenerator<HttpResponseMessage>().AddResult(() => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError))
+                    });
             });
 
             return services;
