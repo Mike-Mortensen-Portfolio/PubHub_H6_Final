@@ -160,7 +160,7 @@ namespace PubHub.API.Controllers
         public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query)
         {
             var publishers = await _context.Set<Publisher>()
-                 .Include(u => u.Account)
+                .Include(p => p.Account)
                 .Filter(query)
                 .Select(p => new PublisherInfoModel()
                 {

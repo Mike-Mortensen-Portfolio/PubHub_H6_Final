@@ -1,6 +1,8 @@
 ﻿using PubHub.BookMobile.Models;
 using PubHub.BookMobile.ViewModels;
+using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Genres;
+using static Android.App.DownloadManager;
 
 namespace PubHub.BookMobile.Pages;
 
@@ -28,6 +30,7 @@ public partial class Library : ContentPage
     {
         if (_viewModel.IsGenreVisible)
             _viewModel.ToggleGenreView();
+        _viewModel.Query = new BookQuery();
         _viewModel.SearchTerm = string.Empty;
         await _viewModel.FetchGenres();
         await _viewModel.FetchBooks();
