@@ -5,19 +5,41 @@
              xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
              xmlns:genreModels="clr-namespace:PubHub.Common.Models.Genres;assembly=PubHub.Common"
              xmlns:models="clr-namespace:PubHub.BookMobile.Models"
+             xmlns:pages="clr-namespace:PubHub.BookMobile.Pages"
              Title="Search books"
              x:DataType="viewModels:LibraryViewModel">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions=".5*, .5*"
+              Padding="0,0,20,0">
+            <Label x:DataType="pages:Library"
+                   Grid.Column="0"
+                   VerticalTextAlignment="Center"
+                   FontSize="{StaticResource Subheader}"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource WarmWhite}"
+                   Text="{Binding Title}"/>
+            <Button Grid.Column="1"
+                    Text="Sign In"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Command="{Binding NavigateToPageCommand}"
+                    CommandParameter="Login"/>
+        </Grid>
+    </Shell.TitleView>
+
     <RefreshView IsRefreshing="{Binding IsBusy}"
                  Command="{Binding FetchBooksCommand}">
         <StackLayout Orientation="Vertical"
-                 Padding="10"
+                     Padding="10"
                      Spacing="25">
             <Grid RowDefinitions="1*, AUTO"
-             ColumnDefinitions="1*, .20*">
+                  ColumnDefinitions="1*, .20*">
                 <Frame Grid.Column="0"
-                   CornerRadius="25"
-                   BackgroundColor="LightGray"
-                   HeightRequest="40">
+                       CornerRadius="25"
+                       BackgroundColor="LightGray"
+                       HeightRequest="40">
                     <SearchBar HeightRequest="40"
                                Placeholder="Search"
                                Text="{Binding SearchTerm}"
@@ -26,12 +48,12 @@
                                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"/>
                 </Frame>
                 <Button Grid.Column="1"
-                    FontFamily="IcoFont"
-                    Text="{StaticResource Gear}"
-                    BackgroundColor="Transparent"
-                    FontSize="30"
-                    TextColor="{StaticResource Primary}"
-                    Command="{Binding ToggleGenreViewCommand}"/>
+                        FontFamily="IcoFont"
+                        Text="{StaticResource Gear}"
+                        BackgroundColor="Transparent"
+                        FontSize="30"
+                        TextColor="{StaticResource Primary}"
+                        Command="{Binding ToggleGenreViewCommand}"/>
                 <Border Grid.Row="1"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
@@ -39,11 +61,10 @@
                         StrokeShape="RoundRectangle 10,10"
                         HeightRequest="200"
                         Padding="2">
-                    <CollectionView 
-                            ItemsSource="{Binding Genres}"
-                            SelectionMode="Multiple"
-                            SelectionChanged="FilterByGenre"
-                            VerticalOptions="FillAndExpand">
+                    <CollectionView ItemsSource="{Binding Genres}"
+                                    SelectionMode="Multiple"
+                                    SelectionChanged="FilterByGenre"
+                                    VerticalOptions="FillAndExpand">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="genreModels:GenreInfoModel">
                                 <Border WidthRequest="200">
@@ -75,11 +96,11 @@
                 </Border>
             </Grid>
             <CollectionView x:Name="bookCollection"
-                        ItemsSource="{Binding Books}"
-                        VerticalOptions="FillAndExpand"
-                        SelectionMode="Single"
-                        SelectionChangedCommand="{Binding NavigateToBookInfoCommand}"
-                        SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference bookCollection}}">
+                            ItemsSource="{Binding Books}"
+                            VerticalOptions="FillAndExpand"
+                            SelectionMode="Single"
+                            SelectionChangedCommand="{Binding NavigateToBookInfoCommand}"
+                            SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference bookCollection}}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Border x:DataType="models:BookListingViewModel">
@@ -101,15 +122,15 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             <Grid RowDefinitions="1*, 1*, 1*, 1*"
-                              ColumnDefinitions="2*, 4*"
+                                  ColumnDefinitions="2*, 4*"
                                   Margin="0,0,0,20">
                                 <Border Grid.Row="0"
-                                   Grid.RowSpan="4"
-                                   Grid.Column="0"
-                                   StrokeShape="RoundRectangle 10,10"
-                                   Padding="0"
-                                   HeightRequest="140"
-                                   WidthRequest="95">
+                                        Grid.RowSpan="4"
+                                        Grid.Column="0"
+                                        StrokeShape="RoundRectangle 10,10"
+                                        Padding="0"
+                                        HeightRequest="140"
+                                        WidthRequest="95">
                                     <Image Source="{Binding ListingCover, Mode=OneWay}"
                                        Aspect="Fill"/>
                                 </Border>

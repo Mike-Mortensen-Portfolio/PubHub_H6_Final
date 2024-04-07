@@ -1,7 +1,4 @@
-﻿using System;
-using CommunityToolkit.Maui;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui.Controls;
+﻿using CommunityToolkit.Maui;
 using PubHub.BookMobile.Pages;
 using PubHub.BookMobile.ViewModels;
 
@@ -19,8 +16,7 @@ namespace PubHub.BookMobile.Extensions
             services
                 .AddSingletonWithShellRoute<Home, HomeViewModel>("Home")
 
-                //  TODO (MSM): Re-add missing class???
-                //.AddTransientWithShellRoute<Login, LoginViewModel>("Login")
+                .AddTransientWithShellRoute<Login, LoginViewModel>("Login")
                 .AddTransientWithShellRoute<Library, LibraryViewModel>("Library")
                 .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo");
 
