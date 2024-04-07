@@ -6,53 +6,61 @@
 
 <PageTitle>Publisher's books</PageTitle>
 
-@if (Publisher != null)
-{
-    <div class="container">
-        <div class="row">
-            <div class="col-md-10">
-                <h1 class="text-center">@Publisher.Name books</h1>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
-            </div>
-            @if (showCreateModal)
-            {
-                <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
-            }
-        </div>
-        <div class="row text-center">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Title</th>
-                        <th scope="col">Publication year</th>
-                        <th scope="col">Administration</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var bookInfo in BookInfos)
-                    {
-                        <tr>
-                            <td>@bookInfo.Title</td>
-                            <td>@bookInfo.PublicationDate</td>
-                            <td>
-                                <div class="combined-item">
-                                    <button class="btn btn-secondary me-2" disabled @onclick="() => OpenUpdateModal(bookInfo)">Update</button>
-                                    <button class="btn btn-danger" @onclick="() => OpenRemoveModal(bookInfo)">Remove</button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        @if (showRemoveModal && bookInfoModel != null)
+<AuthorizeView Policy="Publisher">
+    <Authorized>
+        @if (Publisher != null)
         {
-            <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@bookInfoModel.Id" BookTitle="@bookInfoModel.Title"></RemoveBookModal>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="text-center">@Publisher.Name books</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
+                    </div>
+                    @if (showCreateModal)
+                    {
+                        <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
+                    }
+                </div>
+                <div class="row text-center">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Publication year</th>
+                                <th scope="col">Administration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bookInfo in BookInfos)
+                            {
+                                <tr>
+                                    <td>@bookInfo.Title</td>
+                                    <td>@bookInfo.PublicationDate</td>
+                                    <td>
+                                        <div class="combined-item">
+                                            <button class="btn btn-secondary me-2" disabled @onclick="() => OpenUpdateModal(bookInfo)">Update</button>
+                                            <button class="btn btn-danger" @onclick="() => OpenRemoveModal(bookInfo)">Remove</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (showRemoveModal && bookInfoModel != null)
+                {
+                    <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@bookInfoModel.Id" BookTitle="@bookInfoModel.Title"></RemoveBookModal>
+                }
+            </div>
         }
-    </div>
-}
+    </Authorized>
+    <NotAuthorized>
+        <h3>You do not have access to this page.</h3>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 @code {
     bool showCreateModal;

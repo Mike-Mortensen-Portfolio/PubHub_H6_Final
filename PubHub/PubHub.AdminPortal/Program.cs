@@ -27,8 +27,8 @@ builder.Services.AddPubHubServices(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Operator", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", "63A74B4F-C3A5-8267-87E9-018EB4E51304")));
-    options.AddPolicy("Publisher", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", "B6008023-AD79-8F03-87E8-018EB4E51304")));
+    options.AddPolicy("Operator", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", builder.Configuration.GetValue<string>("Operator") ?? throw new NullReferenceException("Operator couldn't be found."))));
+    options.AddPolicy("Publisher", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", builder.Configuration.GetValue<string>("Publisher") ?? throw new NullReferenceException("Publisher couldn't be found."))));
 });
     
 

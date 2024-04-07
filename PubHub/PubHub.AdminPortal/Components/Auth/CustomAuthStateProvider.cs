@@ -4,17 +4,22 @@ using System.Linq.Dynamic.Core.Tokenizer;
 using System.Security.Claims;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Newtonsoft.Json.Linq;
+using PubHub.Common.Models.Authentication;
+using PubHub.Common.Services;
 
 namespace PubHub.AdminPortal.Components.Auth
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorage;
+        private readonly IAuthenticationService _authenticationService;
         private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
 
-        public CustomAuthStateProvider(ILocalStorageService localStorage)
+        public CustomAuthStateProvider(ILocalStorageService localStorage, IAuthenticationService authenticationService)
         {
             _localStorage = localStorage;
+            _authenticationService = authenticationService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -22,11 +27,33 @@ namespace PubHub.AdminPortal.Components.Auth
             try
             {
                 var token = await _localStorage.GetItemAsync<string>("token");
+                var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
 
-                if (string.IsNullOrWhiteSpace(token))
+                if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(refreshToken))
                     return await Task.FromResult(new AuthenticationState(_anonymous));
 
+                TokenInfo tokenInfo = new() { Token = token, RefreshToken = refreshToken };                
+
                 var claimsPrincipal = GetClaims(token);
+
+                if (claimsPrincipal.FindFirst("exp") != null)
+                {
+                    var expireClaim = long.Parse(claimsPrincipal.FindFirst("exp")?.Value ?? "0");
+
+                    var utcExpire = DateTimeOffset.FromUnixTimeSeconds(expireClaim);
+                    var expiredate = utcExpire.DateTime;
+
+                    if (expiredate < DateTime.UtcNow)
+                    {
+                        var tokenResponse = await _authenticationService.RefreshTokenAsync(tokenInfo);
+                        if (tokenResponse != null && tokenResponse.Instance != null)
+                        {
+                            await _localStorage.SetItemAsync<string>("token", tokenResponse.Instance.Token);
+                            await _localStorage.SetItemAsync<string>("refreshToken", tokenResponse.Instance.RefreshToken);
+                            UpdateAuhenticationState(tokenResponse.Instance.Token);
+                        }
+                    }
+                }
 
                 if (claimsPrincipal.Identity != null && claimsPrincipal.Identity.IsAuthenticated)
                 {

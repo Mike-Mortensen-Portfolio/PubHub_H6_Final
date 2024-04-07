@@ -6,42 +6,49 @@
 
 <PageTitle>Publishers</PageTitle>
 
-@if (Publishers != null)
-{
-    <div class="container">
-        <div class="row">
-            <div class="col-md-10">
-                <h1 class="text-center">Publishers</h1>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add publisher</button>
-            </div>
-            @if (showCreateModal)
-            {
-                <CreatePublisherModal OnClose="() => OnCreateDialogClose()"></CreatePublisherModal>
-            }
-        </div>
-        <div class="row text-center">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var publisher in Publishers)
+<AuthorizeView Policy="Operator">
+    <Authorized>
+        @if (Publishers != null)
+        {
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="text-center">Publishers</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add publisher</button>
+                    </div>
+                    @if (showCreateModal)
                     {
-                        <tr>
-                            <td>@publisher.Name</td>
-                            <td>@publisher.Email</td>
-                        </tr>
+                        <CreatePublisherModal OnClose="() => OnCreateDialogClose()"></CreatePublisherModal>
                     }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
+                </div>
+                <div class="row text-center">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var publisher in Publishers)
+                            {
+                                <tr>
+                                    <td>@publisher.Name</td>
+                                    <td>@publisher.Email</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <h3>You do not have access to this page.</h3>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     bool showCreateModal;
