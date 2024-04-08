@@ -1,8 +1,10 @@
 ﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
+using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
@@ -16,14 +18,16 @@ using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
-    public sealed class UsersController(ILogger<UsersController> logger, PubHubContext context) : Controller
+    public sealed class UsersController(ILogger<UsersController> logger, PubHubContext context, WhitelistService whitelistService) : Controller
     {
         private readonly ILogger<UsersController> _logger = logger;
         private readonly PubHubContext _context = context;
+        private readonly WhitelistService _whitelistService = whitelistService;
 
         /// <summary>
         /// Get all general information about a specific user.

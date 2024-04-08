@@ -1,13 +1,13 @@
 ﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
-using PubHub.API.Domain.Entities;
 using PubHub.Common.Models.ContentTypes;
 
 namespace PubHub.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]

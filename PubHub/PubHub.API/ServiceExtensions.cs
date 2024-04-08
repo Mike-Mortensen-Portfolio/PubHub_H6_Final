@@ -41,7 +41,9 @@ namespace PubHub.API
             .AddEntityFrameworkStores<PubHubContext>()
             .AddDefaultTokenProviders();
 
+            services.Configure<WhitelistOptions>(configuration.GetSection("Whitelist"));
             services.Configure<AuthOptions>(configuration.GetSection("Jwt"));
+            services.AddScoped<WhitelistService>();
             services.AddScoped<AuthService>();
 
             return services;

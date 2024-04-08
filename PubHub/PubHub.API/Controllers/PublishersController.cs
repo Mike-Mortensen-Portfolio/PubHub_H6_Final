@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +14,11 @@ using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
 using PubHub.Common.Models.Genres;
 using PubHub.Common.Models.Publishers;
-using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
