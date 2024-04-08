@@ -1,10 +1,12 @@
 ﻿using AutoFixture;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using PubHub.API.Controllers;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Identity;
 using PubHub.API.UT.Extensions;
 using PubHub.API.UT.Utilities;
 using PubHub.Common.Models.Publishers;
@@ -19,7 +21,7 @@ namespace PubHub.API.UT.Controllers
         public PublishersControllerTests(DatabaseFixture databaseFixture, ApiDataGeneratorFixture apiDataGeneratorFixture)
             : base(databaseFixture, apiDataGeneratorFixture)
         {
-            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context);
+            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, Substitute.For<UserManager<Account>>());
         }
 
         //[Fact]

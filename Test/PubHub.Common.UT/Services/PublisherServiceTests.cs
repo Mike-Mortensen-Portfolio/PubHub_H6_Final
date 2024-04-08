@@ -28,7 +28,7 @@ namespace PubHub.Common.UT.Services
             }));
 
             // Act.
-            var actualModel = await _service.GetPublisherInfo(expectedModel.Id);
+            var actualModel = await _service.GetPublisherInfoAsync(expectedModel.Id);
 
             // Assert.
             Assert.Equivalent(expectedModel, actualModel);
