@@ -1,10 +1,12 @@
-﻿using AutoFixture;
+﻿using System.Diagnostics;
+using AutoFixture;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using PubHub.API.Controllers;
+using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
 using PubHub.API.UT.Extensions;
@@ -87,5 +89,27 @@ namespace PubHub.API.UT.Controllers
             Assert.Equal(expectedModels.Count, response.Value.Length);
             Assert.Equivalent(expectedModels, response.Value);
         }
+
+        //[Fact]
+        //public void Test()
+        //{
+        //    int num = 500000;
+        //    var t1 = Measure(() => WhitelistService.VerifyApplicationAccess("test"), num);
+        //    var t2 = Measure(() => WhitelistService.VerifyApplicationAccess("test", nameof(PublishersControllerTests), nameof(Test)), num);
+        //
+        //    long Measure(Action func, int num)
+        //    {
+        //        func();
+        //        var sw = Stopwatch.StartNew();
+        //        for (int i = 0; i < num; i++)
+        //        {
+        //            func();
+        //        }
+        //
+        //        return sw.ElapsedMilliseconds;
+        //    }
+        //
+        //    Assert.True(t1 <= t2);
+        //}
     }
 }
