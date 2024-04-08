@@ -1,4 +1,6 @@
-﻿namespace PubHub.BookMobile
+﻿using System.Reflection;
+
+namespace PubHub.BookMobile
 {
     public partial class AppShell : Shell
     {

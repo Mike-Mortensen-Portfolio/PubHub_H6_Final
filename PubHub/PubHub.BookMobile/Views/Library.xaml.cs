@@ -1,4 +1,5 @@
-﻿using PubHub.BookMobile.Models;
+﻿using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.Models;
 using PubHub.BookMobile.ViewModels;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Genres;
@@ -28,6 +29,8 @@ public partial class Library : ContentPage
 
     protected override async void OnAppearing()
     {
+        _viewModel.IsAuthenticated = User.IsAuthenticated;
+
         if (_viewModel.IsGenreVisible)
             _viewModel.ToggleGenreView();
         _viewModel.Query = new BookQuery();

@@ -71,6 +71,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.14" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -78,6 +79,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="AuthorizedShell.xaml.cs">
+	    <DependentUpon>AuthorizedShell.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="AuthorizedShell.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\BookInfo.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -96,16 +106,9 @@
 	  <MauiXaml Update="Resources\Styles\FontSizes.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Pages\BookInfo.xaml">
+	  <MauiXaml Update="Views\Logout.xaml">
 	    <Generator>MSBuild:Compile</Generator>
-	  </None>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Pages\" />
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
