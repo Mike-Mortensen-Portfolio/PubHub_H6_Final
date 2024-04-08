@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using PubHub.API.Controllers;
 using PubHub.API.Domain.Auth;
@@ -23,7 +24,17 @@ namespace PubHub.API.UT.Controllers
         public PublishersControllerTests(DatabaseFixture databaseFixture, ApiDataGeneratorFixture apiDataGeneratorFixture)
             : base(databaseFixture, apiDataGeneratorFixture)
         {
-            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, Substitute.For<UserManager<Account>>());
+            var userManager = Substitute.For<UserManager<Account>>(
+                Substitute.For<IUserStore<Account>>(),
+                Substitute.For<IOptions<IdentityOptions>>(),
+                Substitute.For<IPasswordHasher<Account>>(),
+                Substitute.For<IEnumerable<IUserValidator<Account>>>(),
+                Substitute.For<IEnumerable<IPasswordValidator<Account>>>(),
+                Substitute.For<ILookupNormalizer>(),
+                Substitute.For<IdentityErrorDescriber>(),
+                Substitute.For<IServiceProvider>(),
+                Substitute.For<ILogger<UserManager<Account>>>());
+            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager);
         }
 
         //[Fact]
