@@ -1,0 +1,33 @@
+﻿@inject ILocalStorageService LocalStorage;
+@inject CustomAuthStateProvider CustomAuthProvider
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <NavLink class="nav-link text-dark" href="login">
+            <button type="button" class="btn btn-primary" @onclick="SignOut">Sign out</button>
+        </NavLink>
+    </Authorized>
+    <NotAuthorized>
+        <NavLink class="nav-link text-dark" href="login">
+            <button type="button" class="btn btn-primary" @onclick="SignIn">Sign in</button>
+        </NavLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    void SignIn()
+    {
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+
+    async Task SignOut()
+    {
+        await LocalStorage.RemoveItemAsync("token");
+        await LocalStorage.RemoveItemAsync("refreshToken");
+        await CustomAuthProvider.GetAuthenticationStateAsync();
+
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+}

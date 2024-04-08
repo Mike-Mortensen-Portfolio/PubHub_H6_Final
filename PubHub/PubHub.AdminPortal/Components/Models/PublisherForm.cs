@@ -7,8 +7,8 @@ namespace PubHub.AdminPortal.Components.Models
     public class PublisherForm
     {
         [Required]
-        public string Name { get; set; }
-        public AccountCreateModel Account { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public required AccountCreateModel Account { get; set; }
 
         public PublisherCreateModel CreatePublisherModel()
         {

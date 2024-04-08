@@ -5,7 +5,6 @@ using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
-using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Users;
 
 namespace PubHub.Common.Services
@@ -126,7 +125,7 @@ namespace PubHub.Common.Services
                 ArgumentNullException.ThrowIfNull(tokenInfo);
 
                 HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-                httpContent.Headers.Add("Token", tokenInfo.Token);
+                httpContent.Headers.Add("ExpiredToken", tokenInfo.Token);
                 httpContent.Headers.Add("RefreshToken", tokenInfo.RefreshToken);
 
                 HttpResponseMessage response = await Client.PostAsync($"auth/refresh", httpContent);

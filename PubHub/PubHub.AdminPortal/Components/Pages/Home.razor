@@ -2,4 +2,18 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView Policy="Operator">
+    <Authorized>
+        <ManagePublishers />
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="Publisher">
+    <Authorized>
+        <Books />
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+</AuthorizeView>

@@ -18,12 +18,13 @@
 @using PubHub.Common.Models.Authors
 @using PubHub.Common.Models.Publishers
 @using PubHub.AdminPortal.Components.Pages.Shared
-@using System.Linq.Expressions 
-@using PubHub.Common.Extensions
-@using PubHub.Common.Models.Users
-@using PubHub.Common.Services
+@using System.Linq.Expressions
 @using Microsoft.AspNetCore.Components.Authorization
 @using PubHub.Common.Models.Authentication
 @using Blazored.LocalStorage
 @using PubHub.Common.Models.Accounts
 @using PubHub.AdminPortal.Components.Pages.Modals.Publisher
+@using Microsoft.AspNetCore.Authentication.JwtBearer
+@using PubHub.AdminPortal.Components.Auth
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization

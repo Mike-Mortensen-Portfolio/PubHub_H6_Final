@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PubHub.Common.Models.Books;
+﻿using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
-using PubHub.Common.Models.Users;
 
 namespace PubHub.Common.Services
 {

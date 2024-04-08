@@ -1,57 +1,62 @@
-﻿@page "/ManagePublishers"
-@inherits ComponentBase
+﻿@inherits ComponentBase
 @inject PubHub.Common.Services.IPublisherService PublisherService
 @inject Radzen.NotificationService NotificationService
 @inject Radzen.DialogService DialogService
+@attribute [Authorize(Policy = "Operator")]
 
 <PageTitle>Publishers</PageTitle>
 
-@if (Publishers != null)
-{
-    <div class="container">
-        <div class="row">
-            <div class="col-md-10">
-                <h1 class="text-center">Publishers</h1>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add publisher</button>
-            </div>
-            @if (showCreateModal)
-            {
-                <CreatePublisherModal OnClose="() => OnCreateDialogClose()"></CreatePublisherModal>
-            }
-        </div>
-        <div class="row text-center">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var publisher in Publishers)
+<AuthorizeView Policy="Operator">
+    <Authorized>
+        @if (Publishers != null)
+        {
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="text-center">Publishers</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add publisher</button>
+                    </div>
+                    @if (showCreateModal)
                     {
-                        <tr>
-                            <td>@publisher.Name</td>
-                            <td>@publisher.Email</td>
-                        </tr>
+                        <CreatePublisherModal OnClose="() => OnCreateDialogClose()"></CreatePublisherModal>
                     }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
+                </div>
+                <div class="row text-center">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var publisher in Publishers)
+                            {
+                                <tr>
+                                    <td>@publisher.Name</td>
+                                    <td>@publisher.Email</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <h3>You do not have access to this page.</h3>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     bool showCreateModal;
-    bool showUpdateModal;
-    bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
 
     private List<PublisherInfoModel>? Publishers { get; set; }
 
-    private PublisherQuery publisherQuery = new() { OrderBy = OrderPublisherBy.Name };
+    private PublisherQuery publisherQuery = new() { OrderBy = OrderPublisherBy.Name, Descending = true, Max = 10, Page = 1, SearchKey = string.Empty };
 
     protected async override Task OnInitializedAsync()
     {

@@ -1,5 +1,9 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
 using PubHub.AdminPortal.Components;
+using PubHub.AdminPortal.Components.Auth;
 using PubHub.AdminPortal.Components.Helpers;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
@@ -21,9 +25,26 @@ builder.Services.AddPubHubServices(options =>
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Operator", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", builder.Configuration.GetValue<string>("Operator") ?? throw new NullReferenceException("Operator couldn't be found."))));
+    options.AddPolicy("Publisher", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", builder.Configuration.GetValue<string>("Publisher") ?? throw new NullReferenceException("Publisher couldn't be found."))));
+});
+    
+
+builder.Services.AddSingleton<IAuthorizationHandler, CustomClaimRequirementHandler>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+});
+
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<FileHandler>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddScoped<CustomAuthStateProvider>();
 builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
@@ -41,7 +62,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

@@ -3,7 +3,6 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
-using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Genres;
 using static PubHub.Common.IntegrityConstants;
 

@@ -16,6 +16,26 @@ a, .btn-link {
         background-color: #a9a7fa !important;
     }
 
+.btn-primary {
+    color: #fff;
+    background-color: #5856D6 !important; 
+    border-color: #3936d1 !important; 
+}
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #7a78f5 !important; 
+        border-color: #3936d1 !important;
+    }
+
+    .btn-primary:focus,
+    .btn-primary.focus {
+        color: #fff;
+        background-color: #5856D6 !important; 
+        border-color: #3936d1 !important;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.5); 
+    }
+
 .combined-logo {
     position: relative;
     text-align: center;

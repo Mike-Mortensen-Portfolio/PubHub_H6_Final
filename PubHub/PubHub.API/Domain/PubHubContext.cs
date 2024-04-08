@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
@@ -144,7 +144,7 @@ namespace PubHub.API.Domain
 
                 author.TypeToPluralTableName();
             });
-            
+
             builder.Entity<Book>(book =>
             {
                 book.ConfigureId();
@@ -352,6 +352,7 @@ namespace PubHub.API.Domain
                 builder.ApplyConfiguration(books);
                 builder.ApplyConfiguration(bookAuthors);
                 builder.ApplyConfiguration(bookGenres);
+                builder.ApplyConfiguration(operators);
                 builder.ApplyConfiguration(users);
             }
             #endregion

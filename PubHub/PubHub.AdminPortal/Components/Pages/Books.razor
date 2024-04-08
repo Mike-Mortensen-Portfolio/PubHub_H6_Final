@@ -1,76 +1,98 @@
-﻿@page "/Books"
-@inherits ComponentBase
+﻿@inherits ComponentBase
 @inject PubHub.Common.Services.IPublisherService PublisherService
 @inject Radzen.NotificationService NotificationService
 @inject Radzen.DialogService DialogService
+@inject CustomAuthStateProvider CustomAuthProvider
 
 <PageTitle>Publisher's books</PageTitle>
 
-@if (Publisher != null)
-{
-    <div class="container">
-        <div class="row">
-            <div class="col-md-10">
-                <h1 class="text-center">@Publisher.Instance.Name books</h1>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
-            </div>
-            @if (showCreateModal)
-            {
-                <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher.Instance"></CreateBookModal>
-            }
-            @if (showRemoveModal)
-            {
-                <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@bookInfoModel.Id" BookTitle="@bookInfoModel.Title"></RemoveBookModal>
-            }
-        </div>
-        <div class="row text-center">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Title</th>
-                        <th scope="col">Publication year</th>
-                        <th scope="col">Administration</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var bookInfo in BookInfos)
+<AuthorizeView Policy="Publisher">
+    <Authorized>
+        @if (Publisher != null)
+        {
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="text-center">@Publisher.Name books</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success" @onclick="() => showCreateModal = true">+ Add book</button>
+                    </div>
+                    @if (showCreateModal)
                     {
-                        <tr>
-                            <td>@bookInfo.Title</td>
-                            <td>@bookInfo.PublicationDate</td>
-                            <td>
-                                <div class="combined-item">
-                                    <button class="btn btn-secondary me-2" disabled @onclick="() => OpenUpdateModal(bookInfo)">Update</button>
-                                    <button class="btn btn-danger" @onclick="() => OpenRemoveModal(bookInfo)">Remove</button>
-                                </div>
-                            </td>
-                        </tr>
+                        <CreateBookModal OnClose="() => OnCreateDialogClose()" Publisher="Publisher"></CreateBookModal>
                     }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
+                </div>
+                <div class="row text-center">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Publication year</th>
+                                <th scope="col">Administration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bookInfo in BookInfos)
+                            {
+                                <tr>
+                                    <td>@bookInfo.Title</td>
+                                    <td>@bookInfo.PublicationDate</td>
+                                    <td>
+                                        <div class="combined-item">
+                                            <button class="btn btn-secondary me-2" disabled @onclick="() => OpenUpdateModal(bookInfo)">Update</button>
+                                            <button class="btn btn-danger" @onclick="() => OpenRemoveModal(bookInfo)">Remove</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (showRemoveModal && bookInfoModel != null)
+                {
+                    <RemoveBookModal OnClose="() => OnRemoveDialogClose()" BookId="@bookInfoModel.Id" BookTitle="@bookInfoModel.Title"></RemoveBookModal>
+                }
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <h3>You do not have access to this page.</h3>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 @code {
     bool showCreateModal;
-    bool showUpdateModal;
+    // Commented out due to not using the update method yet.
+    // bool showUpdateModal;
     bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
 
-    public IReadOnlyList<BookInfoModel>? BookInfos { get; set; }
-    private ServiceResult<PublisherInfoModel> Publisher { get; set; }
+    public List<BookInfoModel> BookInfos { get; set; } = new();
+    private PublisherInfoModel? Publisher { get; set; }
 
-    private BookInfoModel bookInfoModel;
+    private AuthenticationState? AuthenticationState { get; set; }
+
+    private PublisherQuery publisherQuery = new() { Descending = true, OrderBy = OrderPublisherBy.Name, Max = 10, Page = 1 };
+
+    private BookInfoModel? bookInfoModel;
 
     protected async override Task OnInitializedAsync()
     {
-        Publisher = await PublisherService.GetPublisherInfoAsync(TestData.PUBLISHER_ID);
+        AuthenticationState = await CustomAuthProvider.GetAuthenticationStateAsync();
+        var accountClaim = AuthenticationState.User.Claims.FirstOrDefault(c => c.Type == "sub");
+        if (accountClaim != null)
+        {
+            Guid accountGuid = new Guid(accountClaim.Value.ToString());
+            var serviceResult = await PublisherService.GetPublisherInfoAsync(accountGuid);
+            Publisher = serviceResult.Instance;
+        }
+
         if (Publisher != null)
         {
-            BookInfos = await PublisherService.GetPublisherBooksAsync(Publisher.Instance.Id);
+            var books = await PublisherService.GetPublisherBooksAsync(Publisher.Id);
+            BookInfos = books.ToList();
         }
     }
 
@@ -85,7 +107,10 @@
     public void OpenRemoveModal(BookInfoModel bookInfo)
     {
         bookInfoModel = bookInfo;
-        showRemoveModal = true;
+        if (bookInfoModel != null)
+        {
+            showRemoveModal = true;
+        }
     }
 
     #region Dialog closing methods.
@@ -96,12 +121,13 @@
         StateHasChanged();
     }
 
-    private async Task OnUpdateDialogClose()
-    {
-        showUpdateModal = false;
-        await OnInitializedAsync();
-        StateHasChanged();
-    }
+    // Commented out due to not using the update method yet.
+    //private async Task OnUpdateDialogClose()
+    //{
+    //    showUpdateModal = false;
+    //    await OnInitializedAsync();
+    //    StateHasChanged();
+    //}
 
     private async Task OnRemoveDialogClose()
     {
