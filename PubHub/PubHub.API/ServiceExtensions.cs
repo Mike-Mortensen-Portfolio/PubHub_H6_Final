@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using PubHub.API.Controllers.Problems;
@@ -11,6 +14,7 @@ using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Identity;
 using Serilog;
+using Microsoft.Extensions.Options;
 
 namespace PubHub.API
 {
@@ -45,6 +49,30 @@ namespace PubHub.API
             services.Configure<AuthOptions>(configuration.GetSection("Jwt"));
             services.AddScoped<WhitelistService>();
             services.AddScoped<AuthService>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureJwt(this IServiceCollection services)
+        {
+            AuthOptions authOptions = services.BuildServiceProvider().GetRequiredService<IOptions<AuthOptions>>().Value;
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateLifetime = true,
+                    ValidAudiences = authOptions.Audiences,
+                    ValidIssuers = authOptions.Issuers,
+                    IssuerSigningKey = authOptions.SigningKey,
+                    ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             return services;
         }

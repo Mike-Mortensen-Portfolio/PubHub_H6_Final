@@ -13,6 +13,7 @@ builder.ConfigureLogging();
 builder.Services.ConfigureDatabase(builder.Configuration, "Local");
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity(builder.Configuration);
+builder.Services.ConfigureJwt();
 builder.Services.ConfigureCors();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger(new OpenApiInfo { Title = "PubHub API v1", Version = "v1" });
