@@ -22,6 +22,7 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class UsersController(ILogger<UsersController> logger, PubHubContext context, WhitelistService whitelistService) : Controller
     {
@@ -38,8 +39,10 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetUserAsync(Guid id)
+        public async Task<IResult> GetUserAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var userInfo = await _context.GetUserInfoAsync(id);
             if (userInfo == null)
             {
@@ -65,8 +68,10 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}/books")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetBooksAsync(Guid id)
+        public async Task<IResult> GetBooksAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             // Check if user exists.
             if (!await _context.Set<User>().AnyAsync(u => u.Id == id))
             {
@@ -137,8 +142,10 @@ namespace PubHub.API.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UserUpdateModel userUpdateModel)
+        public async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UserUpdateModel userUpdateModel, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             // TODO (SIA): Validate model.
 
             // Get current entry.
@@ -200,8 +207,10 @@ namespace PubHub.API.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> DeleteUserAsync(Guid id)
+        public async Task<IResult> DeleteUserAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             // Get account Id.
             var accountId = await _context.Set<User>()
                 .Where(u => u.Id == id)
@@ -246,8 +255,10 @@ namespace PubHub.API.Controllers
         /// <response code="404">The user wasn't found.</response>
         [HttpDelete("{id}/suspend-user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IResult> SuspendUserAsync(Guid id)
+        public async Task<IResult> SuspendUserAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             // Get account type ID.
             var accountTypeId = await _context.Set<AccountType>()
                 .Where(a => a.Name.ToLower() == AccountTypeConstants.SUSPENDED_ACCOUNT_TYPE)

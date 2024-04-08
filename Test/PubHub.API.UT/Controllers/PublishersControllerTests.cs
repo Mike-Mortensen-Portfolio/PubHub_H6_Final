@@ -34,7 +34,7 @@ namespace PubHub.API.UT.Controllers
                 Substitute.For<IdentityErrorDescriber>(),
                 Substitute.For<IServiceProvider>(),
                 Substitute.For<ILogger<UserManager<Account>>>());
-            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager);
+            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager, Substitute.For<WhitelistService>());
         }
 
         //[Fact]
@@ -45,7 +45,7 @@ namespace PubHub.API.UT.Controllers
             var publisher = Fixture.Create<PublisherCreateModel>();
 
             // Act.
-            var result = await _controller.AddPublisherAsync(publisher);
+            var result = await _controller.AddPublisherAsync(publisher, string.Empty); // TODO (SIA): Create internal ID.
 
             // Assert.
             var response = Assert.IsAssignableFrom<Created<PublisherInfoModel>>(result);
@@ -66,7 +66,7 @@ namespace PubHub.API.UT.Controllers
             var expectedModel = expectedPublisher.ToInfo();
 
             // Act.
-            var result = await _controller.GetPublisherAsync(expectedPublisher.Id);
+            var result = await _controller.GetPublisherAsync(expectedPublisher.Id, string.Empty); // TODO (SIA): Create internal ID.
 
             // Assert.
             var response = Assert.IsAssignableFrom<Ok<PublisherInfoModel>>(result);
@@ -92,7 +92,7 @@ namespace PubHub.API.UT.Controllers
             };
 
             // Act.
-            var result = await _controller.GetPublishersAsync(query);
+            var result = await _controller.GetPublishersAsync(query, string.Empty); // TODO (SIA): Create internal ID.
 
             // Assert.
             var response = Assert.IsAssignableFrom<Ok<PublisherInfoModel[]>>(result);
@@ -100,27 +100,5 @@ namespace PubHub.API.UT.Controllers
             Assert.Equal(expectedModels.Count, response.Value.Length);
             Assert.Equivalent(expectedModels, response.Value);
         }
-
-        //[Fact]
-        //public void Test()
-        //{
-        //    int num = 500000;
-        //    var t1 = Measure(() => WhitelistService.VerifyApplicationAccess("test"), num);
-        //    var t2 = Measure(() => WhitelistService.VerifyApplicationAccess("test", nameof(PublishersControllerTests), nameof(Test)), num);
-        //
-        //    long Measure(Action func, int num)
-        //    {
-        //        func();
-        //        var sw = Stopwatch.StartNew();
-        //        for (int i = 0; i < num; i++)
-        //        {
-        //            func();
-        //        }
-        //
-        //        return sw.ElapsedMilliseconds;
-        //    }
-        //
-        //    Assert.True(t1 <= t2);
-        //}
     }
 }

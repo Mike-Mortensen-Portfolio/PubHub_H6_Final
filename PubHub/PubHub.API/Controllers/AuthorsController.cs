@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
+using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.Common.Models.Authors;
 using static PubHub.Common.IntegrityConstants;
@@ -14,22 +15,27 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class AuthorsController : ControllerBase
     {
         private readonly ILogger<AuthorsController> _logger;
         private readonly PubHubContext _context;
+        private readonly WhitelistService _whitelistService;
 
-        public AuthorsController(ILogger<AuthorsController> logger, PubHubContext context)
+        public AuthorsController(ILogger<AuthorsController> logger, PubHubContext context, WhitelistService whitelistService)
         {
             _logger = logger;
             _context = context;
+            _whitelistService = whitelistService;
         }
 
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<AuthorInfoModel>))]
-        public async Task<IResult> GetAuthorsAsync()
+        public async Task<IResult> GetAuthorsAsync([FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var authors = await _context.Set<Author>()
                 .Select(author => new AuthorInfoModel
                 {
@@ -44,8 +50,10 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthorInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetAuthorAsync(Guid id)
+        public async Task<IResult> GetAuthorAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var author = await _context.Set<Author>()
                  .Select(author => new AuthorInfoModel
                  {
@@ -70,8 +78,10 @@ namespace PubHub.API.Controllers
         [HttpPost()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthorInfoModel))]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AuthorInfoModel))]
-        public async Task<IResult> AddAuthorAsync([FromBody] AuthorCreateModel authorModel)
+        public async Task<IResult> AddAuthorAsync([FromBody] AuthorCreateModel authorModel, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var entityAuthor = await _context.Set<Author>()
                 .FirstOrDefaultAsync(author => author.Name.ToUpper() == authorModel.Name.ToUpper());
 
@@ -117,8 +127,10 @@ namespace PubHub.API.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> DeleteAuthorAsync(Guid id)
+        public async Task<IResult> DeleteAuthorAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var entityAuthor = await _context.Set<Author>()
                 .FirstOrDefaultAsync(author => author.Id == id);
 

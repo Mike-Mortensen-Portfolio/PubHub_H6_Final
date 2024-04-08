@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
+using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.Common.Models.Genres;
 using static PubHub.Common.IntegrityConstants;
@@ -14,22 +15,27 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class GenresController : ControllerBase
     {
         private readonly PubHubContext _context;
+        private readonly WhitelistService _whitelistService;
         private readonly ILogger<GenresController> _logger;
 
-        public GenresController(ILogger<GenresController> logger, PubHubContext context)
+        public GenresController(ILogger<GenresController> logger, PubHubContext context, WhitelistService whitelistService)
         {
             _context = context;
+            _whitelistService = whitelistService;
             _logger = logger;
         }
 
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<GenreInfoModel>))]
-        public async Task<IResult> GetGenresAsync()
+        public async Task<IResult> GetGenresAsync([FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var genres = await _context.Set<Genre>()
                 .Select(genre => new GenreInfoModel
                 {
@@ -44,8 +50,10 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenreInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetGenreAsync(Guid id)
+        public async Task<IResult> GetGenreAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var genre = await _context.Set<Genre>()
                  .Select(genre => new GenreInfoModel
                  {
@@ -70,8 +78,10 @@ namespace PubHub.API.Controllers
         [HttpPost()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenreInfoModel))]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenreInfoModel))]
-        public async Task<IResult> AddGenreAsync([FromBody] GenreCreateModel genreModel)
+        public async Task<IResult> AddGenreAsync([FromBody] GenreCreateModel genreModel, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var entityGenre = await _context.Set<Genre>()
                 .FirstOrDefaultAsync(genre => genre.Name.ToUpper() == genreModel.Name.ToUpper());
 
@@ -115,8 +125,10 @@ namespace PubHub.API.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> DeleteGenreAsync(Guid id)
+        public async Task<IResult> DeleteGenreAsync(Guid id, [FromHeader] string appId)
         {
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+
             var entityGenre = await _context.Set<Genre>()
                 .FirstOrDefaultAsync(genre => genre.Id == id);
 
