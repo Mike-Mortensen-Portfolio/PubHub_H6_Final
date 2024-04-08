@@ -111,7 +111,7 @@
     public required BookInfoModel BookInfoModel { get; set; }
 
     private BookForm bookUpdateform = new();
-    private IReadOnlyList<ContentTypeInfoModel>? contentTypes = [];
+    private IReadOnlyList<ContentTypeInfoModel> contentTypes = [];
 
     private IReadOnlyList<AuthorInfoModel> authors = [];
     List<string> authorNames = new();
@@ -123,9 +123,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        contentTypes = await ContentTypeService.GetContentTypesAsync();
-        genres = await GenreService.GetGenresAsync();
-        authors = await AuthorService.GetAuthorsAsync();
+        contentTypes = (await ContentTypeService.GetContentTypesAsync()).Instance ?? [];
+        genres = (await GenreService.GetGenresAsync()).Instance ?? [];
+        authors = (await AuthorService.GetAuthorsAsync()).Instance ?? [];
+
         foreach (var author in BookInfoModel.Authors)
         {
             authorNames.Add(author.Name);

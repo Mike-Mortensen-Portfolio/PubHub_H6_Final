@@ -114,8 +114,8 @@
 
     private BookForm bookCreateForm = new();
 
-    private List<ContentTypeInfoModel> contentTypes = new();
-    private List<AuthorInfoModel> authors = new();
+    private IReadOnlyList<ContentTypeInfoModel> contentTypes = [];
+    private IReadOnlyList<AuthorInfoModel> authors = [];
 
     List<string> authorNames = new() { string.Empty };
 
@@ -128,11 +128,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var readContentTypes = await ContentTypeService.GetContentTypesAsync();
-        contentTypes = readContentTypes.ToList();
-        genres = await GenreService.GetGenresAsync();
-        var readAuthors = await AuthorService.GetAuthorsAsync();
-        authors = readAuthors.ToList();
+        contentTypes = (await ContentTypeService.GetContentTypesAsync()).Instance ?? [];
+        genres = (await GenreService.GetGenresAsync()).Instance ?? [];
+        authors = (await AuthorService.GetAuthorsAsync()).Instance ?? [];
     }
 
     /// <summary>

@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using System.Text.Json;
 using PubHub.Common.ApiService;
+using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
 
@@ -8,7 +10,6 @@ namespace PubHub.Common.Services
 {
     public class ContentTypeService : ServiceRoot, IContentTypeService
     {
-#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         public ContentTypeService(IHttpClientService clientService) : base(clientService)
@@ -25,7 +26,7 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="ContentTypeInfoModel"/></returns>
-        public async Task<IReadOnlyList<ContentTypeInfoModel>> GetContentTypesAsync()
+        public async Task<ServiceResult<IReadOnlyList<ContentTypeInfoModel>>> GetContentTypesAsync()
         {
             try
             {
@@ -36,22 +37,22 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var contentTypeInfoModel = JsonSerializer.Deserialize<List<ContentTypeInfoModel>>(content, _serializerOptions);
 
                 if (contentTypeInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
-                return contentTypeInfoModel!;
+                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, "Successfully retrieved all content types!");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get content types:", ex.Message);
-                return [];
+                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(HttpStatusCode.InternalServerError, null, "Unable to retrieve all content types.");
             }
         }
     }

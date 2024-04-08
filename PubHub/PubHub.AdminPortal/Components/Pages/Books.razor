@@ -69,7 +69,7 @@
     bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
 
-    public List<BookInfoModel> BookInfos { get; set; } = new();
+    public IReadOnlyList<BookInfoModel> BookInfos { get; set; } = [];
     private PublisherInfoModel? Publisher { get; set; }
 
     private AuthenticationState? AuthenticationState { get; set; }
@@ -91,8 +91,7 @@
 
         if (Publisher != null)
         {
-            var books = await PublisherService.GetPublisherBooksAsync(Publisher.Id);
-            BookInfos = books.ToList();
+            BookInfos = (await PublisherService.GetPublisherBooksAsync(Publisher.Id)).Instance ?? [];
         }
     }
 
