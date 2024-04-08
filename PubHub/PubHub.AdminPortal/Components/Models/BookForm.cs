@@ -5,7 +5,6 @@ namespace PubHub.AdminPortal.Components.Models
 {
     public class BookForm
     {
-#pragma warning disable IDE0305 // Simplify collection initialization
         // TODO (JBN): make this fit the new models being created for the Book.
         public Guid ContentTypeId { get; set; }
         [Required]
@@ -43,8 +42,8 @@ namespace PubHub.AdminPortal.Components.Models
                 PublisherId = PublisherId,
                 ContentTypeId = ContentTypeId,
                 CoverImage = CoverImage,
-                AuthorIds = AuthorIds.ToArray(),
-                GenreIds = GenreIds.ToArray(),
+                AuthorIds = [.. AuthorIds],
+                GenreIds = [.. GenreIds],
                 IsHidden = IsHidden
             };
 
@@ -61,11 +60,10 @@ namespace PubHub.AdminPortal.Components.Models
                 PublisherId = PublisherId,
                 ContentTypeId =ContentTypeId,
                 CoverImage = CoverImage,
-                AuthorIds = AuthorIds.ToArray(),
-                GenreIds = GenreIds.ToArray(),
+                AuthorIds = [.. AuthorIds],
+                GenreIds = [.. GenreIds],
                 IsHidden = IsHidden
             };
         }
     }
-#pragma warning restore IDE0305 // Simplify collection initialization
 }

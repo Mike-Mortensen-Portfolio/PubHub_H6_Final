@@ -52,6 +52,12 @@ namespace PubHub.AdminPortal.Components.Auth
                             await _localStorage.SetItemAsync<string>("refreshToken", tokenResponse.Instance.RefreshToken);
                             UpdateAuhenticationState(tokenResponse.Instance.Token);
                         }
+                        else
+                        {
+                            await _localStorage.RemoveItemAsync("token");
+                            await _localStorage.RemoveItemAsync("refreshToken");
+                            return await Task.FromResult(new AuthenticationState(_anonymous));
+                        }
                     }
                 }
 
@@ -62,7 +68,7 @@ namespace PubHub.AdminPortal.Components.Auth
                 else
                 {
                     // Return an anonymous authentication state if the user is not authenticated
-                    return new AuthenticationState(new ClaimsPrincipal());
+                    return new AuthenticationState(_anonymous);
                 }
             }
             catch (Exception ex)
@@ -112,11 +118,6 @@ namespace PubHub.AdminPortal.Components.Auth
             {
                 throw new ArgumentException("Invalid token format");
             }
-        }
-
-        public void NotifyAuthenticationStateChanged()
-        {
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
     }
 }
