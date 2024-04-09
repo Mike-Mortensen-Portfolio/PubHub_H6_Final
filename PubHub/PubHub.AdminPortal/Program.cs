@@ -7,6 +7,7 @@ using PubHub.AdminPortal.Components.Auth;
 using PubHub.AdminPortal.Components.Helpers;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
+using PubHub.Common.Models.Authentication;
 using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,15 @@ builder.Services.AddPubHubServices(options =>
     options.Address = builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT) ?? throw new NullReferenceException("API base address couldn't be found.");
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
     options.AppId = builder.Configuration.GetValue<string>(ApiConstants.APP_ID) ?? throw new NullReferenceException("Application ID couldn't be found.");
+    options.TokenInfoAsync = async (sp) =>
+    {
+        var localStorageService = sp.GetRequiredService<ILocalStorageService>();
+        return new TokenInfo()
+        {
+            Token = await localStorageService.GetItemAsync<string>("token") ?? string.Empty,
+            RefreshToken = await localStorageService.GetItemAsync<string>("refreshToken") ?? string.Empty
+        };
+    };
 });
 
 builder.Services.AddAuthorization(options =>
@@ -31,7 +41,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Operator", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", builder.Configuration.GetValue<string>("Operator") ?? throw new NullReferenceException("Operator couldn't be found."))));
     options.AddPolicy("Publisher", policy => policy.Requirements.Add(new CustomClaimRequirement("accountType", builder.Configuration.GetValue<string>("Publisher") ?? throw new NullReferenceException("Publisher couldn't be found."))));
 });
-    
 
 builder.Services.AddSingleton<IAuthorizationHandler, CustomClaimRequirementHandler>();
 
