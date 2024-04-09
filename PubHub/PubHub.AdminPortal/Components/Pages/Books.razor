@@ -91,7 +91,7 @@
 
         if (Publisher != null)
         {
-            BookInfos = (await PublisherService.GetPublisherBooksAsync(Publisher.Id)).Instance ?? [];
+            BookInfos = (await PublisherService.GetPublishersBooksAsync(Publisher.Id)).Instance ?? [];
         }
     }
 

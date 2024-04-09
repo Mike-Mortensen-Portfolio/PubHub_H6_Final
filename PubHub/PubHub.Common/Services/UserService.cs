@@ -35,7 +35,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    return new ServiceResult<UserInfoModel>(HttpStatusCode.InternalServerError, null, $"The user Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -58,7 +58,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine("Get user info failed:", ex.Message);
-                return new ServiceResult<UserInfoModel>(HttpStatusCode.InternalServerError, null, $"Failed to retrieve the user.");
+                return new ServiceResult<UserInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve the user: {ex.Message}.");
             }
         }
 
@@ -74,7 +74,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.InternalServerError, null, $"The user Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}/books");
                 string content = await response.Content.ReadAsStringAsync();
@@ -97,7 +97,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Unable to get user books: {userId}", ex.Message);
-                return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.InternalServerError, null, "Unable to retrieve user's books.");
+                return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.Unused, null, $"Unable to retrieve user's books: {ex.Message}.");
             }
         }
 
@@ -115,15 +115,11 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    return new ServiceResult<UserInfoModel>(HttpStatusCode.InternalServerError, null, $"The user Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
-                if (userUpdateModel == null)
-                    return new ServiceResult<UserInfoModel>(HttpStatusCode.InternalServerError, null, $"The User update model wasn't valid.");
+                ArgumentNullException.ThrowIfNull(userUpdateModel);
 
-                var userModelValues = JsonSerializer.Serialize(userUpdateModel);
-
-                if (userModelValues == null)
-                    return new ServiceResult<UserInfoModel>(HttpStatusCode.InternalServerError, null, $"Unable to serialize the userUpdateModel to json.");
+                var userModelValues = JsonSerializer.Serialize(userUpdateModel) ?? throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
 
                 HttpContent httpContent = new StringContent(userModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -148,7 +144,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to update the user: {userUpdateModel.Name}, ", ex.Message);
-                return new ServiceResult<UserInfoModel>(HttpStatusCode.InternalServerError, null, $"Failed to update the user.");
+                return new ServiceResult<UserInfoModel>(HttpStatusCode.Unused, null, $"Failed to update the user: {ex.Message}.");
             }
         }
 
@@ -164,7 +160,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    return new ServiceResult(HttpStatusCode.InternalServerError, $"The user Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -183,7 +179,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to delete the user: {userId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.InternalServerError, $"Failed to delete the user.");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the user: {ex.Message}.");
             }
         }
 
@@ -199,7 +195,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    return new ServiceResult(HttpStatusCode.InternalServerError, $"The user Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}/suspend-user");
                 string content = await response.Content.ReadAsStringAsync();
@@ -218,7 +214,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to suspend the user: {userId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.InternalServerError, $"Failed to suspend the user.");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to suspend the user: {ex.Message}.");
             }
         }
     }

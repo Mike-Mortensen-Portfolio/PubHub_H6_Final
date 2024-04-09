@@ -33,13 +33,9 @@ namespace PubHub.Common.Services
         {           
             try
             {
-                if (userCreateModel == null)
-                    return new ServiceResult<UserCreatedResponseModel>(HttpStatusCode.InternalServerError, null, $"The user create model wasn't valid.");
+                ArgumentNullException.ThrowIfNull(userCreateModel);
 
-                var userModelValues = JsonSerializer.Serialize(userCreateModel);
-
-                if (userModelValues == null)
-                    return new ServiceResult<UserCreatedResponseModel>(HttpStatusCode.InternalServerError, null, $"Unable to serialize the userCreateModel to json.");
+                var userModelValues = JsonSerializer.Serialize(userCreateModel) ?? throw new NullReferenceException($"Unable to serialize the userCreateModel to json.");
 
                 HttpContent httpContent = new StringContent(userModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -64,7 +60,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the name: {userCreateModel.Name}, ", ex.Message);
-                return new ServiceResult<UserCreatedResponseModel>(HttpStatusCode.InternalServerError, null, $"Failed to add the user.");
+                return new ServiceResult<UserCreatedResponseModel>(HttpStatusCode.Unused, null, $"Failed to add the user: {ex.Message}.");
             }
         }
 
@@ -106,7 +102,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to login, ", ex.Message);
-                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unauthorized, null, $"Failed to login.");
+                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unused, null, $"Failed to login: {ex.Message}.");
             }
         }
 
@@ -148,7 +144,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to refresh the token, ", ex.Message);
-                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unauthorized, null, $"Failed to refresh token.");
+                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unused, null, $"Failed to refresh token: {ex.Message}.");
             }
         }
 
@@ -186,7 +182,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to revoke token, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.Unauthorized, $"Failed to revoke token.");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to revoke token: {ex.Message}.");
             }
         }
     }

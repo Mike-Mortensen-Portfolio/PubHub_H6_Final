@@ -123,9 +123,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        contentTypes = (await ContentTypeService.GetContentTypesAsync()).Instance ?? [];
-        genres = (await GenreService.GetGenresAsync()).Instance ?? [];
-        authors = (await AuthorService.GetAuthorsAsync()).Instance ?? [];
+        contentTypes = (await ContentTypeService.GetAllContentTypesAsync()).Instance ?? [];
+        genres = (await GenreService.GetAllGenresAsync()).Instance ?? [];
+        authors = (await AuthorService.GetAllAuthorsAsync()).Instance ?? [];
 
         foreach (var author in BookInfoModel.Authors)
         {

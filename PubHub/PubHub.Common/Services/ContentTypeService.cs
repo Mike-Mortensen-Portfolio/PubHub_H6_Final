@@ -26,7 +26,7 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="ContentTypeInfoModel"/></returns>
-        public async Task<ServiceResult<IReadOnlyList<ContentTypeInfoModel>>> GetContentTypesAsync()
+        public async Task<ServiceResult<IReadOnlyList<ContentTypeInfoModel>>> GetAllContentTypesAsync()
         {
             try
             {
@@ -47,12 +47,37 @@ namespace PubHub.Common.Services
                 if (contentTypeInfoModel == null)
                     return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
-                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, "Successfully retrieved all content types!");
+                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, contentTypeInfoModel, "Successfully retrieved all content types!");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get content types:", ex.Message);
-                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(HttpStatusCode.InternalServerError, null, "Unable to retrieve all content types.");
+                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(HttpStatusCode.Unused, null, $"Unable to retrieve all content types: {ex.Message}.");
+            }
+        }
+
+        public async Task<IReadOnlyList<ContentTypeInfoModel>> GetContentTypesAsync()
+        {
+            try
+            {
+                HttpResponseMessage response = await Client.GetAsync($"contentTypes");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var contentTypeInfoModels = JsonSerializer.Deserialize<List<ContentTypeInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
+
+                return contentTypeInfoModels;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unable to get content types:", ex.Message);
+                return [];
             }
         }
     }

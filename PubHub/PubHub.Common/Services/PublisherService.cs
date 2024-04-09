@@ -33,8 +33,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (queryOptions == null)
-                    return new ServiceResult<IReadOnlyList<PublisherInfoModel>>(HttpStatusCode.InternalServerError, null, $"The search query wasn't valid.");
+                ArgumentNullException.ThrowIfNull(queryOptions);
 
                 HttpResponseMessage response = await Client.GetAsync($"publishers?{queryOptions.ToQuery()}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -58,7 +57,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get publishers:", ex.Message);
-                return new ServiceResult<IReadOnlyList<PublisherInfoModel>>(HttpStatusCode.InternalServerError, null, "Unable retrieve all publishers.");
+                return new ServiceResult<IReadOnlyList<PublisherInfoModel>>(HttpStatusCode.Unused, null, $"Unable retrieve all publishers: {ex.Message}.");
             }
         }
 
@@ -73,13 +72,9 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (publisherCreateModel == null)
-                    return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"The User create model wasn't valid.");
+                ArgumentNullException.ThrowIfNull(publisherCreateModel);
 
-                var publisherModelValues = JsonSerializer.Serialize(publisherCreateModel);
-
-                if (publisherModelValues == null)
-                    return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"Unable to serialize the publisherCreateModel to json.");
+                var publisherModelValues = JsonSerializer.Serialize(publisherCreateModel) ?? throw new NullReferenceException($"Unable to serialize the publisherCreateModel to json.");
 
                 HttpContent httpContent = new StringContent(publisherModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -104,7 +99,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the publisher: {publisherCreateModel.Name}, ", ex.Message);
-                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"Failed to add the publisher.");
+                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the publisher: {ex.Message}.");
             }
         }
 
@@ -115,12 +110,12 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetPublisherBooksAsync(Guid publisherId)
+        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetPublishersBooksAsync(Guid publisherId)
         {
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
-                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.InternalServerError, null, $"The publisher Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The publisher Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}/books");
                 string content = await response.Content.ReadAsStringAsync();
@@ -143,7 +138,35 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Unable to get publisher's books: {publisherId}", ex.Message);
-                return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.InternalServerError, null, "Unable to get publisher's books.");
+                return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.Unused, null, $"Unable to get publisher's books: {ex.Message}.");
+            }
+        }
+
+        public async Task<IReadOnlyList<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId)
+        {
+            try
+            {
+                if (publisherId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The publisher Id wasn't a valid Id.");
+
+                HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}/books");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var bookInfoModels = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
+
+                return bookInfoModels;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Unable to get publisher's books: {publisherId}", ex.Message);
+                return [];
             }
         }
 
@@ -159,7 +182,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
-                    return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"The publisher Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The publisher Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -182,7 +205,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Get publisher info failed: {publisherId}", ex.Message);
-                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"Failed to retrieve info of the publisher.");
+                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve info of the publisher: {ex.Message}.");
             }
         }
 
@@ -200,15 +223,11 @@ namespace PubHub.Common.Services
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
-                    return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"The publisher Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The publisher Id wasn't a valid Id.");
 
-                if (publisherUpdateModel == null)
-                    return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"The publisher update model wasn't valid.");
+                ArgumentNullException.ThrowIfNull(publisherUpdateModel);
 
-                var publisherModelValues = JsonSerializer.Serialize(publisherUpdateModel);
-
-                if (publisherModelValues == null)
-                    return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"Unable to serialize the userUpdateModel to json.");
+                var publisherModelValues = JsonSerializer.Serialize(publisherUpdateModel) ?? throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
 
                 HttpContent httpContent = new StringContent(publisherModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -233,7 +252,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to update the publisher: {publisherUpdateModel.Name}, ", ex.Message);
-                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.InternalServerError, null, $"Failed to update the publisher.");
+                return new ServiceResult<PublisherInfoModel>(HttpStatusCode.Unused, null, $"Failed to update the publisher: {ex.Message}.");
             }
         }
 
@@ -249,7 +268,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
-                    return new ServiceResult(HttpStatusCode.InternalServerError, $"The publisher Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The publisher Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"publishers/{publisherId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -268,7 +287,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to delete the publisher: {publisherId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.InternalServerError, $"Failed to delete the publisher.");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the publisher: {ex.Message}.");
             }
         }
     }

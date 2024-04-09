@@ -26,7 +26,7 @@ namespace PubHub.Common.Services
         /// Calls the API enpoint to retrieve all genres through the <see cref="GenreInfoModel"/>.
         /// </summary>
         /// <returns>A list of <see cref="GenreInfoModel"/></returns>
-        public async Task<ServiceResult<IReadOnlyList<GenreInfoModel>>> GetGenresAsync()
+        public async Task<ServiceResult<IReadOnlyList<GenreInfoModel>>> GetAllGenresAsync()
         {
             try
             {
@@ -52,7 +52,32 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get genres:", ex.Message);
-                return new ServiceResult<IReadOnlyList<GenreInfoModel>>(HttpStatusCode.InternalServerError, null, "Unable retrieve all genres.");
+                return new ServiceResult<IReadOnlyList<GenreInfoModel>>(HttpStatusCode.Unused, null, $"Unable retrieve all genres: {ex.Message}.");
+            }
+        }
+
+        public async Task<IReadOnlyList<GenreInfoModel>> GetGenresAsync()
+        {
+            try
+            {
+                HttpResponseMessage response = await Client.GetAsync($"genres");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var genreInfoModels = JsonSerializer.Deserialize<List<GenreInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
+
+                return genreInfoModels;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unable to get genres:", ex.Message);
+                return [];
             }
         }
 
@@ -68,7 +93,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (genreId == INVALID_ENTITY_ID)
-                    return new ServiceResult<GenreInfoModel>(HttpStatusCode.InternalServerError, null, $"The genre Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The genre Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"genres/{genreId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -91,7 +116,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine("Get genre info failed:", ex.Message);
-                return new ServiceResult<GenreInfoModel>(HttpStatusCode.InternalServerError, null, $"Failed to retrieve the genre.");
+                return new ServiceResult<GenreInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve the genre: {ex.Message}.");
             }
         }
 
@@ -106,13 +131,9 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (genreCreateModel == null)
-                    return new ServiceResult<GenreCreateModel>(HttpStatusCode.InternalServerError, null, $"The genre create model wasn't valid.");
+                ArgumentNullException.ThrowIfNull(genreCreateModel);
 
-                var genreModelValues = JsonSerializer.Serialize(genreCreateModel);
-
-                if (genreModelValues == null)
-                    return new ServiceResult<GenreCreateModel>(HttpStatusCode.InternalServerError, null, $"Unable to serialize the genreCreateModel to json.");
+                var genreModelValues = JsonSerializer.Serialize(genreCreateModel) ?? throw new NullReferenceException($"Unable to serialize the genreCreateModel to json.");
 
                 HttpContent httpContent = new StringContent(genreModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -133,7 +154,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the genre: {genreCreateModel.Name}, ", ex.Message);
-                return new ServiceResult<GenreCreateModel>(HttpStatusCode.InternalServerError, null, $"Failed to add the genre.");
+                return new ServiceResult<GenreCreateModel>(HttpStatusCode.Unused, null, $"Failed to add the genre: {ex.Message}.");
             }
         }
 
@@ -149,7 +170,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (genreId == INVALID_ENTITY_ID)
-                    return new ServiceResult<GenreCreateModel>(HttpStatusCode.InternalServerError, null, $"The genre Id wasn't a valid Id.");
+                    throw new NullReferenceException($"The genre Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"genres/{genreId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -168,7 +189,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to delete the genre: {genreId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.InternalServerError, $"Failed to delete the genre.");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the genre: {ex.Message}.");
             }
         }
     }
