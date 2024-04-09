@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
+using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
@@ -11,7 +12,6 @@ namespace PubHub.Common.Services
 {
     public class UserService : ServiceRoot, IUserService
     {
-#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         public UserService(IHttpClientService clientService) : base(clientService)
@@ -35,7 +35,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -44,21 +44,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<UserInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
+                    return new ServiceResult<UserInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}"); ;
                 }
 
                 var userInfoModel = JsonSerializer.Deserialize<UserInfoModel>(content, _serializerOptions);
                 if (userInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<UserInfoModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
                 return new ServiceResult<UserInfoModel>(response.StatusCode, userInfoModel, $"Successfully retrieved the user: {userInfoModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Get user info failed:", ex.Message);
-                return new ServiceResult<UserInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve the user.");
+                return new ServiceResult<UserInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve the user: {ex.Message}.");
             }
         }
 
@@ -69,12 +69,12 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<IReadOnlyList<BookInfoModel>> GetUserBooksAsync(Guid userId)
+        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetUserBooksAsync(Guid userId)
         {
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"users/{userId}/books");
                 string content = await response.Content.ReadAsStringAsync();
@@ -83,21 +83,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
+                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var bookInfoModel = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions);
                 if (bookInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
-                return bookInfoModel!;
+                return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, "Successfully retrieved user's books!");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Unable to get user books: {userId}", ex.Message);
-                return [];
+                return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.Unused, null, $"Unable to retrieve user's books: {ex.Message}.");
             }
         }
 
@@ -115,15 +115,11 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
-                if (userUpdateModel == null)
-                    throw new ArgumentNullException($"The User update model wasn't valid: {userUpdateModel?.Name}");
+                ArgumentNullException.ThrowIfNull(userUpdateModel);
 
-                var userModelValues = JsonSerializer.Serialize(userUpdateModel);
-
-                if (userModelValues == null)
-                    throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
+                var userModelValues = JsonSerializer.Serialize(userUpdateModel) ?? throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
 
                 HttpContent httpContent = new StringContent(userModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -134,21 +130,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<UserInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
+                    return new ServiceResult<UserInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var userInfoModel = JsonSerializer.Deserialize<UserInfoModel>(content, _serializerOptions);
                 if (userInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<UserInfoModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
                 return new ServiceResult<UserInfoModel>(response.StatusCode, userInfoModel, $"Successfully updated the user: {userInfoModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to update the user: {userUpdateModel.Name}, ", ex.Message);
-                return new ServiceResult<UserInfoModel>(HttpStatusCode.Unused, null, $"Failed to update the user.");
+                return new ServiceResult<UserInfoModel>(HttpStatusCode.Unused, null, $"Failed to update the user: {ex.Message}.");
             }
         }
 
@@ -164,7 +160,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -173,9 +169,9 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult(HttpStatusCode.InternalServerError, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
+                    return new ServiceResult(response.StatusCode, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 return new ServiceResult(response.StatusCode, $"Successfully deleted the user: {userId}");
@@ -183,7 +179,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to delete the user: {userId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the user: {userId}");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the user: {ex.Message}.");
             }
         }
 
@@ -199,7 +195,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (userId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The user Id wasn't a valid Id: {userId}");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"users/{userId}/suspend-user");
                 string content = await response.Content.ReadAsStringAsync();
@@ -208,9 +204,9 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult(response.StatusCode, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
+                    return new ServiceResult(response.StatusCode, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 return new ServiceResult(response.StatusCode, $"Successfully suspended the user: {userId}");
@@ -218,7 +214,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to suspend the user: {userId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.Unused, $"Failed to suspend the user: {userId}");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to suspend the user: {ex.Message}.");
             }
         }
     }

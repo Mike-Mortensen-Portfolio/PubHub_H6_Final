@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
+using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Books;
 using static PubHub.Common.IntegrityConstants;
 
@@ -11,7 +12,6 @@ namespace PubHub.Common.Services
 {
     public class BookService : ServiceRoot, IBookService
     {
-#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         public BookService(IHttpClientService clientService) : base(clientService)
@@ -28,12 +28,11 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
-        public async Task<IReadOnlyList<BookInfoModel>> GetBooksAsync(BookQuery queryOptions)
+        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetAllBooksAsync(BookQuery queryOptions)
         {
             try
             {
-                if (queryOptions == null)
-                    throw new NullReferenceException($"The search query wasn't valid: {queryOptions}");
+                ArgumentNullException.ThrowIfNull(queryOptions);
 
                 HttpResponseMessage response = await Client.GetAsync($"books?{queryOptions.ToQuery(ignoreNull: true)}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -42,16 +41,43 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null)?($"Details: {errorResponse.Detail}"):(string.Empty))}.");
+                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var bookInfoModel = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions);
                 if (bookInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
-                return bookInfoModel!;
+                return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, bookInfoModel, "Successfully retrieved the books!");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unable to get user books:", ex.Message);
+                return new ServiceResult<IReadOnlyList<BookInfoModel>>(HttpStatusCode.Unused, null, $"Unable to get user's books: {ex.Message}.");
+            }
+        }
+
+        public async Task<IReadOnlyList<BookInfoModel>> GetBooksAsync(BookQuery queryOptions)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(queryOptions);
+
+                HttpResponseMessage response = await Client.GetAsync($"books?{queryOptions.ToQuery(ignoreNull: true)}");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var bookInfoModels = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
+
+                return bookInfoModels;
             }
             catch (Exception ex)
             {
@@ -72,7 +98,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (bookId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The book Id wasn't a valid Id: {bookId}");
+                    throw new NullReferenceException($"The book Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.GetAsync($"books/{bookId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -81,21 +107,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}.");
+                    return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var bookInfoModel = JsonSerializer.Deserialize<BookInfoModel>(content, _serializerOptions);
                 if (bookInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
                 return new ServiceResult<BookInfoModel>(response.StatusCode, bookInfoModel, $"Successfully retrieved the book: {bookInfoModel.Title}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Get book info failed:", ex.Message);
-                return new ServiceResult<BookInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the book.");
+                return new ServiceResult<BookInfoModel>(HttpStatusCode.Unused, null, $"Failed to get the book: {ex.Message}.");
             }
         }
 
@@ -110,13 +136,9 @@ namespace PubHub.Common.Services
         {
             try
             {
-                if (bookCreateModel == null)
-                    throw new ArgumentNullException($"The book create model wasn't valid: {bookCreateModel?.Title}");
+                ArgumentNullException.ThrowIfNull(bookCreateModel);
 
-                var bookModelValues = JsonSerializer.Serialize(bookCreateModel);
-
-                if (bookModelValues == null)
-                    throw new NullReferenceException($"Unable to serialize the bookCreateModel to json.");
+                var bookModelValues = JsonSerializer.Serialize(bookCreateModel) ?? throw new NullReferenceException($"Unable to serialize the bookCreateModel to json.");
 
                 HttpContent httpContent = new StringContent(bookModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -127,21 +149,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var bookInfoModel = JsonSerializer.Deserialize<BookInfoModel>(content, _serializerOptions);
                 if (bookInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
                 return new ServiceResult<BookInfoModel>(response.StatusCode, bookInfoModel, $"Successfully added the book: {bookInfoModel.Title}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the book: {bookCreateModel.Title}, ", ex.Message);
-                return new ServiceResult<BookInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the book: {bookCreateModel.Title}");
+                return new ServiceResult<BookInfoModel>(HttpStatusCode.Unused, null, $"Failed to add the book: {ex.Message}.");
             }
         }
 
@@ -159,15 +181,11 @@ namespace PubHub.Common.Services
             try
             {
                 if (bookId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The user Id wasn't a valid Id: {bookId}");
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
-                if (bookUpdateModel == null)
-                    throw new ArgumentNullException($"The User update model wasn't valid: {bookUpdateModel?.Title}");
+                ArgumentNullException.ThrowIfNull(bookUpdateModel);
 
-                var bookModelValues = JsonSerializer.Serialize(bookUpdateModel);
-
-                if (bookModelValues == null)
-                    throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
+                var bookModelValues = JsonSerializer.Serialize(bookUpdateModel) ?? throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
 
                 HttpContent httpContent = new StringContent(bookModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -178,21 +196,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information:{errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult<BookInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var bookInfoModel = JsonSerializer.Deserialize<BookInfoModel>(content, _serializerOptions);
                 if (bookInfoModel == null)
-                    throw new NullReferenceException($"Unable to map the request over to the client.");
+                    return new ServiceResult<BookInfoModel>(response.StatusCode, null, "Unable to map the request over to the client.");
 
                 return new ServiceResult<BookInfoModel>(response.StatusCode, bookInfoModel, $"Successfully updated the book: {bookInfoModel.Title}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to update the book: {bookUpdateModel.Title}, ", ex.Message);
-                return new ServiceResult<BookInfoModel>(HttpStatusCode.Unused, null, $"Failed to update the book: {bookUpdateModel.Title}");
+                return new ServiceResult<BookInfoModel>(HttpStatusCode.Unused, null, $"Failed to update the book: {ex.Message}.");
             }
         }
 
@@ -208,7 +226,7 @@ namespace PubHub.Common.Services
             try
             {
                 if (bookId == INVALID_ENTITY_ID)
-                    throw new ArgumentException($"The book Id wasn't a valid Id: {bookId}");
+                    throw new NullReferenceException($"The book Id wasn't a valid Id.");
 
                 HttpResponseMessage response = await Client.DeleteAsync($"books/{bookId}");
                 string content = await response.Content.ReadAsStringAsync();
@@ -217,9 +235,9 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult(response.StatusCode, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult(response.StatusCode, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 return new ServiceResult(response.StatusCode, $"Successfully deleted the book: {bookId}");
@@ -227,7 +245,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to delete the book: {bookId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the book: {bookId}");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the book: {ex.Message}");
             }
         }
     }
