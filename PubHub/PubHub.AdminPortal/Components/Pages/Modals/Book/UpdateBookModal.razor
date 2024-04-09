@@ -153,7 +153,7 @@
     {
         var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
 
-        bookUpdateform.GenreIds = bookGenres.ToList();
+        bookUpdateform.Genres = bookGenres.ToList();
     }
 
     async void AddMoreAuthors()
