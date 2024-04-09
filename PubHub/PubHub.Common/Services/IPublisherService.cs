@@ -7,7 +7,7 @@ namespace PubHub.Common.Services
     {
         Task<ServiceResult<PublisherInfoModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel);
         Task<ServiceResult<PublisherInfoModel>> GetPublisherInfoAsync(Guid publisherId);
-        Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetPublishersBooksAsync(Guid publisherId);
+        Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetAllPublisherBooksAsync(Guid publisherId);
         [Obsolete($"Use {nameof(GetPublisherBooksAsync)} instead.")]
         Task<IReadOnlyList<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId);
         Task<ServiceResult<PublisherInfoModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel);

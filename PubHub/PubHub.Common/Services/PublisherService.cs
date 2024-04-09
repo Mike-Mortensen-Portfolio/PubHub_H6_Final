@@ -110,7 +110,7 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetPublishersBooksAsync(Guid publisherId)
+        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetAllPublisherBooksAsync(Guid publisherId)
         {
             try
             {
