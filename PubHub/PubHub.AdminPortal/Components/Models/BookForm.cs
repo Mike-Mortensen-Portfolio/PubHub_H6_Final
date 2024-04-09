@@ -12,7 +12,6 @@ namespace PubHub.AdminPortal.Components.Models
         public Guid PublisherId { get; set; }
 
         [Required(ErrorMessage = "Please enter a title for the book.")]
-        [RegularExpression(@"^[^\\/:*;\.\)\(]+$", ErrorMessage = "The characters ':', '.' ';', '*', '/' and '\' are not allowed")]
         public string? Title { get; set; }
 
         [Required(ErrorMessage = "Please upload a cover image.")]
@@ -33,13 +32,11 @@ namespace PubHub.AdminPortal.Components.Models
         /// and a time span if <see cref="ContentTypeConstants.AUDIO_CONTENT_TYPE"/>
         /// </summary>
         [Required(ErrorMessage = "Please give the length of the book, page total or seconds for audio book.")]
-        [RegularExpression(@"^[^\\/:*;\.\)\(]+$", ErrorMessage = "The characters ':', '.' ';', '*', '/' and '\' are not allowed")]
         public double Length { get; set; }
 
         public bool IsHidden { get; set; } = false;
 
         [Required(ErrorMessage = "Please add at least one author.")]
-        [RegularExpression(@"^[^\\/:*;\.\)\(]+$", ErrorMessage = "The characters ':', '.' ';', '*', '/' and '\' are not allowed")]
         public List<Guid>? Authors { get; set; }
 
         [Required(ErrorMessage = "Please select at least one genre.")]

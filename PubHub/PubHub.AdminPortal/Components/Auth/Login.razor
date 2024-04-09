@@ -39,15 +39,24 @@
         try
         {
             if (string.IsNullOrWhiteSpace(loginForm.Email))
-                throw new Exception("Email is required.");
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Email is required.", Duration = 5000 });
+                return;
+            }
 
             if (string.IsNullOrWhiteSpace(loginForm.Password))
-                throw new Exception("Password is required.");
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Password is required.", Duration = 5000 });
+                return;
+            }
 
             var result = await AuthService.LoginAsync(loginForm.CreateLoginInfo());
 
             if (result.Instance == null)
-                throw new Exception(result.ErrorDescriptor);
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Duration = 5000 });
+                return;
+            }
 
             await LocalStorage.SetItemAsync<string>("token", result.Instance.Token);
             await LocalStorage.SetItemAsync<string>("refreshToken", result.Instance.RefreshToken);

@@ -54,15 +54,24 @@
         try
         {
             if (string.IsNullOrWhiteSpace(publisherCreateForm.Password) && string.IsNullOrWhiteSpace(publisherCreateForm.ConfirmPassword))
-                throw new NullReferenceException("Unable to create login because the passwords were invalid.");
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to create login because the passwords were invalid.", Detail = "Error", Duration = 5000 });
+                return;
+            }
 
             string savedPassword = string.Equals(publisherCreateForm.Password!, publisherCreateForm.ConfirmPassword!) ? publisherCreateForm.Password! : string.Empty;
 
             if (string.IsNullOrWhiteSpace(savedPassword))
-                throw new NullReferenceException("The two passwords weren't eqauls to one another.");
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "The two passwords weren't eqauls to one another.", Detail = "Error", Duration = 5000 });
+                return;
+            }
 
             if (publisherCreateForm == null)
-                throw new ArgumentException("The form isn't containing the right values or is missing values.");
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "The form isn't containing the right values or is missing values.", Detail = "Error", Duration = 5000 });
+                return;
+            }
 
             var result = await PublisherService.AddPublisherAsync(publisherCreateForm.CreatePublisherModel());
             if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)

@@ -196,7 +196,10 @@
         try
         {
             if (bookCreateForm.Authors == null)
-                throw new Exception("Authors is null, please add at least one author.");
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Authors is null, please add at least one author.", Detail = "Error", Duration = 5000 });
+                return;
+            }
 
             bookCreateForm.Authors.Clear();
             foreach (var authorName in authorNames)
