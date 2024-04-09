@@ -26,13 +26,19 @@ namespace PubHub.Common.Extensions
             var uri = new Uri(apiOptions.Address);
             if (apiOptions.ConfigureForMobile)
             {
-                services.AddSingleton<IHttpClientService>(sp => new HttpClientService(new HttpClient() { BaseAddress = uri }));
+                HttpClient httpClient = new() { BaseAddress = uri };
+                httpClient.DefaultRequestHeaders.Add(ApiConstants.APP_ID, apiOptions.AppId);
+                services.AddSingleton<IHttpClientService>(sp => new HttpClientService(httpClient));
             }
             else
             {
                 var clientName = apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME;
                 services.AddScoped<IHttpClientService>(sp => new HttpClientService(services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>().CreateClient(clientName)));
-                services.AddHttpClient(clientName, options => { options.BaseAddress = uri; });
+                services.AddHttpClient(clientName, options =>
+                {
+                    options.BaseAddress = uri;
+                    options.DefaultRequestHeaders.Add(ApiConstants.APP_ID, apiOptions.AppId);
+                });
             }
 
             return services

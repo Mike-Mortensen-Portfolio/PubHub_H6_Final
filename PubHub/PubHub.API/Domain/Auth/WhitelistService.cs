@@ -62,6 +62,7 @@ namespace PubHub.API.Domain.Auth
             }
 
             problem = null;
+
             return true;
         }
     }
