@@ -152,6 +152,7 @@ namespace PubHub.API.Controllers
                     book.Length == createModel.Length &&
                     book.PublicationDate == createModel.PublicationDate &&
                     book.Title == createModel.Title &&
+                    book.Summary == createModel.Summary &&
                     book.BookContent.Equals(createModel.BookContent));
 
             if (existingBook is not null)
@@ -259,6 +260,7 @@ namespace PubHub.API.Controllers
                 book.Length == createdBook.Length &&
                 book.PublicationDate == createdBook.PublicationDate &&
                 book.Title == createdBook.Title &&
+                book.Summary == createdBook.Summary &&
                 book.BookContent.Equals(createdBook.BookContent))
                 .Select(book => new BookInfoModel
                 {
@@ -334,6 +336,7 @@ namespace PubHub.API.Controllers
             existingBook.PublicationDate = updateModel.PublicationDate;
             existingBook.PublisherId = updateModel.PublisherId;
             existingBook.Title = updateModel.Title;
+            existingBook.Summary = updateModel.Summary;
 
             if (await _context.SaveChangesAsync() == NO_CHANGES)
             {

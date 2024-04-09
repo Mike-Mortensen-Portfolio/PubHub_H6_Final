@@ -312,7 +312,7 @@ namespace PubHub.API.Migrations
                     ContentTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PublisherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Summary = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Summary = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
                     CoverImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     BookContent = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     PublicationDate = table.Column<DateOnly>(type: "date", nullable: false),

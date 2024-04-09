@@ -43,6 +43,7 @@ namespace PubHub.API.Domain
             const int EMAIL_MAX_LENGTH = 256;
             const int USERNAME_MAX_LENGTH = 256;
             const int BOOK_TITLE_MAX_LENGTH = 256;
+            const int BOOK_SUMMARY_MAX_LENGTH = 1024;
 
             base.OnModelCreating(builder);
 
@@ -163,6 +164,9 @@ namespace PubHub.API.Domain
 
                 book.Property(b => b.Title)
                     .HasMaxLength(BOOK_TITLE_MAX_LENGTH);
+
+                book.Property(b => b.Summary)
+                    .HasMaxLength(BOOK_SUMMARY_MAX_LENGTH);
 
                 book.TypeToPluralTableName();
             });
