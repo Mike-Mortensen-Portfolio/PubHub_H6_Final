@@ -35,14 +35,14 @@
                                 </select>
                                 <ValidationMessage For="@(() => bookCreateForm.ContentTypeId)" />
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <label for="createBookContent" class="form-label"><b>Book content:</b></label>
                                 <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
                                 <progress class="mt-2" max="100" value="@progressValue"></progress>
                                 <span>@($"{progressValue}%")</span>
                                 <ValidationMessage For="@(() => bookCreateForm.BookContent)" />
-                            </div>                            
+                            </div>
                         </div>
                     </div>
                     <div class="form-group mb-2">
@@ -193,8 +193,11 @@
 
     private async Task CreateBook()
     {
-        if (bookCreateForm.Authors != null)
+        try
         {
+            if (bookCreateForm.Authors == null)
+                throw new Exception("Authors is null, please add at least one author.");
+
             bookCreateForm.Authors.Clear();
             foreach (var authorName in authorNames)
             {
@@ -209,17 +212,22 @@
                     bookCreateForm.Authors.Add(authorExists.Id);
                 }
             }
+            bookCreateForm.PublisherId = Publisher.Id;
+            var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
+            if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+                await ModalOptions(false);
+            }
+            else
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+            }
         }
-        bookCreateForm.PublisherId = Publisher.Id;
-        var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
-        if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+        catch (Exception ex)
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
-            await ModalOptions(false);
-        }
-        else
-        {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+            Debug.WriteLine("Unable to login, ", ex.Message);
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to create book, check your values.", Detail = "Error", Duration = 5000 });
         }
     }
 

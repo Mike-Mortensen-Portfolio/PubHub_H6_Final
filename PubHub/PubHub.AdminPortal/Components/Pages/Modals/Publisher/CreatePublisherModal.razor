@@ -10,28 +10,35 @@
                 <h4 class="modal-title">Create a new book</h4>
                 <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
             </div>
-            <div class="modal-body">
-                <div class="form-group mb-2">
-                    <label for="createPublisherName" class="form-label"><b>Publisher name:</b></label>
-                    <input @bind="name" type="text" id="createPublisherName" class="form-control" placeholder="Type in the publisher name..." />
+            <EditForm Model="publisherCreateForm" OnValidSubmit="() => CreatePublisher()">
+                <DataAnnotationsValidator />
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="createPublisherName" class="form-label"><b>Publisher name:</b></label>
+                        <input @bind="publisherCreateForm.Name" type="text" id="createPublisherName" class="form-control" placeholder="Type in the publisher name..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.Name)" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createPublisherEmail" class="form-label"><b>Publisher email:</b></label>
+                        <input @bind="publisherCreateForm.Email" type="email" id="createPublisherEmail" class="form-control" placeholder="Type in the publisher email..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.Email)" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createPublisherPassword" class="form-label"><b>Publisher password:</b></label>
+                        <input @bind="publisherCreateForm.Password" type="password" id="createPublisherPassword" class="form-control" placeholder="Type in the publisher password..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.Password)" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createPublisherPassword" class="form-label"><b>Confirm password:</b></label>
+                        <input @bind="publisherCreateForm.ConfirmPassword" type="password" id="createPublisherPassword" class="form-control" placeholder="Type in the publisher password again..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.ConfirmPassword)" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" @onclick="() => CreatePublisher()">Create</button>
+                        <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                    </div>
                 </div>
-                <div class="form-group mb-2">
-                    <label for="createPublisherEmail" class="form-label"><b>Publisher email:</b></label>
-                    <input @bind="email" type="email" id="createPublisherEmail" class="form-control" placeholder="Type in the publisher email..." />
-                </div>
-                <div class="form-group mb-2">
-                    <label for="createPublisherPassword" class="form-label"><b>Publisher password:</b></label>
-                    <input @bind="password" type="password" id="createPublisherPassword" class="form-control" placeholder="Type in the publisher password..." />
-                </div>
-                <div class="form-group mb-2">
-                    <label for="createPublisherPassword" class="form-label"><b>Confirm password:</b></label>
-                    <input @bind="confirmPassword" type="password" id="createPublisherPassword" class="form-control" placeholder="Type in the publisher password again..." />
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success" @onclick="() => CreatePublisher()">Create</button>
-                    <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
-                </div>
-            </div>
+            </EditForm>            
         </div>
     </div>
 </div>
@@ -40,43 +47,40 @@
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
 
-    string name = string.Empty;
-    string email = string.Empty;
-    string password = string.Empty;
-    string confirmPassword = string.Empty;
+    public PublisherForm publisherCreateForm { get; set; } = new();
 
     private async Task CreatePublisher()
     {
-        string savedPassword = string.Equals(password, confirmPassword) ? password : string.Empty;
-
-        if (savedPassword != null)
+        try
         {
-            AccountForm accountForm = new()
-            {
-                Email = email,
-                Password = savedPassword
-            };
+            if (string.IsNullOrWhiteSpace(publisherCreateForm.Password) && string.IsNullOrWhiteSpace(publisherCreateForm.ConfirmPassword))
+                throw new NullReferenceException("Unable to create login because the passwords were invalid.");
 
-            PublisherForm publisherForm = new()
-            {
-                Name = name,
-                Account = accountForm.CreateAccountModel()
-            };
+            string savedPassword = string.Equals(publisherCreateForm.Password!, publisherCreateForm.ConfirmPassword!) ? publisherCreateForm.Password! : string.Empty;
 
-            if (publisherForm != null)
+            if (string.IsNullOrWhiteSpace(savedPassword))
+                throw new NullReferenceException("The two passwords weren't eqauls to one another.");
+
+            if (publisherCreateForm == null)
+                throw new ArgumentException("The form isn't containing the right values or is missing values.");
+
+            var result = await PublisherService.AddPublisherAsync(publisherCreateForm.CreatePublisherModel());
+            if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
             {
-                var result = await PublisherService.AddPublisherAsync(publisherForm.CreatePublisherModel());
-                if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
-                {
-                    NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
-                    await ModalOptions(false);
-                }
-                else
-                {
-                    NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
-                }
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+                await ModalOptions(false);
+            }
+            else
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
             }
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Unable to create publisher, ", ex.Message);
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to create the publisher, check your values.", Detail = "Error", Duration = 5000 });
+        }
+
     }
 
     Task ModalOptions(bool IsClosing)
