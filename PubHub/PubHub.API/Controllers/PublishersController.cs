@@ -43,7 +43,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         public async Task<IResult> AddPublisherAsync([FromBody] PublisherCreateModel publisherCreateModel, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+                return problem;
 
             // TODO (SIA): Validate model.
 
@@ -144,7 +145,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetPublisherAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+                return problem;
 
             var publisherModel = await _context.GetPublisherInfoAsync(id);
             if (publisherModel == null)
@@ -167,7 +169,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PublisherInfoModel[]))]
         public async Task<IResult> GetPublishersAsync([FromQuery] PublisherQuery query, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+                return problem;
 
             var publishers = await _context.Set<Publisher>()
                 .Include(p => p.Account)
@@ -194,7 +197,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetBooksAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+                return problem;
 
             // Check if publisher exists.
             if (!await _context.Set<Publisher>().AnyAsync(u => u.Id == id))
@@ -264,7 +268,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> UpdatePublisherAsync(Guid id, [FromBody] PublisherUpdateModel publisherUpdateModel, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+                return problem;
 
             // TODO (SIA): Validate model.
 
@@ -331,7 +336,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeletePublisherAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+                return problem;
 
             // Check if publisher exists.
             if (!await _context.Set<Publisher>().AnyAsync(p => p.Id == id))

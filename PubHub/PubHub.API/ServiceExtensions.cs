@@ -15,6 +15,7 @@ using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Identity;
 using Serilog;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PubHub.API
 {
@@ -64,8 +65,13 @@ namespace PubHub.API
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
                     ValidateLifetime = true,
+                    ValidateAudience = true,
+                    ValidateIssuer = true,
+                    RequireExpirationTime = true,
+                    RequireAudience = true,
+                    RequireSignedTokens = true,
+                    TryAllIssuerSigningKeys = true,
                     ValidAudiences = authOptions.Audiences,
                     ValidIssuers = authOptions.Issuers,
                     IssuerSigningKey = authOptions.SigningKey,

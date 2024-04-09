@@ -29,7 +29,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<ContentTypeInfoModel>))]
         public async Task<IResult> GetContentTypesAsync([FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem) return problem;
+            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+                return problem;
 
             var contentTypes = await _context.Set<Domain.Entities.ContentType>()
                 .Select(contentType => new ContentTypeInfoModel
