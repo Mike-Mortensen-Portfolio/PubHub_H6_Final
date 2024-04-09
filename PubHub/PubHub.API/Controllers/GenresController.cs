@@ -34,7 +34,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<GenreInfoModel>))]
         public async Task<IResult> GetGenresAsync([FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var genres = await _context.Set<Genre>()
@@ -53,7 +53,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetGenreAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var genre = await _context.Set<Genre>()
@@ -82,7 +82,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenreInfoModel))]
         public async Task<IResult> AddGenreAsync([FromBody] GenreCreateModel genreModel, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var entityGenre = await _context.Set<Genre>()
@@ -130,7 +130,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteGenreAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var entityGenre = await _context.Set<Genre>()

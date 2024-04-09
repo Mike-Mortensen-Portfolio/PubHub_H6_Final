@@ -41,7 +41,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var userInfo = await _context.GetUserInfoAsync(id);
@@ -71,7 +71,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetBooksAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Check if user exists.
@@ -146,7 +146,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UserUpdateModel userUpdateModel, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // TODO (SIA): Validate model.
@@ -212,7 +212,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Get account Id.
@@ -261,7 +261,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IResult> SuspendUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (_whitelistService.VerifyApplicationAccess(appId, GetType().Name) is IResult problem)
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Get account type ID.

@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Options;
 using PubHub.API.Controllers.Problems;
 
@@ -20,11 +21,16 @@ namespace PubHub.API.Domain.Auth
         /// <param name="appId">Unique and secret application ID of an application accessing the PubHub API.</param>
         /// <param name="controllerName">Name of the controller trying to be accessed.</param>
         /// <param name="methodName">Name of controller method trying to be accessed.</param>
-        /// <returns>Null if the application can be granted access; otherwise problem from <see cref="UnauthorizedSpecification"/>.</returns>
-        public IResult? VerifyApplicationAccess(string appId, string controllerName, [CallerMemberName] string methodName = "")
+        /// <param name="problem">Null when returning true; otherwise problem from <see cref="UnauthorizedSpecification"/>.</param>
+        /// <returns>True if the application as access; otherwise false.</returns>
+        public bool TryVerifyApplicationAccess(string appId, string controllerName, [NotNullWhen(false)] out IResult? problem, [CallerMemberName] string methodName = "")
         {
             if (string.IsNullOrEmpty(controllerName) || string.IsNullOrEmpty(methodName))
-                return _unauthorizedResult.Invoke();
+            {
+                problem = _unauthorizedResult.Invoke();
+
+                return false;
+            }
 
             // Get whitelisted application.
             var appWhitelist = _whitelistOptions.Apps
@@ -33,17 +39,30 @@ namespace PubHub.API.Domain.Auth
             
             // No application with the given ID is on the whitelist.
             if (appWhitelist == null)
-                return _unauthorizedResult.Invoke();
+            {
+                problem = _unauthorizedResult.Invoke();
+
+                return false;
+            }
 
             // The application is not allowed in the given controller.
             if (!appWhitelist.ControllerEndpoints.TryGetValue(controllerName, out IEnumerable<string>? allowedEndpoints))
-                return _unauthorizedResult.Invoke();
+            {
+                problem = _unauthorizedResult.Invoke();
+
+                return false;
+            }
 
             // The application is not allowed on the given endpoint.
             if (!allowedEndpoints.Contains(methodName))
-                return _unauthorizedResult.Invoke();
+            {
+                problem = _unauthorizedResult.Invoke();
 
-            return null;
+                return false;
+            }
+
+            problem = null;
+            return true;
         }
     }
 }
