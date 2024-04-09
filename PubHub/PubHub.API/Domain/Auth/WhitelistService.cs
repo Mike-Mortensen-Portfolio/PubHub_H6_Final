@@ -22,7 +22,7 @@ namespace PubHub.API.Domain.Auth
         /// <param name="controllerName">Name of the controller trying to be accessed.</param>
         /// <param name="methodName">Name of controller method trying to be accessed.</param>
         /// <param name="problem">Null when returning true; otherwise problem from <see cref="UnauthorizedSpecification"/>.</param>
-        /// <returns>True if the application as access; otherwise false.</returns>
+        /// <returns><see langword="true"/> if the application has access; otherwise <see langword="false"/>.</returns>
         public bool TryVerifyApplicationAccess(string appId, string controllerName, [NotNullWhen(false)] out IResult? problem, [CallerMemberName] string methodName = "")
         {
             if (string.IsNullOrEmpty(controllerName) || string.IsNullOrEmpty(methodName))

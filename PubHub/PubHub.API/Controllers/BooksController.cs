@@ -469,9 +469,6 @@ namespace PubHub.API.Controllers
             if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
-            //if (_whitelistService.Try(out IResult problem))
-            //  return problem;
-
             var book = await _context.Set<Book>()
                 .FirstOrDefaultAsync(book => book.Id == id);
 
