@@ -11,7 +11,6 @@ namespace PubHub.Common.Services
 {
     public class AuthenticationService : ServiceRoot, IAuthenticationService
     {
-#pragma warning disable IDE0270 // Use coalesce expression
         private readonly JsonSerializerOptions _serializerOptions;
 
         public AuthenticationService(IHttpClientService clientService) : base(clientService)
@@ -31,16 +30,12 @@ namespace PubHub.Common.Services
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
         public async Task<ServiceResult<UserCreatedResponseModel>> RegisterUserAsync(UserCreateModel userCreateModel)
-        {
+        {           
             try
             {
-                if (userCreateModel == null)
-                    throw new ArgumentNullException($"The user create model wasn't valid: {userCreateModel?.Name}");
+                ArgumentNullException.ThrowIfNull(userCreateModel);
 
-                var userModelValues = JsonSerializer.Serialize(userCreateModel);
-
-                if (userModelValues == null)
-                    throw new NullReferenceException($"Unable to serialize the userCreateModel to json.");
+                var userModelValues = JsonSerializer.Serialize(userCreateModel) ?? throw new NullReferenceException($"Unable to serialize the userCreateModel to json.");
 
                 HttpContent httpContent = new StringContent(userModelValues.ToString(), Encoding.UTF8, "application/json");
 
@@ -51,21 +46,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<UserCreatedResponseModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult<UserCreatedResponseModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var userCreatedResponseModel = JsonSerializer.Deserialize<UserCreatedResponseModel>(content, _serializerOptions);
                 if (userCreatedResponseModel == null)
-                    throw new NullReferenceException($"Unable to handle the user create response, status code: {response.StatusCode}");
+                    return new ServiceResult<UserCreatedResponseModel>(response.StatusCode, null, $"Unable to handle the user create response, status code: {response.StatusCode}");
 
                 return new ServiceResult<UserCreatedResponseModel>(response.StatusCode, userCreatedResponseModel, $"Successfully added the user: {userCreateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the name: {userCreateModel.Name}, ", ex.Message);
-                return new ServiceResult<UserCreatedResponseModel>(HttpStatusCode.Unused, null, $"Failed to add the user: {userCreateModel.Name}");
+                return new ServiceResult<UserCreatedResponseModel>(HttpStatusCode.Unused, null, $"Failed to add the user: {ex.Message}.");
             }
         }
 
@@ -93,21 +88,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var tokenResponseModel = JsonSerializer.Deserialize<TokenResponseModel>(content, _serializerOptions);
                 if (tokenResponseModel == null)
-                    throw new NullReferenceException($"Unable to handle the Token response, status code: {response.StatusCode}");
+                    return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to handle the Token response, status code: {response.StatusCode}");
 
                 return new ServiceResult<TokenResponseModel>(response.StatusCode, tokenResponseModel, $"Successfully logging in.");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to login, ", ex.Message);
-                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unused, null, $"Failed to login.");
+                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unused, null, $"Failed to login: {ex.Message}.");
             }
         }
 
@@ -135,21 +130,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title} {((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var tokenResponseModel = JsonSerializer.Deserialize<TokenResponseModel>(content, _serializerOptions);
                 if (tokenResponseModel == null)
-                    throw new NullReferenceException($"Unable to handle the Token response, status code: {response.StatusCode}");
+                    return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to handle the Token response, status code: {response.StatusCode}");
 
                 return new ServiceResult<TokenResponseModel>(response.StatusCode, tokenResponseModel, $"Successfully refreshed token.");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to refresh the token, ", ex.Message);
-                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unused, null, $"Failed to refresh token.");
+                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unused, null, $"Failed to refresh token: {ex.Message}.");
             }
         }
 
@@ -177,9 +172,9 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new ServiceResult(response.StatusCode, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($"Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new ServiceResult(response.StatusCode, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 return new ServiceResult(response.StatusCode, $"Successfully revoked the token.");
@@ -187,7 +182,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to revoke token, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.Unused, $"Failed to revoke token.");
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to revoke token: {ex.Message}.");
             }
         }
     }

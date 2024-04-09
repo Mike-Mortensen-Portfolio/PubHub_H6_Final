@@ -60,7 +60,11 @@
 
     protected async override Task OnInitializedAsync()
     {
-        Publishers = await PublisherService.GetPublishersAsync(publisherQuery);
+        var resultPub = await PublisherService.GetPublishersAsync(publisherQuery);
+        if (resultPub != null && resultPub.Instance != null)
+        {
+            Publishers = resultPub.Instance.ToList();
+        }
     }
 
     #region Dialog closing methods.
