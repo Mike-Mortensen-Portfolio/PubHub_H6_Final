@@ -60,7 +60,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var resultPub = await PublisherService.GetPublishersAsync(publisherQuery);
+        var resultPub = await PublisherService.GetAllPublishersAsync(publisherQuery);
         if (resultPub != null && resultPub.Instance != null)
         {
             Publishers = resultPub.Instance.ToList();

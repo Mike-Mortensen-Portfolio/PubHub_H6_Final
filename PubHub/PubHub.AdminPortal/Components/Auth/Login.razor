@@ -60,7 +60,7 @@
         catch (Exception ex)
         {
             Debug.WriteLine("Unable to login, ", ex.Message);
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to login.", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to login. Check your values.", Duration = 5000 });
         }
     }
 }
