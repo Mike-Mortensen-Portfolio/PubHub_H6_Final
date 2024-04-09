@@ -29,7 +29,7 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="PublisherInfoModel"/></returns>
-        public async Task<ServiceResult<IReadOnlyList<PublisherInfoModel>>> GetPublishersAsync(PublisherQuery queryOptions)
+        public async Task<ServiceResult<IReadOnlyList<PublisherInfoModel>>> GetAllPublishersAsync(PublisherQuery queryOptions)
         {
             try
             {
@@ -58,6 +58,33 @@ namespace PubHub.Common.Services
             {
                 Debug.WriteLine("Unable to get publishers:", ex.Message);
                 return new ServiceResult<IReadOnlyList<PublisherInfoModel>>(HttpStatusCode.Unused, null, $"Unable retrieve all publishers: {ex.Message}.");
+            }
+        }
+
+        public async Task<IReadOnlyList<PublisherInfoModel>> GetPublishersAsync(PublisherQuery queryOptions)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(queryOptions);
+
+                HttpResponseMessage response = await Client.GetAsync($"publishers?{queryOptions.ToQuery()}");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
+                    
+                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var publisherInfoModels = JsonSerializer.Deserialize<List<PublisherInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
+                
+                return publisherInfoModels;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unable to get publishers:", ex.Message);
+                return [];
             }
         }
 

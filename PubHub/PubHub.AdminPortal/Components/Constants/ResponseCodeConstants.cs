@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace PubHub.AdminPortal.Components.Models
+namespace PubHub.AdminPortal.Components.Constants
 {
     public static class ResponseCodeConstants
     {

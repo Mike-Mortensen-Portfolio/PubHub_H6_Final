@@ -14,29 +14,34 @@
                 <h4 class="modal-title">Create a new book</h4>
                 <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
             </div>
-            <EditForm Model="bookCreateForm" OnSubmit="() => CreateBook()">
+            <EditForm Model="bookCreateForm" OnValidSubmit="() => CreateBook()">
+                <DataAnnotationsValidator />
                 <div class="modal-body">
                     <div class="form-group mb-2">
                         <label for="createBookTitleInput" class="form-label"><b>Book title:</b></label>
                         <input @bind-value="bookCreateForm.Title" id="createBookTitleInput" class="form-control" placeholder="Type in the book title..." />
                     </div>
+                    <ValidationMessage For="@(() => bookCreateForm.Title)" />
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="createSelectContentType" class="form-label"><b>Content type:</b></label>
-                                <select @onchange="@(async value => { bookCreateForm.ContentTypeId = new Guid(value.Value!.ToString()!); })" id="createSelectContentType" class="form-select">
-                                    <option value="0">Nothing selected</option>
+                                <select required @onchange="@(async value => { bookCreateForm.ContentTypeId = new Guid(value.Value!.ToString()!); })" id="createSelectContentType" class="form-select">
+                                    <option value=""></option>
                                     @foreach (var contentType in contentTypes)
                                     {
                                         <option value="@contentType.Id">@contentType.Name</option>
                                     }
                                 </select>
+                                <ValidationMessage For="@(() => bookCreateForm.ContentTypeId)" />
                             </div>
+
                             <div class="col-md-6">
                                 <label for="createBookContent" class="form-label"><b>Book content:</b></label>
                                 <InputFile OnChange="@BookContentFileChanged" id="createBookContent" class="form-control">Content</InputFile>
                                 <progress class="mt-2" max="100" value="@progressValue"></progress>
                                 <span>@($"{progressValue}%")</span>
+                                <ValidationMessage For="@(() => bookCreateForm.BookContent)" />
                             </div>
                         </div>
                     </div>
@@ -44,21 +49,25 @@
                         <label for="createBookCoverImg" class="form-label"><b>Cover image:</b></label>
                         <InputFile OnChange="@BookCoverImgFileChanged" id="createBookCoverImg" class="form-control">Cover image</InputFile>
                     </div>
+                    <ValidationMessage For="@(() => bookCreateForm.CoverImage)" />
                     <div class="form-group mb-2">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <label for="createBookLength" class="form-label"><b>Book length:</b></label>
-                                <input @bind-value="bookCreateForm.Length" id="createBookLength" class="form-control" placeholder="Type in the length of the book..." />
+                                <input required @bind-value="bookCreateForm.Length" id="createBookLength" type="number" class="form-control" />
+                                <p class="text-dark" style="font-size: 10px;">Please type in the total pages for an e-book or the total seconds for an audio-book.</p>
                             </div>
-                            <div class="col-md-6">
+                            <ValidationMessage For="@(() => bookCreateForm.Length)" />
+                            <div class="col-md-5">
                                 <label for="createIsBookHidden" class="form-label"><b>Accessability:</b></label>
                                 <div class="row">
-                                    <div class="col-md-8 mt-2">
+                                    <div class="col-md-10 mt-2">
                                         <label class="form-label">Should the book be accessable?</label>
                                     </div>
-                                    <div class="col-md-4 mt-2">
+                                    <div class="col-md-2 mt-2">
                                         <input @bind-value="bookCreateForm.IsHidden" id="createIsBookHidden" type="checkbox" class="form-check" />
                                     </div>
+                                    <ValidationMessage For="@(() => bookCreateForm.IsHidden)" />
                                 </div>
                             </div>
                         </div>
@@ -67,6 +76,7 @@
                         <label for="createBookGenres" class="form-label"><b>Genres:</b></label>
                         <RadzenDropDown Data="@genres" TextProperty="Name" ValueProperty="Id" AllowFiltering="true" @bind-Value="multipleGenres" Change="@GenreOnChange" Multiple="true" Placeholder="Select genres" Chips="true" AllowClear="true" Name="DropDownMultipleChips" Style="width: 100%; " />
                     </div>
+                    <ValidationMessage For="@(() => bookCreateForm.Genres)" />
                     <div class="form-group mb-2">
                         <label for="createBookAuthors" class="form-label"><b>Authors:</b></label>
                         @{ int i = 0; }
@@ -83,6 +93,7 @@
                         }
                         <button type="button" class="btn btn-info mt-2" @onclick="AddMoreAuthors">Add another author</button>
                     </div>
+                    <ValidationMessage For="@(() => bookCreateForm.Authors)" />
                     <div class="form-group mb-2">
                         <div class="row">
                             <div class="col-md-6">
@@ -93,6 +104,7 @@
                                 <label for="createPublicationYear" class="form-label"><b>Publication year:</b></label>
                                 <InputDate class="form-control" TValue="DateOnly" @bind-Value:format="dd/MM/yyyy" @bind-Value="@bookCreateForm.PublicationDate"></InputDate>
                             </div>
+                            <ValidationMessage For="@(() => bookCreateForm.PublicationDate)" />
                         </div>
                     </div>
                 </div>
@@ -170,7 +182,7 @@
     {
         var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
 
-        if (multipleGenres != null) { bookCreateForm.GenreIds = multipleGenres.ToList(); }
+        if (multipleGenres != null) { bookCreateForm.Genres = multipleGenres.ToList(); }
     }
 
     async void AddMoreAuthors()
@@ -181,30 +193,44 @@
 
     private async Task CreateBook()
     {
-        bookCreateForm.AuthorIds.Clear();
-        foreach (var authorName in authorNames)
+        try
         {
-            var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
-            if (authorExists == null && authorName != null && authorName != string.Empty)
+            if (bookCreateForm.Authors == null)
             {
-                AuthorCreateModel authorCreateModel = new() { Name = authorName };
-                authorExists = (await AuthorService.AddAuthorAsync(authorCreateModel)).Instance;
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Authors is null, please add at least one author.", Detail = "Error", Duration = 5000 });
+                return;
             }
-            if (authorName != string.Empty && authorExists != null)
+
+            bookCreateForm.Authors.Clear();
+            foreach (var authorName in authorNames)
             {
-                bookCreateForm.AuthorIds.Add(authorExists.Id);
+                var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
+                if (authorExists == null && authorName != null && authorName != string.Empty)
+                {
+                    AuthorCreateModel authorCreateModel = new() { Name = authorName };
+                    authorExists = (await AuthorService.AddAuthorAsync(authorCreateModel)).Instance;
+                }
+                if (authorName != string.Empty && authorExists != null)
+                {
+                    bookCreateForm.Authors.Add(authorExists.Id);
+                }
+            }
+            bookCreateForm.PublisherId = Publisher.Id;
+            var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
+            if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+                await ModalOptions(false);
+            }
+            else
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
             }
         }
-        bookCreateForm.PublisherId = Publisher.Id;
-        var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
-        if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
+        catch (Exception ex)
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
-            await ModalOptions(false);
-        }
-        else
-        {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+            Debug.WriteLine("Unable to login, ", ex.Message);
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to create book, check your values.", Detail = "Error", Duration = 5000 });
         }
     }
 
