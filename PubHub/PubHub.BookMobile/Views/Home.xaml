@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PubHub.BookMobile.Pages.Home"
-             xmlns:pages="clr-namespace:PubHub.BookMobile.Pages"
+             x:Class="PubHub.BookMobile.Views.Home"
+             xmlns:pages="clr-namespace:PubHub.BookMobile.Views"
              xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
              xmlns:auth="clr-namespace:PubHub.BookMobile.Auth"
              x:DataType="viewModels:HomeViewModel"

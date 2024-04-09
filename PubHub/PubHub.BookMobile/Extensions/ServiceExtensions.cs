@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Maui;
-using PubHub.BookMobile.Pages;
-using PubHub.BookMobile.ViewModels;
 using PubHub.BookMobile.Views;
+using PubHub.BookMobile.ViewModels;
 
 namespace PubHub.BookMobile.Extensions
 {

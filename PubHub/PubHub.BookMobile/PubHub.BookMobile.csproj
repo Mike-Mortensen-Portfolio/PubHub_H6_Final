@@ -79,12 +79,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="LoadingShell.xaml.cs">
+	    <DependentUpon>LoadingShell.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="AuthorizedShell.xaml.cs">
 	    <DependentUpon>AuthorizedShell.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="LoadingShell.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="AuthorizedShell.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -95,6 +101,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Library.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\LoadingView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Login.xaml">

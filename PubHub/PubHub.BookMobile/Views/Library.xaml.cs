@@ -5,7 +5,7 @@ using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Genres;
 using static Android.App.DownloadManager;
 
-namespace PubHub.BookMobile.Pages;
+namespace PubHub.BookMobile.Views;
 
 public partial class Library : ContentPage
 {

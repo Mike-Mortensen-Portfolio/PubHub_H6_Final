@@ -5,6 +5,8 @@ using System.Reflection;
 using PubHub.BookMobile.Extensions;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
+using PubHub.BookMobile.Auth;
+using PubHub.Common.Models.Authentication;
 
 namespace PubHub.BookMobile
 {
@@ -34,6 +36,13 @@ namespace PubHub.BookMobile
                     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
                     options.AppId = builder.Configuration.GetSection("ApiSettings").GetValue<string>(ApiConstants.APP_ID) ?? throw new NullReferenceException("Application ID couldn't be found.");
                     options.ConfigureForMobile = true;
+                    options.TokenInfoAsync = (provider) =>
+                    {
+                        if (User.TryGetCachedToken(out TokenInfo? result))
+                            return Task.FromResult(User.GetChachedToken());
+                        return Task.FromResult(new TokenInfo { RefreshToken = string.Empty, Token = string.Empty });
+
+                    };
                 });
 
 #if DEBUG

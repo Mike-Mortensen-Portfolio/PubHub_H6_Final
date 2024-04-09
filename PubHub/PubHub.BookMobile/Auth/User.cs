@@ -60,19 +60,24 @@ namespace PubHub.BookMobile.Auth
             return Preferences.ContainsKey(PreferenceConstants.TOKEN_KEY) && Preferences.ContainsKey(PreferenceConstants.REFRESH_TOKEN_KEY);
         }
 
-        internal static bool GetCachedToken(out TokenInfo? tokens)
+        internal static bool TryGetCachedToken(out TokenInfo? tokens)
         {
             tokens = null;
             if (!HasChachedUser())
                 return false;
 
-            tokens = new TokenInfo
-            {
-                RefreshToken = Preferences.Get(PreferenceConstants.REFRESH_TOKEN_KEY, null),
-                Token = Preferences.Get(PreferenceConstants.TOKEN_KEY, null)
-            };
+            tokens = GetChachedToken();
 
             return true;
+        }
+
+        internal static TokenInfo GetChachedToken()
+        {
+            return new TokenInfo
+            {
+                RefreshToken = Preferences.Get(PreferenceConstants.REFRESH_TOKEN_KEY, null) ?? throw new Exception($"No {PreferenceConstants.REFRESH_TOKEN_KEY} found!"),
+                Token = Preferences.Get(PreferenceConstants.TOKEN_KEY, null) ?? throw new Exception($"No {PreferenceConstants.TOKEN_KEY} found!")
+            };
         }
 
         private static Guid? ExtractGuid(string claimType)

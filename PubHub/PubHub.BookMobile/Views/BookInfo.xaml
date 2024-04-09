@@ -6,7 +6,7 @@
              xmlns:booksModels="clr-namespace:PubHub.Common.Models.Books;assembly=PubHub.Common"
              xmlns:authorModels="clr-namespace:PubHub.Common.Models.Authors;assembly=PubHub.Common"
              xmlns:genreModels="clr-namespace:PubHub.Common.Models.Genres;assembly=PubHub.Common"
-             x:Class="PubHub.BookMobile.Pages.BookInfo"
+             x:Class="PubHub.BookMobile.Views.BookInfo"
              x:DataType="viewModels:BookInfoViewModel"
              Title="{Binding BookListing.Title}">
     <ScrollView>
