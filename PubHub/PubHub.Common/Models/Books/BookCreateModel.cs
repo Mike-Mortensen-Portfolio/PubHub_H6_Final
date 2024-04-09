@@ -5,6 +5,7 @@
         public required Guid ContentTypeId { get; init; }
         public required Guid PublisherId { get; init; }
         public required string Title { get; set; }
+        public required string Summary { get; set; }
         public byte[]? CoverImage { get; set; }
         public required byte[] BookContent { get; set; }
         public required DateOnly PublicationDate { get; init; }

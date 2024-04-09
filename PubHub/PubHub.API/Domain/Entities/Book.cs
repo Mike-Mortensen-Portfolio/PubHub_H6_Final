@@ -6,6 +6,7 @@
         public Guid ContentTypeId { get; set; }
         public Guid PublisherId { get; set; }
         public required string Title { get; set; }
+        public required string Summary { get; set; }
         public byte[]? CoverImage { get; set; }
         public required byte[] BookContent { get; set; }
         public DateOnly PublicationDate { get; set; }

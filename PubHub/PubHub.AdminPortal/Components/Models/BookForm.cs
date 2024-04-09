@@ -11,6 +11,7 @@ namespace PubHub.AdminPortal.Components.Models
         public Guid PublisherId { get; set; }
         [Required]
         public string Title { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
         public byte[]? CoverImage { get; set; }
         [Required]
         public byte[] BookContent { get; set; } = [];
@@ -36,6 +37,7 @@ namespace PubHub.AdminPortal.Components.Models
             return new BookCreateModel()
             {
                 Title = Title,
+                Summary = Summary,
                 Length = Length,
                 PublicationDate = PublicationDate,
                 BookContent = BookContent,
@@ -54,6 +56,7 @@ namespace PubHub.AdminPortal.Components.Models
             return new BookUpdateModel()
             {
                 Title = Title,
+                Summary = Summary,
                 Length = Length,
                 PublicationDate = PublicationDate,
                 BookContent = BookContent,

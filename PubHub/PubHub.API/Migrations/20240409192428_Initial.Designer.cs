@@ -12,7 +12,7 @@ using PubHub.API.Domain;
 namespace PubHub.API.Migrations
 {
     [DbContext(typeof(PubHubContext))]
-    [Migration("20240402175252_Initial")]
+    [Migration("20240409192428_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -236,6 +236,10 @@ namespace PubHub.API.Migrations
 
                     b.Property<Guid>("PublisherId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()

@@ -62,6 +62,7 @@ namespace PubHub.API.Controllers
                         Name = book.Publisher.Name
                     },
                     Title = book.Title,
+                    Summary = book.Summary,
                     Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,
@@ -121,6 +122,7 @@ namespace PubHub.API.Controllers
                     Name = entityBook.Publisher.Name
                 },
                 Title = entityBook.Title,
+                Summary = entityBook.Summary,
                 Genres = entityBook.BookGenres.Select(bookGenres => new GenreInfoModel
                 {
                     Id = bookGenres.GenreId,
@@ -184,7 +186,8 @@ namespace PubHub.API.Controllers
                 Length = createModel.Length,
                 PublicationDate = createModel.PublicationDate,
                 PublisherId = createModel.PublisherId,
-                Title = createModel.Title
+                Title = createModel.Title,
+                Summary = createModel.Summary
             };
 
             foreach (var genreId in createModel.GenreIds)
@@ -274,6 +277,7 @@ namespace PubHub.API.Controllers
                         Name = book.Publisher.Name
                     },
                     Title = book.Title,
+                    Summary = book.Summary,
                     Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,
@@ -428,6 +432,7 @@ namespace PubHub.API.Controllers
                         Name = book.Publisher.Name
                     },
                     Title = book.Title,
+                    Summary = book.Summary,
                     Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,
