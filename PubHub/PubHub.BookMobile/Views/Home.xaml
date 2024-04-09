@@ -4,6 +4,7 @@
              x:Class="PubHub.BookMobile.Pages.Home"
              xmlns:pages="clr-namespace:PubHub.BookMobile.Pages"
              xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
+             xmlns:auth="clr-namespace:PubHub.BookMobile.Auth"
              x:DataType="viewModels:HomeViewModel"
              Title="Home">
 
@@ -18,15 +19,24 @@
                    TextColor="{StaticResource WarmWhite}"
                    Text="{Binding Title}"/>
             <Button Grid.Column="1"
-                    Text="Sign In"
+                    Text="Sign in"
+                    IsVisible="{Binding IsAuthenticated, Converter={StaticResource InvertedBoolConverter}}"
                     FontAttributes="Bold"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
                     Command="{Binding NavigateToPageCommand}"
                     CommandParameter="Login"/>
+            <Button Grid.Column="1"
+                    Text="Sign out"
+                    IsVisible="{Binding IsAuthenticated}"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Command="{Binding NavigateToPageCommand}"
+                    CommandParameter="Logout"/>
         </Grid>
     </Shell.TitleView>
-    
+
     <ScrollView>
         <StackLayout Margin="0,20,0,0"
                      Orientation="Vertical"

@@ -20,6 +20,8 @@ namespace PubHub.BookMobile.ViewModels
         private bool _isGenreVisible = false;
         [ObservableProperty]
         private BookQuery _query;
+        [ObservableProperty]
+        private bool _isAuthenticated;
 
         public LibraryViewModel(IBookService bookService, IGenreService genreService)
         {

@@ -1,9 +1,14 @@
 ﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using PubHub.BookMobile.Auth;
 
 namespace PubHub.BookMobile.ViewModels
 {
     public partial class HomeViewModel : NavigationObject
     {
+        [ObservableProperty]
+        private bool _isAuthenticated;
+
         public ObservableCollection<Item> Items { get; } =
         [
             new Item
@@ -26,7 +31,7 @@ namespace PubHub.BookMobile.ViewModels
             },
         ];
     }
-    
+
     public class Item
     {
         public string? ImageUrl { get; set; }
