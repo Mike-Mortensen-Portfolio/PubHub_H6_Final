@@ -23,6 +23,7 @@ builder.Services.AddPubHubServices(options =>
 {
     options.Address = builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT) ?? throw new NullReferenceException("API base address couldn't be found.");
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
+    options.AppId = builder.Configuration.GetValue<string>(ApiConstants.APP_ID) ?? throw new NullReferenceException("Application ID couldn't be found.");
 });
 
 builder.Services.AddAuthorization(options =>

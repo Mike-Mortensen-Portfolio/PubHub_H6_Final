@@ -14,5 +14,9 @@
         /// Whether services (incl. the <see cref="HttpClient"/>) should be configured for use on mobile.
         /// </summary>
         public bool ConfigureForMobile { get; set; } = false;
+        /// <summary>
+        /// Unique identifier for the current application. Used to authenticate the application on the PubHub API.
+        /// </summary>
+        public string AppId { get; set; } = string.Empty;
     }
 }
