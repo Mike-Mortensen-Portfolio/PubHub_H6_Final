@@ -32,6 +32,7 @@ namespace PubHub.BookMobile
                 {
                     options.Address = builder.Configuration.GetSection("ApiSettings").GetValue<string>(ApiConstants.API_ENDPOINT) ?? throw new NullReferenceException("API base address couldn't be found.");
                     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
+                    options.AppId = builder.Configuration.GetSection("ApiSettings").GetValue<string>(ApiConstants.APP_ID) ?? throw new NullReferenceException("Application ID couldn't be found.");
                     options.ConfigureForMobile = true;
                 });
 

@@ -5,7 +5,6 @@ using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace PubHub.API.Domain.Auth
 {
@@ -64,7 +63,7 @@ namespace PubHub.API.Domain.Auth
         /// <returns>JWT token; otherwise <see cref="string.Empty"/>.</returns>
         private string CreateToken(Account account, Guid subjectId)
         {
-            var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authOptions.Key)), SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(_authOptions.SigningKey, SecurityAlgorithms.HmacSha256);
             var claims = BuildClaimsAsync(account, subjectId);
             var jwt = GetJwtToken(signingCredentials, claims);
 

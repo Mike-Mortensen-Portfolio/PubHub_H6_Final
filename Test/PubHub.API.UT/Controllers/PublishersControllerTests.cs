@@ -1,10 +1,13 @@
-﻿using AutoFixture;
+﻿using System.Diagnostics;
+using AutoFixture;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using PubHub.API.Controllers;
+using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Identity;
 using PubHub.API.UT.Extensions;
@@ -21,7 +24,17 @@ namespace PubHub.API.UT.Controllers
         public PublishersControllerTests(DatabaseFixture databaseFixture, ApiDataGeneratorFixture apiDataGeneratorFixture)
             : base(databaseFixture, apiDataGeneratorFixture)
         {
-            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, Substitute.For<UserManager<Account>>());
+            var userManager = Substitute.For<UserManager<Account>>(
+                Substitute.For<IUserStore<Account>>(),
+                Substitute.For<IOptions<IdentityOptions>>(),
+                Substitute.For<IPasswordHasher<Account>>(),
+                Substitute.For<IEnumerable<IUserValidator<Account>>>(),
+                Substitute.For<IEnumerable<IPasswordValidator<Account>>>(),
+                Substitute.For<ILookupNormalizer>(),
+                Substitute.For<IdentityErrorDescriber>(),
+                Substitute.For<IServiceProvider>(),
+                Substitute.For<ILogger<UserManager<Account>>>());
+            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager, Substitute.For<WhitelistService>());
         }
 
         //[Fact]
@@ -32,7 +45,7 @@ namespace PubHub.API.UT.Controllers
             var publisher = Fixture.Create<PublisherCreateModel>();
 
             // Act.
-            var result = await _controller.AddPublisherAsync(publisher);
+            var result = await _controller.AddPublisherAsync(publisher, string.Empty); // TODO (SIA): Create internal ID.
 
             // Assert.
             var response = Assert.IsAssignableFrom<Created<PublisherInfoModel>>(result);
@@ -53,7 +66,7 @@ namespace PubHub.API.UT.Controllers
             var expectedModel = expectedPublisher.ToInfo();
 
             // Act.
-            var result = await _controller.GetPublisherAsync(expectedPublisher.Id);
+            var result = await _controller.GetPublisherAsync(expectedPublisher.Id, string.Empty); // TODO (SIA): Create internal ID.
 
             // Assert.
             var response = Assert.IsAssignableFrom<Ok<PublisherInfoModel>>(result);
@@ -79,7 +92,7 @@ namespace PubHub.API.UT.Controllers
             };
 
             // Act.
-            var result = await _controller.GetPublishersAsync(query);
+            var result = await _controller.GetPublishersAsync(query, string.Empty); // TODO (SIA): Create internal ID.
 
             // Assert.
             var response = Assert.IsAssignableFrom<Ok<PublisherInfoModel[]>>(result);

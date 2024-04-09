@@ -22,6 +22,7 @@ namespace PubHub.API.Controllers
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class AuthController : Controller
     {
@@ -29,21 +30,26 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context;
         private readonly UserManager<Account> _userManager;
         private readonly AuthService _authService;
+        private readonly WhitelistService _whitelistService;
 
-        public AuthController(ILogger<AuthController> logger, PubHubContext context, UserManager<Account> userManager, AuthService authService)
+        public AuthController(ILogger<AuthController> logger, PubHubContext context, UserManager<Account> userManager, AuthService authService, WhitelistService whitelistService)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _authService = authService;
+            _whitelistService = whitelistService;
         }
 
         [HttpPost("user")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
-        public async Task<IResult> RegisterUserAsync([FromBody] UserCreateModel userCreateModel)
+        public async Task<IResult> RegisterUserAsync([FromBody] UserCreateModel userCreateModel, [FromHeader] string appId)
         {
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+                return problem;
+
             // TODO (SIA): Validate model.
 
             // Check if user already exists.
@@ -162,8 +168,11 @@ namespace PubHub.API.Controllers
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password)
+        public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password, [FromHeader] string appId)
         {
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+                return problem;
+
             if (!ModelState.IsValid)
             {
                 return Results.Problem(
@@ -229,8 +238,11 @@ namespace PubHub.API.Controllers
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken)
+        public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+                return problem;
+
             // Read expired token.
             JwtSecurityToken jwt = new(expiredToken);
 
@@ -355,8 +367,11 @@ namespace PubHub.API.Controllers
         [HttpPost("revoke")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken)
+        public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
+            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+                return problem;
+
             // Read expired token.
             JwtSecurityToken jwt = new(token);
 

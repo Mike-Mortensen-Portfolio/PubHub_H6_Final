@@ -1,4 +1,6 @@
-﻿namespace PubHub.Common.ApiService
+﻿using PubHub.Common.Models.Authentication;
+
+namespace PubHub.Common.ApiService
 {
     public class ApiOptions
     {
@@ -14,5 +16,13 @@
         /// Whether services (incl. the <see cref="HttpClient"/>) should be configured for use on mobile.
         /// </summary>
         public bool ConfigureForMobile { get; set; } = false;
+        /// <summary>
+        /// Unique identifier for the current application. Used to authenticate the application on the PubHub API.
+        /// </summary>
+        public string AppId { get; set; } = string.Empty;
+        /// <summary>
+        /// Get the current access and refresh token.
+        /// </summary>
+        public Func<IServiceProvider, Task<TokenInfo>> TokenInfoAsync { get; set; } = null!;
     }
 }
