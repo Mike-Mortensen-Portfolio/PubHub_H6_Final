@@ -41,9 +41,9 @@ namespace PubHub.AdminPortal.Components.Auth
                     var expireClaim = long.Parse(claimsPrincipal.FindFirst("exp")?.Value ?? "0");
 
                     var utcExpire = DateTimeOffset.FromUnixTimeSeconds(expireClaim);
-                    var expiredate = utcExpire.DateTime;
-                    // If the token has expired, then we want to refresh the token and update the existing token and refresh token in our local storage.
-                    if (expiredate < DateTime.UtcNow)
+                    var refreshdate = utcExpire.DateTime.Subtract(TimeSpan.FromMinutes(12));
+                    // If the token has expires in 5 minutes, then we want to refresh the token and update the existing token and refresh token in our local storage.
+                    if (refreshdate < DateTime.UtcNow)
                     {
                         var tokenResponse = await _authenticationService.RefreshesTokenAsync();
                         if (tokenResponse != null && tokenResponse.Instance != null)
