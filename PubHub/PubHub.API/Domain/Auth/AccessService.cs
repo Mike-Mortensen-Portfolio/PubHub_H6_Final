@@ -1,18 +1,21 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using PubHub.API.Controllers.Problems;
+using PubHub.API.Domain.Services;
 
 namespace PubHub.API.Domain.Auth
 {
-    public class WhitelistService
+    public class AccessService
     {
         private readonly WhitelistOptions _whitelistOptions;
-        private readonly Func<IResult> _unauthorizedResult = () => Results.Problem(statusCode: UnauthorizedSpecification.STATUS_CODE, title: UnauthorizedSpecification.TITLE, detail: "Unauthorized access to resource.");
+        private readonly TypeLookupService _typeLookupService;
 
-        public WhitelistService(IOptions<WhitelistOptions> whitelistOptions)
+        public AccessService(IOptions<WhitelistOptions> whitelistOptions, TypeLookupService typeLookupService)
         { 
             _whitelistOptions = whitelistOptions.Value;
+            _typeLookupService = typeLookupService;
         }
 
         /// <summary>
@@ -27,7 +30,7 @@ namespace PubHub.API.Domain.Auth
         {
             if (string.IsNullOrEmpty(controllerName) || string.IsNullOrEmpty(methodName))
             {
-                problem = _unauthorizedResult.Invoke();
+                problem = ProblemResults.UnauthorizedResult();
 
                 return false;
             }
@@ -40,7 +43,7 @@ namespace PubHub.API.Domain.Auth
             // No application with the given ID is on the whitelist.
             if (appWhitelist == null)
             {
-                problem = _unauthorizedResult.Invoke();
+                problem = ProblemResults.UnauthorizedResult();
 
                 return false;
             }
@@ -48,7 +51,7 @@ namespace PubHub.API.Domain.Auth
             // The application is not allowed in the given controller.
             if (!appWhitelist.ControllerEndpoints.TryGetValue(controllerName, out IEnumerable<string>? allowedEndpoints))
             {
-                problem = _unauthorizedResult.Invoke();
+                problem = ProblemResults.UnauthorizedResult();
 
                 return false;
             }
@@ -56,7 +59,7 @@ namespace PubHub.API.Domain.Auth
             // The application is not allowed on the given endpoint.
             if (!allowedEndpoints.Contains(methodName))
             {
-                problem = _unauthorizedResult.Invoke();
+                problem = ProblemResults.UnauthorizedResult();
 
                 return false;
             }
@@ -65,5 +68,14 @@ namespace PubHub.API.Domain.Auth
 
             return true;
         }
+
+        /// <summary>
+        /// Create an <see cref="AccessResult"/> ready to apply verification to with allow methods from <see cref="AccessResultExtensions"/>.
+        /// End verification with <see cref="AccessResultExtensions.TryVerify(AccessResult, out IResult?)"/>.
+        /// </summary>
+        /// <param name="principal">Subject to verify access for.</param>
+        /// <returns><see cref="AccessResult"/> for <paramref name="principal"/>.</returns>
+        public AccessResult SubjectAccess(ClaimsPrincipal principal) =>
+            new(principal, _typeLookupService);
     }
 }

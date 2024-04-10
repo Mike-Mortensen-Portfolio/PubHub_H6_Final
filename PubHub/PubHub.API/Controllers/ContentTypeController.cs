@@ -17,19 +17,19 @@ namespace PubHub.API.Controllers
     public class ContentTypesController : ControllerBase
     {
         private readonly PubHubContext _context;
-        private readonly WhitelistService _whitelistService;
+        private readonly AccessService _accessService;
 
-        public ContentTypesController(PubHubContext context, WhitelistService whitelistService)
+        public ContentTypesController(PubHubContext context, AccessService accessService)
         {
             _context = context;
-            _whitelistService = whitelistService;
+            _accessService = accessService;
         }
 
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<ContentTypeInfoModel>))]
         public async Task<IResult> GetContentTypesAsync([FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var contentTypes = await _context.Set<Domain.Entities.ContentType>()

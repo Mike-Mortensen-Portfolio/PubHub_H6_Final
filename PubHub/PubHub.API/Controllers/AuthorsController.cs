@@ -21,20 +21,20 @@ namespace PubHub.API.Controllers
     {
         private readonly ILogger<AuthorsController> _logger;
         private readonly PubHubContext _context;
-        private readonly WhitelistService _whitelistService;
+        private readonly AccessService _accessService;
 
-        public AuthorsController(ILogger<AuthorsController> logger, PubHubContext context, WhitelistService whitelistService)
+        public AuthorsController(ILogger<AuthorsController> logger, PubHubContext context, AccessService accessService)
         {
             _logger = logger;
             _context = context;
-            _whitelistService = whitelistService;
+            _accessService = accessService;
         }
 
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<AuthorInfoModel>))]
         public async Task<IResult> GetAuthorsAsync([FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var authors = await _context.Set<Author>()
@@ -53,7 +53,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetAuthorAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var author = await _context.Set<Author>()
@@ -82,7 +82,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AuthorInfoModel))]
         public async Task<IResult> AddAuthorAsync([FromBody] AuthorCreateModel authorModel, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var entityAuthor = await _context.Set<Author>()
@@ -132,7 +132,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteAuthorAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             var entityAuthor = await _context.Set<Author>()

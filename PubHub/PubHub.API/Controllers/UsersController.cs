@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
+using PubHub.API.Domain.Services;
 using PubHub.Common;
 using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
@@ -24,11 +26,20 @@ namespace PubHub.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
-    public sealed class UsersController(ILogger<UsersController> logger, PubHubContext context, WhitelistService whitelistService) : Controller
+    public sealed class UsersController : Controller
     {
-        private readonly ILogger<UsersController> _logger = logger;
-        private readonly PubHubContext _context = context;
-        private readonly WhitelistService _whitelistService = whitelistService;
+        private readonly ILogger<UsersController> _logger;
+        private readonly PubHubContext _context;
+        private readonly AccessService _accessService;
+        private readonly TypeLookupService _typeLookupService;
+
+        public UsersController(ILogger<UsersController> logger, PubHubContext context, AccessService accessService, TypeLookupService typeLookupService)
+        {
+            _logger = logger;
+            _context = context;
+            _accessService = accessService;
+            _typeLookupService = typeLookupService;
+        }
 
         /// <summary>
         /// Get all general information about a specific user.
@@ -41,12 +52,30 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
+                return applicationAccessProblem;
+
+            if (!_accessService.SubjectAccess(User)
+                .AllowUser(id)
+                .AllowOperator()
+                .TryVerify(out IResult? subjectAccessProblem))
+                return subjectAccessProblem;
+
+            // Verify user access.
+            var accountTypeId = User.GetAccountTypeId();
+            if (_typeLookupService.IsUser(accountTypeId))
+            {
+                // Only allow users to request their own information.
+                var subjectId = User.GetSubjectId();
+                if (id != subjectId)
+                    return ProblemResults.UnauthorizedResult();
+            }
+            else if (!_typeLookupService.IsOperator(accountTypeId))
+                // Allow any operator.
+                return ProblemResults.UnauthorizedResult();
 
             var userInfo = await _context.GetUserInfoAsync(id);
             if (userInfo == null)
-            {
                 return Results.Problem(
                     statusCode: NotFoundSpecification.STATUS_CODE,
                     title: NotFoundSpecification.TITLE,
@@ -55,7 +84,6 @@ namespace PubHub.API.Controllers
                     {
                         { "Id", id }
                     });
-            }
 
             return Results.Ok(userInfo);
         }
@@ -71,7 +99,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetBooksAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Check if user exists.
@@ -147,7 +175,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UserUpdateModel userUpdateModel, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // TODO (SIA): Validate model.
@@ -213,7 +241,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Get account Id.
@@ -262,7 +290,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IResult> SuspendUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Get account type ID.

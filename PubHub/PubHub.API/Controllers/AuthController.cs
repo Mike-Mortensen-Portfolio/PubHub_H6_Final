@@ -30,15 +30,15 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context;
         private readonly UserManager<Account> _userManager;
         private readonly AuthService _authService;
-        private readonly WhitelistService _whitelistService;
+        private readonly AccessService _accessService;
 
-        public AuthController(ILogger<AuthController> logger, PubHubContext context, UserManager<Account> userManager, AuthService authService, WhitelistService whitelistService)
+        public AuthController(ILogger<AuthController> logger, PubHubContext context, UserManager<Account> userManager, AuthService authService, AccessService accessService)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _authService = authService;
-            _whitelistService = whitelistService;
+            _accessService = accessService;
         }
 
         [HttpPost("user")]
@@ -47,7 +47,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
         public async Task<IResult> RegisterUserAsync([FromBody] UserCreateModel userCreateModel, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // TODO (SIA): Validate model.
@@ -170,7 +170,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             if (!ModelState.IsValid)
@@ -240,7 +240,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Read expired token.
@@ -338,8 +338,8 @@ namespace PubHub.API.Controllers
             if (storedRefreshToken == null || DateTime.UtcNow > storedRefreshToken.Expiration)
             {
                 return Results.Problem(
-                    statusCode: NotFoundSpecification.STATUS_CODE,
-                    title: NotFoundSpecification.TITLE,
+                    statusCode: UnprocessableEntitySpecification.STATUS_CODE,
+                    title: UnprocessableEntitySpecification.TITLE,
                     detail: "No matching refresh token found for account.",
                     extensions: new Dictionary<string, object?>
                     {
@@ -369,7 +369,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Read expired token.
