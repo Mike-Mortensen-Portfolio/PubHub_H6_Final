@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PubHub.Common.ApiService;
+using PubHub.Common.Models.Authentication;
 using PubHub.Common.Services;
 
 namespace PubHub.Common.Extensions
@@ -22,17 +23,31 @@ namespace PubHub.Common.Extensions
             if (apiOptions == null)
                 throw new ArgumentNullException(nameof(services), "Options cannot be empty.");
 
+            services.AddScoped<Func<Task<TokenInfo>>>((sp) => () => apiOptions.TokenInfoAsync.Invoke(sp));
+
             // Add HttpClient for specified platform.
             var uri = new Uri(apiOptions.Address);
             if (apiOptions.ConfigureForMobile)
             {
-                services.AddSingleton<IHttpClientService>(sp => new HttpClientService(new HttpClient() { BaseAddress = uri }));
+                HttpClient httpClient = new() { BaseAddress = uri };
+                httpClient.DefaultRequestHeaders.Add(ApiConstants.APP_ID, apiOptions.AppId);
+                services.AddSingleton<IHttpClientService>(sp => new HttpClientService(
+                    httpClient,
+                    sp.GetRequiredService<Func<Task<TokenInfo>>>()
+                    ));
             }
             else
             {
                 var clientName = apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME;
-                services.AddScoped<IHttpClientService>(sp => new HttpClientService(services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>().CreateClient(clientName)));
-                services.AddHttpClient(clientName, options => { options.BaseAddress = uri; });
+                services.AddScoped<IHttpClientService>(sp => new HttpClientService(
+                    sp.GetRequiredService<IHttpClientFactory>().CreateClient(clientName),
+                    sp.GetRequiredService<Func<Task<TokenInfo>>>()
+                    ));
+                services.AddHttpClient(clientName, options =>
+                {
+                    options.BaseAddress = uri;
+                    options.DefaultRequestHeaders.Add(ApiConstants.APP_ID, apiOptions.AppId);
+                });
             }
 
             return services

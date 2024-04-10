@@ -1,4 +1,7 @@
-﻿namespace PubHub.API.Domain.Auth
+﻿using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+namespace PubHub.API.Domain.Auth
 {
     public class AuthOptions
     {
@@ -7,5 +10,7 @@
         public required int RefreshLifetime { get; init; }
         public required IEnumerable<string> Audiences { get; init; }
         public required string Key {  get; init; }
+
+        public SymmetricSecurityKey SigningKey => new(Encoding.UTF8.GetBytes(Key));
     }
 }
