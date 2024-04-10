@@ -13,7 +13,7 @@
         <ShellContent ContentTemplate="{DataTemplate views:Home}"
                       Route="Home"/>
     </FlyoutItem>
-    
+
     <FlyoutItem Title="Search book">
         <FlyoutItem.FlyoutIcon>
             <FontImageSource FontFamily="IcoFont"
@@ -28,7 +28,7 @@
             <FontImageSource FontFamily="IcoFont"
                              Glyph="{StaticResource AddressBook}"/>
         </FlyoutItem.FlyoutIcon>
-        <ShellContent ContentTemplate="{DataTemplate views:Library}"
-                      Route="Library"/>
+        <ShellContent ContentTemplate="{DataTemplate views:Profile}"
+                      Route="Profile"/>
     </FlyoutItem>
 </Shell>

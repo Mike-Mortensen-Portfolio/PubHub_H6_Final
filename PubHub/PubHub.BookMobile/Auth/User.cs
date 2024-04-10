@@ -34,7 +34,6 @@ namespace PubHub.BookMobile.Auth
 
         private static ClaimsPrincipal? GetIdentity(string token)
         {
-
             var handler = new JwtSecurityTokenHandler();
             if (!handler.CanReadToken(token))
                 return null;
@@ -84,7 +83,7 @@ namespace PubHub.BookMobile.Auth
         {
             var claim = ExtractClaim(claimType);
 
-            if (Guid.TryParse(claim, out Guid result))
+            if (!Guid.TryParse(claim, out Guid result))
                 return null;
 
             return result;

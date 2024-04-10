@@ -19,46 +19,46 @@ namespace PubHub.BookMobile
         protected override async void OnStart()
         {
             base.OnStart();
-            if (!User.TryGetCachedToken(out TokenInfo? result) && result != null)
+            if (!User.TryGetCachedToken(out TokenInfo? result) || result is null)
             {
                 User.Unset();
                 MainPage = new AppShell();
                 return;
             }
 
-            var response = await _authService.RefreshTokenAsync(result!);
+            var response = await _authService.RefreshTokenAsync(result);
 
-            if (!response.IsSuccess && response.Instance is null)
+            if (!response.IsSuccess || response.Instance is null)
             {
                 User.Unset();
                 MainPage = new AppShell();
                 return;
             }
 
-            User.Set(response.Instance!);
+            User.Set(response.Instance);
             MainPage = new AuthorizedShell();
         }
 
         protected override async void OnResume()
         {
             base.OnResume();
-            if (!User.TryGetCachedToken(out TokenInfo? result) && result != null)
+            if (!User.TryGetCachedToken(out TokenInfo? result) || result is null)
             {
                 User.Unset();
                 MainPage = new AppShell();
                 return;
             }
 
-            var response = await _authService.RefreshTokenAsync(result!);
+            var response = await _authService.RefreshTokenAsync(result);
 
-            if (!response.IsSuccess && response.Instance is null)
+            if (!response.IsSuccess || response.Instance is null)
             {
                 User.Unset();
                 MainPage = new AppShell();
                 return;
             }
 
-            User.Set(response.Instance!);
+            User.Set(response.Instance);
             MainPage = new AuthorizedShell(); MainPage = new AppShell();
         }
     }

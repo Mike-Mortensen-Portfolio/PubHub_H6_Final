@@ -2,14 +2,19 @@
 
 namespace PubHub.Common.Models.Users
 {
-    public class UserUpdateModel(UserInfoModel user)
+    public class UserUpdateModel
     {
-        public required string Name { get; set; } = user.Name;
-        public required string Surname { get; set; } = user.Surname;
-        public required DateOnly Birthday { get; set; } = user.Birthday;
-        public required AccountUpdateModel Account { get; set; } = new()
+        public UserUpdateModel(UserInfoModel user)
         {
-            Email = user.Email
-        };
+            Name = user.Name;
+            Surname = user.Surname;
+            Birthday = user.Birthday;
+            Account = new AccountUpdateModel { Email = user.Email };
+        }
+
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public DateOnly Birthday { get; set; }
+        public AccountUpdateModel Account { get; set; }
     }
 }
