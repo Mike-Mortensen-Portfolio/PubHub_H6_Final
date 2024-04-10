@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
@@ -60,19 +59,6 @@ namespace PubHub.API.Controllers
                 .AllowOperator()
                 .TryVerify(out IResult? subjectAccessProblem))
                 return subjectAccessProblem;
-
-            // Verify user access.
-            var accountTypeId = User.GetAccountTypeId();
-            if (_typeLookupService.IsUser(accountTypeId))
-            {
-                // Only allow users to request their own information.
-                var subjectId = User.GetSubjectId();
-                if (id != subjectId)
-                    return ProblemResults.UnauthorizedResult();
-            }
-            else if (!_typeLookupService.IsOperator(accountTypeId))
-                // Allow any operator.
-                return ProblemResults.UnauthorizedResult();
 
             var userInfo = await _context.GetUserInfoAsync(id);
             if (userInfo == null)

@@ -38,7 +38,7 @@ namespace PubHub.API.Domain.Auth
 
             if (accessResult.TypeLookupService.IsUser(accessResult.AccountTypeId))
             {
-                if (userId != accessResult.SubjectId)
+                if (userId == accessResult.SubjectId)
                     accessResult.Allow();
             }
 

@@ -13,7 +13,7 @@ namespace PubHub.API.Domain.Extensions
         /// <returns><see cref="TokenClaimConstants.ID"/> value; otherwise <see cref="Guid.Empty"/>.</returns>
         public static Guid GetSubjectId(this ClaimsPrincipal claimsPrincipal)
         {
-            if (Guid.TryParse(claimsPrincipal.Claims.FirstOrDefault(c => c.Type == TokenClaimConstants.ID)?.Value, out var subjectId))
+            if (Guid.TryParse(claimsPrincipal.FindFirstValue(TokenClaimConstants.ID), out var subjectId))
             {
                 return subjectId;
             }
@@ -28,7 +28,7 @@ namespace PubHub.API.Domain.Extensions
         /// <returns><see cref="TokenClaimConstants.ACCOUNT_TYPE"/> value; otherwise <see cref="Guid.Empty"/>.</returns>
         public static Guid GetAccountTypeId(this ClaimsPrincipal claimsPrincipal)
         {
-            if (Guid.TryParse(claimsPrincipal.Claims.FirstOrDefault(c => c.Type == TokenClaimConstants.ACCOUNT_TYPE)?.Value, out var accountTypeId))
+            if (Guid.TryParse(claimsPrincipal.FindFirstValue(TokenClaimConstants.ACCOUNT_TYPE), out var accountTypeId))
             {
                 return accountTypeId;
             }
