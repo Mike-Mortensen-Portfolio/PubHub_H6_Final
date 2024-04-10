@@ -43,12 +43,7 @@ namespace PubHub.Common.Services
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> PostAsync(string uri, HttpContent? httpContent = null)
         {
-            CheckNetwork();
-
-            var tokenInfo = await _tokenInfoAsync.Invoke();
-            _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
-            //_client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
-            httpContent?.Headers.Add("refreshToken", tokenInfo.RefreshToken);
+            CheckNetwork();            
 
             return await Policy
                 .HandleResult(_retryPredicate)
@@ -58,7 +53,11 @@ namespace PubHub.Common.Services
                 })
                 .ExecuteAsync(async () =>
                 {
-                    Debug.WriteLine($"{nameof(PostAsync)}: {_client.BaseAddress}{uri}");                    
+                    Debug.WriteLine($"{nameof(PostAsync)}: {_client.BaseAddress}{uri}");
+                    var tokenInfo = await _tokenInfoAsync.Invoke();
+                    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
+                    //_client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
+                    httpContent?.Headers.Add("refreshToken", tokenInfo.RefreshToken);
                     return await _client.PostAsync(uri, httpContent);
                 });
         }
