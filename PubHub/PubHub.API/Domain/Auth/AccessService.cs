@@ -75,7 +75,7 @@ namespace PubHub.API.Domain.Auth
         /// </summary>
         /// <param name="principal">Subject to verify access for.</param>
         /// <returns><see cref="AccessResult"/> for <paramref name="principal"/>.</returns>
-        public AccessResult SubjectAccess(ClaimsPrincipal principal) =>
-            new(principal, _typeLookupService);
+        public AccessResult Access(ClaimsPrincipal principal, string appId) =>
+            new(principal, appId, _typeLookupService);
     }
 }

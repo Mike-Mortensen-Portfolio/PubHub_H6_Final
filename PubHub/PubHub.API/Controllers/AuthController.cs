@@ -47,8 +47,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
         public async Task<IResult> RegisterUserAsync([FromBody] UserCreateModel userCreateModel, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
+                return applicationAccessProblem;
 
             // TODO (SIA): Validate model.
 
@@ -170,8 +170,11 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.Access(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .CheckWhitelistSubject()
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             if (!ModelState.IsValid)
             {
@@ -240,8 +243,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
+                return applicationAccessProblem;
 
             // Read expired token.
             JwtSecurityToken jwt = new(expiredToken);
@@ -369,8 +372,8 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
+                return applicationAccessProblem;
 
             // Read expired token.
             JwtSecurityToken jwt = new(token);

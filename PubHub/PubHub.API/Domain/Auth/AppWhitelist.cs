@@ -3,6 +3,7 @@
     public class AppWhitelist
     {
         public required string AppId { get; init; }
+        public required IEnumerable<string> Subjects { get; init; }
         public required IDictionary<string, IEnumerable<string>> ControllerEndpoints { get; init; }
     }
 }

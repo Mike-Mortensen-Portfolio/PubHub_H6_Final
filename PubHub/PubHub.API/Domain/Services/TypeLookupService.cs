@@ -15,5 +15,8 @@ namespace PubHub.API.Domain.Services
 
         public bool IsOperator(Guid accountTypeId) => _context.Set<AccountType>()
             .Any(at => at.Name == AccountTypeConstants.OPERATOR_ACCOUNT_TYPE && at.Id == accountTypeId);
+
+        public string? GetAccountTypeName(Guid accountTypeId) => _context.Set<AccountType>()
+            .FirstOrDefault(at => at.Id == accountTypeId)?.Name;
     }
 }
