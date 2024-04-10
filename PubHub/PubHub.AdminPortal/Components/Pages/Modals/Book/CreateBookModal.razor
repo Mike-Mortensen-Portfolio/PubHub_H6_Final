@@ -83,7 +83,7 @@
                         @foreach (var authorName in authorNames)
                         {
                             var index = i++;
-                            <InputText @bind-Value="@authorNames[index]" type="text" class="form-control mt-2" list="authorList" placeholder="Type in author name..." />
+                            <InputText @bind-Value="@authorNames[index]" @onkeyup="@OnAuthorChange" type="text" class="form-control mt-2" list="authorList" placeholder="Type in author name..." />
                             <datalist id="authorList">
                                 @foreach (var author in authors)
                                 {
@@ -178,6 +178,24 @@
         bookCreateForm.CoverImage = await FileHandler.FileToByteArray(inputFileChange.File);
     }
 
+    private async Task OnAuthorChange()
+    {
+        bookCreateForm.Authors = new();
+        foreach (var authorName in authorNames)
+        {
+            var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
+            if (authorExists == null && authorName != null && authorName != string.Empty)
+            {
+                AuthorCreateModel authorCreateModel = new() { Name = authorName };
+                authorExists = (await AuthorService.AddAuthorAsync(authorCreateModel)).Instance;
+            }
+            if (authorName != string.Empty && authorExists != null)
+            {
+                bookCreateForm.Authors.Add(authorExists.Id);
+            }
+        }
+    }
+
     void GenreOnChange(object genre)
     {
         var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
@@ -201,20 +219,6 @@
                 return;
             }
 
-            bookCreateForm.Authors.Clear();
-            foreach (var authorName in authorNames)
-            {
-                var authorExists = authors.Where(x => x.Name == authorName).FirstOrDefault();
-                if (authorExists == null && authorName != null && authorName != string.Empty)
-                {
-                    AuthorCreateModel authorCreateModel = new() { Name = authorName };
-                    authorExists = (await AuthorService.AddAuthorAsync(authorCreateModel)).Instance;
-                }
-                if (authorName != string.Empty && authorExists != null)
-                {
-                    bookCreateForm.Authors.Add(authorExists.Id);
-                }
-            }
             bookCreateForm.PublisherId = Publisher.Id;
             var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
             if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
