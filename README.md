@@ -33,7 +33,7 @@ PubHub also offers the service of Second-party stores and markets to makes a par
 ## Admin portal 
 You will have to add user secrets to enable the Authorization part, as there is in the `Program.cs` a section to add policies. This is used so that we can get the authorized views depending on what account is signing into the application.
 
-User secrets will have to contain the following with your own needed values:
+`appSettings.json` will have to contain the following with your own needed values:
 ```
 {
     "<AccountTypeName>": "<AccountTypeId>"
