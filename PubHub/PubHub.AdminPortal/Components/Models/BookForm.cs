@@ -13,6 +13,9 @@ namespace PubHub.AdminPortal.Components.Models
 
         [Required(ErrorMessage = "Please enter a title for the book.")]
         public string? Title { get; set; }
+        
+        [Required(ErrorMessage = "Please enter a summary of the book.")]
+        public string? Summary { get; set; }
 
         [Required(ErrorMessage = "Please upload a cover image.")]
         public byte[]? CoverImage { get; set; }
@@ -48,6 +51,7 @@ namespace PubHub.AdminPortal.Components.Models
             return new BookCreateModel()
             {
                 Title = Title ?? string.Empty,
+                Summary = Summary ?? string.Empty,
                 Length = Length,
                 PublicationDate = PublicationDate,
                 BookContent = BookContent ?? [],
@@ -66,6 +70,7 @@ namespace PubHub.AdminPortal.Components.Models
             return new BookUpdateModel()
             {
                 Title = Title ?? string.Empty,
+                Summary = Summary ?? string.Empty,
                 Length = Length,
                 PublicationDate = PublicationDate,
                 BookContent = BookContent ?? [],

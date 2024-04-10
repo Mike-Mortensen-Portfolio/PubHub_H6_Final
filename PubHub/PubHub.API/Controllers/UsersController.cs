@@ -117,6 +117,7 @@ namespace PubHub.API.Controllers
                         Name = ub.Book.Publisher!.Name
                     },
                     Title = ub.Book!.Title,
+                    Summary = ub.Book!.Summary,
                     Genres = ub.Book.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,

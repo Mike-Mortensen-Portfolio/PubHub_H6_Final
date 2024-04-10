@@ -9,6 +9,7 @@ namespace PubHub.Common.Models.Books
         public Guid Id { get; init; }
         public required BookPublisherModel Publisher { get; init; } = null!;
         public required string Title { get; set; }
+        public required string Summary { get; set; }
         public byte[]? CoverImage { get; set; }
         public required ContentTypeInfoModel ContentType { get; init; }
         public DateOnly PublicationDate { get; set; }

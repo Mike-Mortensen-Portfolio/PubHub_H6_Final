@@ -71,6 +71,7 @@ namespace PubHub.API.Controllers
                         Name = book.Publisher.Name
                     },
                     Title = book.Title,
+                    Summary = book.Summary,
                     Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,
@@ -133,6 +134,7 @@ namespace PubHub.API.Controllers
                     Name = entityBook.Publisher.Name
                 },
                 Title = entityBook.Title,
+                Summary = entityBook.Summary,
                 Genres = entityBook.BookGenres.Select(bookGenres => new GenreInfoModel
                 {
                     Id = bookGenres.GenreId,
@@ -165,6 +167,7 @@ namespace PubHub.API.Controllers
                     book.Length == createModel.Length &&
                     book.PublicationDate == createModel.PublicationDate &&
                     book.Title == createModel.Title &&
+                    book.Summary == createModel.Summary &&
                     book.BookContent.Equals(createModel.BookContent));
 
             if (existingBook is not null)
@@ -199,7 +202,8 @@ namespace PubHub.API.Controllers
                 Length = createModel.Length,
                 PublicationDate = createModel.PublicationDate,
                 PublisherId = createModel.PublisherId,
-                Title = createModel.Title
+                Title = createModel.Title,
+                Summary = createModel.Summary
             };
 
             foreach (var genreId in createModel.GenreIds)
@@ -271,6 +275,7 @@ namespace PubHub.API.Controllers
                 book.Length == createdBook.Length &&
                 book.PublicationDate == createdBook.PublicationDate &&
                 book.Title == createdBook.Title &&
+                book.Summary == createdBook.Summary &&
                 book.BookContent.Equals(createdBook.BookContent))
                 .Select(book => new BookInfoModel
                 {
@@ -289,6 +294,7 @@ namespace PubHub.API.Controllers
                         Name = book.Publisher.Name
                     },
                     Title = book.Title,
+                    Summary = book.Summary,
                     Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,
@@ -348,6 +354,7 @@ namespace PubHub.API.Controllers
             existingBook.PublicationDate = updateModel.PublicationDate;
             existingBook.PublisherId = updateModel.PublisherId;
             existingBook.Title = updateModel.Title;
+            existingBook.Summary = updateModel.Summary;
 
             if (await _context.SaveChangesAsync() == NO_CHANGES)
             {
@@ -446,6 +453,7 @@ namespace PubHub.API.Controllers
                         Name = book.Publisher.Name
                     },
                     Title = book.Title,
+                    Summary = book.Summary,
                     Genres = book.BookGenres.Select(bookGenres => new GenreInfoModel
                     {
                         Id = bookGenres.GenreId,

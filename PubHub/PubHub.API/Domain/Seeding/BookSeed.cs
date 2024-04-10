@@ -37,6 +37,7 @@ namespace PubHub.API.Domain.Seeding
                     PublicationDate = new DateOnly (2018, 7, 1),
                     PublisherId = _publisherSeed[PUBLISHER_EMAIL].Id,
                     Title = "Exquisite",
+                    Summary = "The exquisite creations embody our best artistic endeavors, and offer a glimpse of the greatness of the civilizations that produced them. Their sheer beauty and charm are enough for us to marvel at, let alone the large sum of resources, efforts and time poured into making them. In this book, we hope to follow our predecessors' footprints in the endless pursuit of exquisite beauty, and to explore the possibilities of how this style might blaze new trails in today's graphic design world."
                 },
                 new Book {
                     Id = UuidValueGenerator.Next(),
@@ -46,7 +47,8 @@ namespace PubHub.API.Domain.Seeding
                     Length = 123,
                     PublicationDate = new DateOnly (2023, 4, 7),
                     PublisherId = _publisherSeed[PUBLISHER2_EMAIL].Id,
-                    Title = "Horse"
+                    Title = "Horse",
+                    Summary = "Kentucky, 1850. An enslaved groom named Jarret and a bay foal forge a bond of understanding that will carry the horse to record-setting victories across the South. When the nation erupts in civil war, an itinerant young artist who has made his name on paintings of the racehorse takes up arms for the Union."
                 },
                 new Book
                 {
@@ -57,7 +59,8 @@ namespace PubHub.API.Domain.Seeding
                     Length = 123,
                     PublicationDate = new DateOnly(2023, 4, 7),
                     PublisherId = _publisherSeed[PUBLISHER2_EMAIL].Id,
-                    Title = "Horse"
+                    Title = "Horse",
+                    Summary = "Kentucky, 1850. An enslaved groom named Jarret and a bay foal forge a bond of understanding that will carry the horse to record-setting victories across the South. When the nation erupts in civil war, an itinerant young artist who has made his name on paintings of the racehorse takes up arms for the Union."
                 }
             ];
 
