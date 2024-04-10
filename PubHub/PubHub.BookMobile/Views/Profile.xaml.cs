@@ -16,6 +16,7 @@ public partial class Profile : ContentPage
 
     protected override async void OnAppearing()
     {
+        _viewModel.NotInEditMode = true;
         await _viewModel.FecthUserCommand.ExecuteAsync(null);
         base.OnAppearing();
     }

@@ -18,83 +18,150 @@
                            FontAttributes="Bold"
                            Text="Personal Information"/>
                     <StackLayout Orientation="Vertical"
-                                 Padding="10,0,10,0">
+                                 Padding="10,0,10,0"
+                                 Spacing="5">
                         <StackLayout Orientation="Horizontal"
-                                     Spacing="5">
+                                     Spacing="5"
+                                     HeightRequest="40">
                             <Label FontAttributes="Bold"
                                    Text="Name:"
                                    WidthRequest="50"
                                    VerticalOptions="Center"/>
-                            <Entry Text="{Binding UserInfo.Name}"
-                                   IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
+                            <Border IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
                                 <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroupList>
-                                        <VisualStateGroup Name="CommonStates">
-                                            <VisualState Name="Normal">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="{x:StaticResource Gray200}"/>
-                                                    <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                            <VisualState Name="Disabled">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="Transparent"/>
-                                                    <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateGroupList>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="{StaticResource Gray200}"/>
+                                                <Setter Property="Stroke" Value="{StaticResource Gray200}"/>
+                                                <Setter Property="StrokeShape" Value="RoundRectangle 5,5"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                <Setter Property="Stroke" Value="Transparent"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
-                            </Entry>
-                            <Entry Text="{Binding UserInfo.Surname}"
-                                   IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
+                                <Entry Text="{Binding Name}"
+                                       IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup Name="CommonStates">
+                                                <VisualState Name="Normal">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Entry>
+                            </Border>
+                            <Border IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
                                 <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroupList>
-                                        <VisualStateGroup Name="CommonStates">
-                                            <VisualState Name="Normal">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="{x:StaticResource Gray200}"/>
-                                                    <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                            <VisualState Name="Disabled">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="Transparent"/>
-                                                    <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateGroupList>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="{StaticResource Gray200}"/>
+                                                <Setter Property="Stroke" Value="{StaticResource Gray200}"/>
+                                                <Setter Property="StrokeShape" Value="RoundRectangle 5,5"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                <Setter Property="Stroke" Value="Transparent"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
-                            </Entry>
+                                <Entry Text="{Binding Surname}"
+                                       IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup Name="CommonStates">
+                                                <VisualState Name="Normal">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Entry>
+                            </Border>
                         </StackLayout>
                         <StackLayout Orientation="Horizontal"
-                                     Spacing="5">
+                                     Spacing="5"
+                                     HeightRequest="40">
                             <Label FontAttributes="Bold"
                                    VerticalOptions="Center"
                                    Text="Email:"
                                    WidthRequest="50"/>
-                            <Entry Text="{Binding UserInfo.Email}"
-                                   IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
+                            <Border IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
                                 <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroupList>
-                                        <VisualStateGroup Name="CommonStates">
-                                            <VisualState Name="Normal">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="{x:StaticResource Gray200}"/>
-                                                    <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                            <VisualState Name="Disabled">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="Transparent"/>
-                                                    <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateGroupList>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="{StaticResource Gray200}"/>
+                                                <Setter Property="Stroke" Value="{StaticResource Gray200}"/>
+                                                <Setter Property="StrokeShape" Value="RoundRectangle 5,5"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                <Setter Property="Stroke" Value="Transparent"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
-                            </Entry>
+                                <Entry Text="{Binding Email}"
+                                       IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup Name="CommonStates">
+                                                <VisualState Name="Normal">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor" Value="{x:StaticResource Gray200}"/>
+                                                        <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                        <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Entry>
+                            </Border>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal"
+                                     Spacing="5">
+                            <Button IsVisible="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}"
+                                    Text="Cancel"
+                                    WidthRequest="80"
+                                    Command="{Binding CancelCommand}"/>
+                            <Button IsVisible="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}"
+                                    Text="Save"
+                                    WidthRequest="80"
+                                    Command="{Binding UpdateCommand}"/>
                         </StackLayout>
                     </StackLayout>
                 </StackLayout>
@@ -110,7 +177,7 @@
                         Text="{Binding Source={x:StaticResource Edit}, StringFormat='{0} Edit Profile'}"
                         WidthRequest="200"
                         HeightRequest="55"
-                        Command="{Binding ToggleEditCommand}"/>
+                        Command="{Binding GoIntoEditModeCommand}"/>
                 <Button FontFamily="IcoFont"
                         FontAttributes="Bold"
                         HorizontalOptions="End"
