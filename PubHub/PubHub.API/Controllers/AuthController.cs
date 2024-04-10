@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using PubHub.API.Controllers.Problems;
 using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
@@ -26,6 +28,7 @@ namespace PubHub.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class AuthController : Controller
     {
+        private const string BEARER_KEY = "Bearer ";
         private readonly ILogger<AuthController> _logger;
         private readonly PubHubContext _context;
         private readonly UserManager<Account> _userManager;
@@ -238,16 +241,31 @@ namespace PubHub.API.Controllers
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> RefreshTokenAsync([FromHeader] string expiredToken, [FromHeader] string refreshToken, [FromHeader] string appId)
-        {
+        public async Task<IResult> RefreshTokenAsync([FromHeader] string authorization, [FromHeader] string refreshToken, [FromHeader] string appId)
+        {         
             if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
             // Read expired token.
-            JwtSecurityToken jwt = new(expiredToken);
+            var rawToken = authorization.Replace(BEARER_KEY, string.Empty);
+
+            JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
+            if (!jwtHandler.CanReadToken(rawToken))
+            {
+                return Results.Problem(
+                    statusCode: BadRequestSpecification.STATUS_CODE,
+                    title: BadRequestSpecification.TITLE,
+                    detail: "Cannot read expired token.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Token" , authorization }
+                    });
+            }
+
+            var jwt = jwtHandler.ReadJwtToken(rawToken);
 
             // Find subject (account holder GUID).
-            var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            var sub = jwt.Claims.FirstOrDefault(c => c.Type == TokenClaimConstants.ID)?.Value;
             if (sub == null)
             {
                 return Results.Problem(
@@ -256,12 +274,12 @@ namespace PubHub.API.Controllers
                     detail: "Unable to extract subject from token.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Token" , expiredToken }
+                        { "Token" , authorization }
                     });
             }
 
             // Find account type ID.
-            var accountType = jwt.Claims.FirstOrDefault(c => c.Type == "accountType")?.Value;
+            var accountType = jwt.Claims.FirstOrDefault(c => c.Type == TokenClaimConstants.ACCOUNT_TYPE)?.Value;
             if (accountType == null)
             {
                 return Results.Problem(
@@ -270,7 +288,7 @@ namespace PubHub.API.Controllers
                     detail: "Unable to extract account type from token.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Token" , expiredToken }
+                        { "Token" , authorization }
                     });
             }
 
@@ -284,8 +302,8 @@ namespace PubHub.API.Controllers
                     detail: "Unable to parse GUID claims.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "sub" , sub },
-                        { "accountType", accountType }
+                        { TokenClaimConstants.ID , sub },
+                        { TokenClaimConstants.ACCOUNT_TYPE, accountType }
                     });
             }
 
@@ -363,20 +381,35 @@ namespace PubHub.API.Controllers
 
             return Results.Accepted(value: new TokenResponseModel(tokenResult.Token, tokenResult.RefreshToken));
         }
-        
+
         [HttpPost("revoke")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> RevokeTokenAsync([FromHeader] string token, [FromHeader] string refreshToken, [FromHeader] string appId)
+        public async Task<IResult> RevokeTokenAsync([FromHeader] string authorization, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
             if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
                 return problem;
 
-            // Read expired token.
-            JwtSecurityToken jwt = new(token);
+            // Read token.
+            var rawToken = authorization.Replace(BEARER_KEY, string.Empty);
+
+            JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
+            if (!jwtHandler.CanReadToken(rawToken))
+            {
+                return Results.Problem(
+                    statusCode: BadRequestSpecification.STATUS_CODE,
+                    title: BadRequestSpecification.TITLE,
+                    detail: "Cannot read token.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Token" , authorization }
+                    });
+            }
+
+            var jwt = jwtHandler.ReadJwtToken(rawToken);
 
             // Find subject (account holder GUID).
-            var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            var sub = jwt.Claims.FirstOrDefault(c => c.Type == TokenClaimConstants.ID)?.Value;
             if (sub == null)
             {
                 return Results.Problem(
@@ -385,12 +418,12 @@ namespace PubHub.API.Controllers
                     detail: "Unable to extract subject from token.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Token" , token }
+                        { "Token" , rawToken }
                     });
             }
 
             // Find account type ID.
-            var accountType = jwt.Claims.FirstOrDefault(c => c.Type == "accountType")?.Value;
+            var accountType = jwt.Claims.FirstOrDefault(c => c.Type == TokenClaimConstants.ACCOUNT_TYPE)?.Value;
             if (accountType == null)
             {
                 return Results.Problem(
@@ -399,7 +432,7 @@ namespace PubHub.API.Controllers
                     detail: "Unable to extract account type from token.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "Token" , token }
+                        { "Token" , rawToken }
                     });
             }
 
@@ -413,8 +446,8 @@ namespace PubHub.API.Controllers
                     detail: "Unable to parse GUID claims.",
                     extensions: new Dictionary<string, object?>
                     {
-                        { "sub" , sub },
-                        { "accountType", accountType }
+                        { TokenClaimConstants.ID , sub },
+                        { TokenClaimConstants.ACCOUNT_TYPE, accountType }
                     });
             }
 

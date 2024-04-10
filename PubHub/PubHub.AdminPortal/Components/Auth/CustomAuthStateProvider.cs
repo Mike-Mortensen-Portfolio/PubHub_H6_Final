@@ -45,7 +45,7 @@ namespace PubHub.AdminPortal.Components.Auth
                     // If the token has expired, then we want to refresh the token and update the existing token and refresh token in our local storage.
                     if (expiredate < DateTime.UtcNow)
                     {
-                        var tokenResponse = await _authenticationService.RefreshTokenAsync(tokenInfo);
+                        var tokenResponse = await _authenticationService.RefreshesTokenAsync();
                         if (tokenResponse != null && tokenResponse.Instance != null)
                         {
                             await _localStorage.SetItemAsync<string>("token", tokenResponse.Instance.Token);

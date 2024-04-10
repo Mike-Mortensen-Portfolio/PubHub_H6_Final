@@ -7,6 +7,6 @@ namespace PubHub.Common
         public const string ID = "sub";
         public const string EMAIL = ClaimTypes.Email;
         public const string ACCOUNT_TYPE = "accountType";
-        public const string AUDIENCE = "aud";
+        public const string AUDIENCE = "aud";        
     }
 }
