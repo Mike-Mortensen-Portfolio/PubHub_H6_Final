@@ -3,9 +3,39 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PubHub.BookMobile.Views.Profile"
              xmlns:models="clr-namespace:PubHub.BookMobile.ViewModels"
+             xmlns:views="clr-namespace:PubHub.BookMobile.Views"
              xmlns:auth="clr-namespace:PubHub.BookMobile.Auth"
              x:DataType="models:ProfileViewModel"
              Title="{Binding FullName}">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions=".5*, .5*"
+              Padding="0,0,20,0">
+            <Label x:DataType="views:Profile"
+                   Grid.Column="0"
+                   VerticalTextAlignment="Center"
+                   FontSize="{StaticResource Subheader}"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource WarmWhite}"
+                   Text="{Binding Title}"/>
+            <Button Grid.Column="1"
+                    Text="Sign in"
+                    IsVisible="{Binding IsAuthenticated, Converter={StaticResource InvertedBoolConverter}}"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Command="{Binding NavigateToPageCommand}"
+                    CommandParameter="Login"/>
+            <Button Grid.Column="1"
+                    Text="Sign out"
+                    IsVisible="{Binding IsAuthenticated}"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Command="{Binding NavigateToPageCommand}"
+                    CommandParameter="Logout"/>
+        </Grid>
+    </Shell.TitleView>
 
     <RefreshView IsRefreshing="{Binding IsBusy}"
                  Command="{Binding FecthUserCommand}">

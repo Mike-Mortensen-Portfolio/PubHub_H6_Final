@@ -14,10 +14,11 @@ namespace PubHub.BookMobile.Extensions
         public static IServiceCollection AddRoutes(this IServiceCollection services)
         {
             services
-                .AddSingletonWithShellRoute<Home, HomeViewModel>("Home")
+                .AddTransient<Home, HomeViewModel>()
 
                 .AddTransientWithShellRoute<Login, LoginViewModel>("Login")
                 .AddTransientWithShellRoute<Logout>("Logout")
+                .AddTransientWithShellRoute<Register,RegisterViewModel>("Register")
                 .AddTransientWithShellRoute<Library, LibraryViewModel>("Library")
                 .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo")
                 .AddTransientWithShellRoute<Profile, ProfileViewModel>("Profile");
