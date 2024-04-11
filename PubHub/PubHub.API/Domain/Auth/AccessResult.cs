@@ -28,14 +28,23 @@ namespace PubHub.API.Domain.Auth
             TypeLookupService = typeLookupService;
         }
 
+        public AccessResult(Guid accountTypeId, string appId, TypeLookupService typeLookupService, WhitelistOptions whiteListOptions)
+        {
+            _whiteListOptions = whiteListOptions;
+            _accountTypeId = accountTypeId;
+            _appId = appId;
+            Principal = null;
+            TypeLookupService = typeLookupService;
+        }
+
         public TypeLookupService TypeLookupService { get; init; }
-        public ClaimsPrincipal Principal { get; init; }
+        public ClaimsPrincipal? Principal { get; init; }
 
         public bool Concluded => _success == false;
         public bool Success => _success ?? false;
 
-        public Guid AccountTypeId => _accountTypeId ??= Principal.GetAccountTypeId();
-        public Guid SubjectId => _subjectId ??= Principal.GetSubjectId();
+        public Guid AccountTypeId => _accountTypeId ??= Principal?.GetAccountTypeId() ?? Guid.Empty;
+        public Guid SubjectId => _subjectId ??= Principal?.GetSubjectId() ?? Guid.Empty;
         public string? SubjectName => _subjectName ??= TypeLookupService.GetAccountTypeName(AccountTypeId);
         /// <summary>
         /// Whitelist for application with <see cref="_appId"/>. Is <see langword="null"/> if the application isn't whitelisted.

@@ -176,6 +176,11 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetTokenAsync([FromBody] LoginInfo loginInfo, [FromHeader] string appId)
         {
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? endpointAccessProblem))
+                return endpointAccessProblem;
+
             if (!ModelState.IsValid)
             {
                 return Results.Problem(
@@ -193,7 +198,20 @@ namespace PubHub.API.Controllers
             var account = await _userManager.FindByEmailAsync(loginInfo.Email);
             if (account != null)
             {
+                if (!_accessService.AccessFor(account.AccountTypeId, appId)
+                    .CheckWhitelistSubject()
+                    .TryVerify(out IResult? accountTypeAccessProblem))
+                    return accountTypeAccessProblem;
+
+                if (await _userManager.IsLockedOutAsync(account))
+                    return Results.Problem(
+                        statusCode: UnauthorizedSpecification.STATUS_CODE,
+                        title: UnauthorizedSpecification.TITLE,
+                        detail: "Account is locked out.");
+
                 passwordIsCorrect = await _userManager.CheckPasswordAsync(account, loginInfo.Password);
+                if (!passwordIsCorrect)
+                    await _userManager.AccessFailedAsync(account);
             }
             if (account == null || !passwordIsCorrect)
             {
@@ -220,12 +238,6 @@ namespace PubHub.API.Controllers
                         { "Id", account.Id }
                     });
             }
-
-            if (!_accessService.AccessFor(User, appId)
-                .CheckWhitelistEndpoint(GetType().Name)
-                .CheckWhitelistSubject(accountTypeName)
-                .TryVerify(out IResult? accessProblem))
-                return accessProblem;
 
             // Create token.
             var tokenResult = await _authService.CreateTokenPairAsync(account, accountTypeName);

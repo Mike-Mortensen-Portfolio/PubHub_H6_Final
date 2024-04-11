@@ -24,5 +24,10 @@ namespace PubHub.API.Domain.Auth
         /// <returns><see cref="AccessResult"/> for <paramref name="principal"/>.</returns>
         public AccessResult AccessFor(ClaimsPrincipal principal, string appId) =>
             new(principal, appId, _typeLookupService, _whitelistOptions);
+
+        /// <inheritdoc cref="AccessFor(ClaimsPrincipal, string)"/>
+        /// <param name="accountTypeId">ID of account type to verify access for.</param>
+        public AccessResult AccessFor(Guid accountTypeId, string appId) =>
+            new(accountTypeId, appId, _typeLookupService, _whitelistOptions);
     }
 }
