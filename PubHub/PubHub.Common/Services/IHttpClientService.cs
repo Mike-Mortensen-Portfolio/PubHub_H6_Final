@@ -13,7 +13,7 @@
         /// Send a POST message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="uri">URI (must NOT start with '/').</param>
-        /// <param name="httpContent">Content of the POST message.</param>
+        /// <param name="content">Content of the POST message.</param>
         /// <returns>HTTP response.</returns>
         public Task<HttpResponseMessage> PostAsync(string uri, string? content = null);
 
@@ -21,7 +21,7 @@
         /// Send a PUT message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="uri">URI (must NOT start with '/').</param>
-        /// <param name="httpContent">Content of the PUT message.</param>
+        /// <param name="content">Content of the PUT message.</param>
         /// <returns>HTTP response.</returns>
         public Task<HttpResponseMessage> PutAsync(string uri, string? content = null);
 
