@@ -51,7 +51,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
         public async Task<IResult> RegisterUserAsync([FromBody] UserCreateModel userCreateModel, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .TryVerify(out IResult? accessResult))
                 return accessResult;
@@ -176,7 +176,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetTokenAsync([FromBody] LoginInfo loginInfo, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .TryVerify(out IResult? endpointAccessProblem))
                 return endpointAccessProblem;
@@ -198,8 +198,9 @@ namespace PubHub.API.Controllers
             var account = await _userManager.FindByEmailAsync(loginInfo.Email);
             if (account != null)
             {
-                if (!_accessService.AccessFor(account.AccountTypeId, appId)
+                if (!_accessService.AccessFor(appId, account.AccountTypeId)
                     .CheckWhitelistSubject()
+                    .AllowAny()
                     .TryVerify(out IResult? accountTypeAccessProblem))
                     return accountTypeAccessProblem;
 
@@ -263,9 +264,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RefreshTokenAsync([FromHeader] string authorization, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .CheckWhitelistSubject()
+                .AllowAny()
                 .TryVerify(out IResult? accessProblem))
                 return accessProblem;
 
@@ -410,9 +412,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> RevokeTokenAsync([FromHeader] string authorization, [FromHeader] string refreshToken, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .CheckWhitelistSubject()
+                .AllowAny()
                 .TryVerify(out IResult? accessProblem))
                 return accessProblem;
 

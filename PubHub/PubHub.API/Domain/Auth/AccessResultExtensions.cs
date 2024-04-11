@@ -69,7 +69,9 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
             }
 
-            accessResult.Allow();
+            // Allow if not validating subject.
+            if (!accessResult.HasSubject)
+                accessResult.Allow();
 
             return accessResult;
         }
@@ -78,7 +80,7 @@ namespace PubHub.API.Domain.Auth
         /// Check if <see cref="AccessResult.SubjectName"/> is included in the <see cref="AccessResult.AppWhitelist"/>.
         /// </summary>
         /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
-        /// <param name="subjectName">Name of subject to use if of <see cref="AccessResult.SubjectName"/> is null.</param>
+        /// <param name="subjectNameFallback">Name of subject to use if <see cref="AccessResult.SubjectName"/> is null.</param>
         /// <returns><paramref name="accessResult"/></returns>
         public static AccessResult CheckWhitelistSubject(this AccessResult accessResult, string? subjectNameFallback = null)
         {
@@ -89,7 +91,9 @@ namespace PubHub.API.Domain.Auth
             if (!(subjectName != null && (accessResult.AppWhitelist?.Subjects.Contains(subjectName) ?? false)))
                 accessResult.Disallow();
 
-            accessResult.Allow();
+            // Allow if not validating subject.
+            if (!accessResult.HasSubject)
+                accessResult.Allow();
 
             return accessResult;
         }
@@ -175,6 +179,22 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
 
             if (accessResult.TypeLookupService.IsOperator(accessResult.AccountTypeId))
+                accessResult.Allow();
+
+            return accessResult;
+        }
+
+        /// <summary>
+        /// Allow any subject, only superseded by the whitelist.
+        /// </summary>
+        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <returns><paramref name="accessResult"/></returns>
+        public static AccessResult AllowAny(this AccessResult accessResult)
+        {
+            if (accessResult.Concluded || accessResult.Success)
+                return accessResult;
+
+            if (accessResult.HasSubject)
                 accessResult.Allow();
 
             return accessResult;
