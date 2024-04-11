@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PubHub.BookMobile.Models;
+using PubHub.Common;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Genres;
 using PubHub.Common.Services;
@@ -250,8 +251,21 @@ namespace PubHub.BookMobile.ViewModels
             Books.Clear();
             IsBusy = true;
 
-            var books = (await _bookService.GetAllBooksAsync(Query)).Instance;
-            foreach (var book in books!)
+            var result = await _bookService.GetAllBooksAsync(Query);
+
+            if (!result.IsSuccess || result.Instance is null)
+            {
+                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                else
+                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+
+                IsBusy = false;
+                return;
+            }
+
+            var books = result.Instance!;
+            foreach (var book in books)
             {
                 var existingBookListing = Books.FirstOrDefault(b => b.Title == book.Title && b.PublicationDate == book.PublicationDate);
 
@@ -292,9 +306,22 @@ namespace PubHub.BookMobile.ViewModels
         {
             IsBusy = true;
             Genres.Clear();
+            
+            var result = await _genreService.GetAllGenresAsync();
 
-            var genres = (await _genreService.GetAllGenresAsync()).Instance;
-            genres = [.. genres!.OrderBy(genre => genre.Name)];
+            if (!result.IsSuccess || result.Instance is null)
+            {
+                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve genres. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                else
+                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve genres. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+
+                IsBusy = false;
+                return;
+            }
+
+            var genres = result.Instance!;
+            genres = [.. genres.OrderBy(genre => genre.Name)];
 
             foreach (var genre in genres)
             {

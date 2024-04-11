@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PubHub.BookMobile.Pages.Login"
-             xmlns:pages="clr-namespace:PubHub.BookMobile.Pages"
+             x:Class="PubHub.BookMobile.Views.Login"
+             xmlns:pages="clr-namespace:PubHub.BookMobile.Views"
              xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
              x:DataType="viewModels:LoginViewModel"
              Title="Login">
@@ -23,9 +23,13 @@
                            VerticalOptions="Center"
                            FontAttributes="Bold"
                            WidthRequest="80"/>
-                    <Entry WidthRequest="200"
-                           Keyboard="Email"
-                           Text="{Binding Email}"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            HeightRequest="30"
+                            Stroke="Transparent">
+                        <Entry WidthRequest="200"
+                               Keyboard="Email"
+                               Text="{Binding Email}"/>
+                    </Border>
                 </StackLayout>
                 <StackLayout Orientation="Horizontal"
                              HeightRequest="40">
@@ -33,9 +37,13 @@
                            VerticalOptions="Center"
                            FontAttributes="Bold"
                            WidthRequest="80"/>
-                    <Entry WidthRequest="200"
-                           IsPassword="True"
-                           Text="{Binding Password}"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            HeightRequest="30"
+                            Stroke="Transparent">
+                        <Entry WidthRequest="200"
+                               IsPassword="True"
+                               Text="{Binding Password}"/>
+                    </Border>
                 </StackLayout>
                 <Button Margin="0,20,0,0"
                         Text="Sign in"

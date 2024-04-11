@@ -13,39 +13,53 @@ namespace PubHub.BookMobile
             InitializeComponent();
             _authService = authService;
 
-            MainPage = new AppShell();
+            MainPage = new LoadingShell();
         }
 
         protected override async void OnStart()
         {
-            if (User.GetCachedToken(out TokenInfo? result) && result != null)
+            base.OnStart();
+            if (!User.TryGetCachedToken(out TokenInfo? result) || result is null)
             {
-                var response = await _authService.RefreshTokenAsync();
-
-                if (response.IsSuccess && response.Instance != null)
-                {
-                    User.Set(response.Instance);
-                    MainPage = new AuthorizedShell();
-                }
+                User.Unset();
+                MainPage = new AppShell();
+                return;
             }
 
-            base.OnStart();
+            var response = await _authService.RefreshTokenAsync();
+
+            if (!response.IsSuccess || response.Instance is null)
+            {
+                User.Unset();
+                MainPage = new AppShell();
+                return;
+            }
+
+            User.Set(response.Instance);
+            MainPage = new AuthorizedShell();
         }
 
         protected override async void OnResume()
         {
-            if (User.GetCachedToken(out TokenInfo? result) && result != null)
+            base.OnResume();
+            if (!User.TryGetCachedToken(out TokenInfo? result) || result is null)
             {
-                var response = await _authService.RefreshTokenAsync();
-
-                if (response.IsSuccess && response.Instance != null)
-                {
-                    User.Set(response.Instance);
-                    MainPage = new AuthorizedShell();
-                }
+                User.Unset();
+                MainPage = new AppShell();
+                return;
             }
 
-            base.OnResume();
+            var response = await _authService.RefreshTokenAsync();
+
+            if (!response.IsSuccess || response.Instance is null)
+            {
+                User.Unset();
+                MainPage = new AppShell();
+                return;
+            }
+
+            User.Set(response.Instance);
+            MainPage = new AuthorizedShell(); MainPage = new AppShell();
         }
     }
 }

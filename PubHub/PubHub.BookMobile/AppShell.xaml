@@ -5,14 +5,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:root="clr-namespace:PubHub.BookMobile"
     x:DataType="root:AppShell"
-    xmlns:pages="clr-namespace:PubHub.BookMobile.Pages">
+    xmlns:views="clr-namespace:PubHub.BookMobile.Views">
 
     <FlyoutItem Title="Home">
         <FlyoutItem.FlyoutIcon>
             <FontImageSource FontFamily="IcoFont"
                              Glyph="{StaticResource Home}"/>
         </FlyoutItem.FlyoutIcon>
-        <ShellContent ContentTemplate="{DataTemplate pages:Home}"
+        <ShellContent ContentTemplate="{DataTemplate views:Home}"
                           Route="Home"/>
     </FlyoutItem>
 
@@ -21,7 +21,7 @@
             <FontImageSource FontFamily="IcoFont"
                              Glyph="{StaticResource Look}"/>
         </FlyoutItem.FlyoutIcon>
-        <ShellContent ContentTemplate="{DataTemplate pages:Library}"
+        <ShellContent ContentTemplate="{DataTemplate views:Library}"
                           Route="Library"/>
     </FlyoutItem>
 </Shell>

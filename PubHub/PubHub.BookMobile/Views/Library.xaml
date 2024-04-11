@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PubHub.BookMobile.Pages.Library"
+             x:Class="PubHub.BookMobile.Views.Library"
              xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
              xmlns:genreModels="clr-namespace:PubHub.Common.Models.Genres;assembly=PubHub.Common"
              xmlns:models="clr-namespace:PubHub.BookMobile.Models"
-             xmlns:pages="clr-namespace:PubHub.BookMobile.Pages"
+             xmlns:views="clr-namespace:PubHub.BookMobile.Views"
              xmlns:auth="clr-namespace:PubHub.BookMobile.Auth"
              Title="Search books"
              x:DataType="viewModels:LibraryViewModel">
@@ -13,7 +13,7 @@
     <Shell.TitleView>
         <Grid ColumnDefinitions=".5*, .5*"
               Padding="0,0,20,0">
-            <Label x:DataType="pages:Library"
+            <Label x:DataType="views:Library"
                    Grid.Column="0"
                    VerticalTextAlignment="Center"
                    FontSize="{StaticResource Subheader}"

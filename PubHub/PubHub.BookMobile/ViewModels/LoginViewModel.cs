@@ -1,6 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
@@ -39,7 +37,7 @@ namespace PubHub.BookMobile.ViewModels
         public async Task SignIn()
         {
             IsBusy = true;
-            var result = await _authService.LoginAsync(new LoginInfo { Email = Email, Password = Password });
+            var result = await _authService.LoginAsync(new LoginInfo { Email = Email!, Password = Password! });
 
             TokenResponseModel tokens;
             if (!result.IsSuccess || result.Instance is null)
