@@ -30,14 +30,12 @@ namespace PubHub.API.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly PubHubContext _context;
         private readonly AccessService _accessService;
-        private readonly TypeLookupService _typeLookupService;
 
-        public UsersController(ILogger<UsersController> logger, PubHubContext context, AccessService accessService, TypeLookupService typeLookupService)
+        public UsersController(ILogger<UsersController> logger, PubHubContext context, AccessService accessService)
         {
             _logger = logger;
             _context = context;
             _accessService = accessService;
-            _typeLookupService = typeLookupService;
         }
 
         /// <summary>
