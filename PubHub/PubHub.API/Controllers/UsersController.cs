@@ -173,6 +173,7 @@ namespace PubHub.API.Controllers
             // Get current entry.
             var user = _context.Set<User>()
                 .Include(u => u.Account)
+                    .ThenInclude(a => a.AccountType)
                 .FirstOrDefault(u => u.Id == id);
             if (user == null)
             {

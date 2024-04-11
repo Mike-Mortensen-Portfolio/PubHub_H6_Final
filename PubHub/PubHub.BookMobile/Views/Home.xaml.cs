@@ -1,10 +1,7 @@
-﻿using Java.Lang;
-using PubHub.BookMobile.Auth;
+﻿using PubHub.BookMobile.Auth;
 using PubHub.BookMobile.ViewModels;
-using PubHub.Common.Models.Authentication;
-using PubHub.Common.Services;
 
-namespace PubHub.BookMobile.Pages;
+namespace PubHub.BookMobile.Views;
 
 public partial class Home : ContentPage
 {

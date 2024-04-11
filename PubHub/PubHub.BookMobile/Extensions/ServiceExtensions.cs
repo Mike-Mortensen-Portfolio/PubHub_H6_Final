@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Maui;
-using PubHub.BookMobile.Pages;
-using PubHub.BookMobile.ViewModels;
 using PubHub.BookMobile.Views;
+using PubHub.BookMobile.ViewModels;
 
 namespace PubHub.BookMobile.Extensions
 {
@@ -20,7 +19,8 @@ namespace PubHub.BookMobile.Extensions
                 .AddTransientWithShellRoute<Login, LoginViewModel>("Login")
                 .AddTransientWithShellRoute<Logout>("Logout")
                 .AddTransientWithShellRoute<Library, LibraryViewModel>("Library")
-                .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo");
+                .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo")
+                .AddTransientWithShellRoute<Profile, ProfileViewModel>("Profile");
 
             return services;
         }

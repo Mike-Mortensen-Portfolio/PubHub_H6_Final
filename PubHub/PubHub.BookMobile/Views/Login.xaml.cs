@@ -1,6 +1,6 @@
 ﻿using PubHub.BookMobile.ViewModels;
 
-namespace PubHub.BookMobile.Pages;
+namespace PubHub.BookMobile.Views;
 
 public partial class Login : ContentPage
 {

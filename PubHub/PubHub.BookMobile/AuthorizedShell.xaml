@@ -3,23 +3,23 @@
     x:Class="PubHub.BookMobile.AuthorizedShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:pages="clr-namespace:PubHub.BookMobile.Pages">
+    xmlns:views="clr-namespace:PubHub.BookMobile.Views">
 
     <FlyoutItem Title="Home">
         <FlyoutItem.FlyoutIcon>
             <FontImageSource FontFamily="IcoFont"
                              Glyph="{StaticResource Home}"/>
         </FlyoutItem.FlyoutIcon>
-        <ShellContent ContentTemplate="{DataTemplate pages:Home}"
+        <ShellContent ContentTemplate="{DataTemplate views:Home}"
                       Route="Home"/>
     </FlyoutItem>
-    
+
     <FlyoutItem Title="Search book">
         <FlyoutItem.FlyoutIcon>
             <FontImageSource FontFamily="IcoFont"
                              Glyph="{StaticResource Look}"/>
         </FlyoutItem.FlyoutIcon>
-        <ShellContent ContentTemplate="{DataTemplate pages:Library}"
+        <ShellContent ContentTemplate="{DataTemplate views:Library}"
                       Route="Library"/>
     </FlyoutItem>
 
@@ -28,7 +28,7 @@
             <FontImageSource FontFamily="IcoFont"
                              Glyph="{StaticResource AddressBook}"/>
         </FlyoutItem.FlyoutIcon>
-        <ShellContent ContentTemplate="{DataTemplate pages:Library}"
-                      Route="Library"/>
+        <ShellContent ContentTemplate="{DataTemplate views:Profile}"
+                      Route="Profile"/>
     </FlyoutItem>
 </Shell>
