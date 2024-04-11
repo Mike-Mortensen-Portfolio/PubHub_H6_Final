@@ -47,8 +47,8 @@ namespace PubHub.AdminPortal.Components.Auth
                         var tokenResponse = await _authenticationService.RefreshTokenAsync();
                         if (tokenResponse != null && tokenResponse.Instance != null)
                         {
-                            await _localStorage.SetItemAsync<string>("token", tokenResponse.Instance.Token);
-                            await _localStorage.SetItemAsync<string>("refreshToken", tokenResponse.Instance.RefreshToken);
+                            await _localStorage.SetItemAsync("token", tokenResponse.Instance.Token);
+                            await _localStorage.SetItemAsync("refreshToken", tokenResponse.Instance.RefreshToken);
                             claimsPrincipal = GetClaims(tokenResponse.Instance.Token);
                         }
                         else
