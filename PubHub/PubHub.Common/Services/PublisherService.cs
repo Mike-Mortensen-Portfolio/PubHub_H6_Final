@@ -61,33 +61,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        public async Task<IReadOnlyList<PublisherInfoModel>> GetPublishersAsync(PublisherQuery queryOptions)
-        {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(queryOptions);
-
-                HttpResponseMessage response = await Client.GetAsync($"publishers?{queryOptions.ToQuery()}");
-                string content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
-                    
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
-                }
-
-                var publisherInfoModels = JsonSerializer.Deserialize<List<PublisherInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
-                
-                return publisherInfoModels;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Unable to get publishers:", ex.Message);
-                return [];
-            }
-        }
-
         /// <summary>
         /// Calls the API endpoint for adding a <see cref="PublisherCreateModel"/> to the database.
         /// </summary>
@@ -103,9 +76,7 @@ namespace PubHub.Common.Services
 
                 var publisherModelValues = JsonSerializer.Serialize(publisherCreateModel) ?? throw new NullReferenceException($"Unable to serialize the publisherCreateModel to json.");
 
-                HttpContent httpContent = new StringContent(publisherModelValues.ToString(), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await Client.PostAsync("publishers", httpContent);
+                HttpResponseMessage response = await Client.PostAsync("publishers", publisherModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -169,34 +140,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        public async Task<IReadOnlyList<BookInfoModel>> GetPublisherBooksAsync(Guid publisherId)
-        {
-            try
-            {
-                if (publisherId == INVALID_ENTITY_ID)
-                    throw new NullReferenceException($"The publisher Id wasn't a valid Id.");
-
-                HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}/books");
-                string content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
-
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
-                }
-
-                var bookInfoModels = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
-
-                return bookInfoModels;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Unable to get publisher's books: {publisherId}", ex.Message);
-                return [];
-            }
-        }
-
         /// <summary>
         /// Calls the API end point for retrieving <see cref="PublisherInfoModel">, to use in the client applications.
         /// </summary>
@@ -256,9 +199,7 @@ namespace PubHub.Common.Services
 
                 var publisherModelValues = JsonSerializer.Serialize(publisherUpdateModel) ?? throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
 
-                HttpContent httpContent = new StringContent(publisherModelValues.ToString(), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await Client.PutAsync($"publishers/{publisherId}", httpContent);
+                HttpResponseMessage response = await Client.PutAsync($"publishers/{publisherId}", publisherModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
