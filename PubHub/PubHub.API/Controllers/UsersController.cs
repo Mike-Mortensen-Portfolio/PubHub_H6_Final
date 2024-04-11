@@ -49,7 +49,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .AllowUser(id)
                 .AllowOperator()
@@ -81,7 +81,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetBooksAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .AllowUser(id)
                 .AllowOperator()
@@ -161,7 +161,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UserUpdateModel userUpdateModel, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .AllowUser(id)
                 .AllowOperator()
@@ -232,7 +232,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .AllowUser(id)
                 .AllowOperator()
@@ -285,7 +285,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IResult> SuspendUserAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .AllowUser(id)
                 .AllowOperator()

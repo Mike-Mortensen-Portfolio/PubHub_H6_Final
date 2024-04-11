@@ -29,7 +29,7 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<ContentTypeInfoModel>))]
         public async Task<IResult> GetContentTypesAsync([FromHeader] string appId)
         {
-            if (!_accessService.AccessFor(User, appId)
+            if (!_accessService.AccessFor(appId)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .TryVerify(out IResult? accessProblem))
                 return accessProblem;

@@ -20,7 +20,7 @@ namespace PubHub.API.Domain.Auth
         private string? _subjectName;
         private AppWhitelist? _appWhitelist;
 
-        public AccessResult(ClaimsPrincipal principal, string appId, TypeLookupService typeLookupService, WhitelistOptions whiteListOptions)
+        public AccessResult(string appId, ClaimsPrincipal principal, TypeLookupService typeLookupService, WhitelistOptions whiteListOptions)
         {
             _whiteListOptions = whiteListOptions;
             _appId = appId;
@@ -28,12 +28,18 @@ namespace PubHub.API.Domain.Auth
             TypeLookupService = typeLookupService;
         }
 
-        public AccessResult(Guid accountTypeId, string appId, TypeLookupService typeLookupService, WhitelistOptions whiteListOptions)
+        public AccessResult(string appId, Guid accountTypeId, TypeLookupService typeLookupService, WhitelistOptions whiteListOptions)
         {
             _whiteListOptions = whiteListOptions;
-            _accountTypeId = accountTypeId;
             _appId = appId;
-            Principal = null;
+            _accountTypeId = accountTypeId;
+            TypeLookupService = typeLookupService;
+        }
+
+        public AccessResult(string appId, TypeLookupService typeLookupService, WhitelistOptions whiteListOptions)
+        {
+            _whiteListOptions = whiteListOptions;
+            _appId = appId;
             TypeLookupService = typeLookupService;
         }
 
@@ -42,6 +48,7 @@ namespace PubHub.API.Domain.Auth
 
         public bool Concluded => _success == false;
         public bool Success => _success ?? false;
+        public bool HasSubject => !(Principal == null && AccountTypeId == Guid.Empty);
 
         public Guid AccountTypeId => _accountTypeId ??= Principal?.GetAccountTypeId() ?? Guid.Empty;
         public Guid SubjectId => _subjectId ??= Principal?.GetSubjectId() ?? Guid.Empty;
