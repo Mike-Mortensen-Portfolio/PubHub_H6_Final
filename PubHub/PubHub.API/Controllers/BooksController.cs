@@ -25,13 +25,13 @@ namespace PubHub.API.Controllers
     {
         private readonly ILogger<BooksController> _logger;
         private readonly PubHubContext _context;
-        private readonly WhitelistService _whitelistService;
+        private readonly AccessService _accessService;
 
-        public BooksController(ILogger<BooksController> logger, PubHubContext context, WhitelistService whitelistService)
+        public BooksController(ILogger<BooksController> logger, PubHubContext context, AccessService accessService)
         {
             _logger = logger;
             _context = context;
-            _whitelistService = whitelistService;
+            _accessService = accessService;
         }
 
         /// <summary>
@@ -42,8 +42,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<BookInfoModel>))]
         public async Task<IResult> GetBooksAsync([FromQuery] BookQuery queryOptions, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var query = _context.Set<Book>()
                 .Include(book => book.ContentType)
@@ -93,8 +95,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetBookAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var query = _context.Set<Book>()
                 .Include(book => book.ContentType)
@@ -156,8 +160,12 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ProblemDetails))]
         public async Task<IResult> AddBookAsync([FromBody] BookCreateModel createModel, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .AllowPublisher(createModel.PublisherId)
+                .AllowOperator()
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var books = _context.Set<Book>();
             var existingBook = await books
@@ -316,8 +324,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
         public async Task<IResult> UpdateBookAsync(Guid id, [FromBody] BookUpdateModel updateModel, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             //  TODO (MSM)  Implement updates on genres and authors
             var books = _context.Set<Book>();
@@ -333,6 +343,12 @@ namespace PubHub.API.Controllers
                     {
                         { "Id", id }
                     });
+
+            if (!_accessService.AccessFor(User, appId)
+                .AllowPublisher(existingBook.PublisherId)
+                .AllowOperator()
+                .TryVerify(out IResult? subjectAccessProblem))
+                return subjectAccessProblem;
 
             var publisher = await _context.Set<Publisher>().FirstOrDefaultAsync(publisher => publisher.Id == updateModel.PublisherId);
 
@@ -474,8 +490,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteBookAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_whitelistService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? problem))
-                return problem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var book = await _context.Set<Book>()
                 .FirstOrDefaultAsync(book => book.Id == id);
@@ -489,6 +507,12 @@ namespace PubHub.API.Controllers
                     {
                         { "Id", id }
                     });
+
+            if (!_accessService.AccessFor(User, appId)
+                .AllowPublisher(book.PublisherId)
+                .AllowOperator()
+                .TryVerify(out IResult? subjectAccessProblem))
+                return subjectAccessProblem;
 
             _context.Set<Book>().Remove(book);
 

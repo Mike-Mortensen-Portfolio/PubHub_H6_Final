@@ -34,7 +34,7 @@ namespace PubHub.API.UT.Controllers
                 Substitute.For<IdentityErrorDescriber>(),
                 Substitute.For<IServiceProvider>(),
                 Substitute.For<ILogger<UserManager<Account>>>());
-            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager, Substitute.For<WhitelistService>());
+            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager, Substitute.For<AccessService>());
         }
 
         //[Fact]

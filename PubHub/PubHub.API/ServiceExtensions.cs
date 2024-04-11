@@ -16,6 +16,7 @@ using PubHub.API.Domain.Identity;
 using Serilog;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authorization;
+using PubHub.API.Domain.Services;
 
 namespace PubHub.API
 {
@@ -48,7 +49,8 @@ namespace PubHub.API
 
             services.Configure<WhitelistOptions>(configuration.GetSection("Whitelist"));
             services.Configure<AuthOptions>(configuration.GetSection("Jwt"));
-            services.AddScoped<WhitelistService>();
+            services.AddScoped<AccessService>();
+            services.AddScoped<TypeLookupService>();
             services.AddScoped<AuthService>();
 
             return services;
@@ -63,6 +65,7 @@ namespace PubHub.API
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateLifetime = true,
