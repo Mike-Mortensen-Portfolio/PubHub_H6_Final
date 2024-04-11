@@ -30,7 +30,7 @@
 
         if (!result.IsSuccess)
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Had trouble logging you out. Try again.", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = $"Had trouble logging you out. Try again or contact PubHub support. Error: {ErrorsCodeConstants.NO_CONNECTION}", Duration = 5000 });
             return;
         }
 

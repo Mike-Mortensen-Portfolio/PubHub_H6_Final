@@ -54,7 +54,7 @@
 
             if (result.Instance == null)
             {
-                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to login in, check your credentials.", Duration = 5000 });
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = $"Unable to login in, check your credentials or contact PubHub support. Error: {ErrorsCodeConstants.NO_CONNECTION}", Duration = 5000 });
                 return;
             }
 
