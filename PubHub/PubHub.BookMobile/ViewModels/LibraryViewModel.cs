@@ -250,9 +250,8 @@ namespace PubHub.BookMobile.ViewModels
             Books.Clear();
             IsBusy = true;
 
-            var books = await _bookService.GetBooksAsync(Query);
-
-            foreach (var book in books)
+            var books = (await _bookService.GetAllBooksAsync(Query)).Instance;
+            foreach (var book in books!)
             {
                 var existingBookListing = Books.FirstOrDefault(b => b.Title == book.Title && b.PublicationDate == book.PublicationDate);
 
@@ -294,8 +293,8 @@ namespace PubHub.BookMobile.ViewModels
             IsBusy = true;
             Genres.Clear();
 
-            var genres = await _genreService.GetGenresAsync();
-            genres = [.. genres.OrderBy(genre => genre.Name)];
+            var genres = (await _genreService.GetAllGenresAsync()).Instance;
+            genres = [.. genres!.OrderBy(genre => genre.Name)];
 
             foreach (var genre in genres)
             {
