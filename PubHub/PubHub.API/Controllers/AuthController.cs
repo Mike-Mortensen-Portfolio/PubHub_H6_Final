@@ -210,7 +210,9 @@ namespace PubHub.API.Controllers
                         detail: "Account is locked out.");
 
                 passwordIsCorrect = await _userManager.CheckPasswordAsync(account, loginInfo.Password);
-                if (!passwordIsCorrect)
+                if (passwordIsCorrect)
+                    await _userManager.ResetAccessFailedCountAsync(account);
+                else
                     await _userManager.AccessFailedAsync(account);
             }
             if (account == null || !passwordIsCorrect)
