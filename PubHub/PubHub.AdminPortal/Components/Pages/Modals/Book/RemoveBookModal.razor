@@ -44,12 +44,12 @@
         var result = await BookService.DeleteBookAsync(BookId);
         if (result.StatusCode == ResponseCodeConstants.OK_CODE)
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = $"Successfully removed the book: {BookTitle}.", Detail = "Success", Duration = 5000 });
             await ModalOptions(false);
         }
         else
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = "Unable to remove a book.", Detail = "Success", Duration = 5000 });
             unsuccessfulResult = true;
         }
     }
