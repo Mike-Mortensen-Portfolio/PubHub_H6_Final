@@ -11,7 +11,7 @@ namespace PubHub.API.Domain.Auth
     /// </summary>
     public class AccessResult
     {
-        private readonly Func<WhitelistOptions> _whiteListOptionsFunc;
+        private readonly WhitelistOptions _whiteListOptions;
         private readonly string _appId;
         
         private bool? _success;
@@ -20,9 +20,9 @@ namespace PubHub.API.Domain.Auth
         private string? _subjectName;
         private AppWhitelist? _appWhitelist;
 
-        public AccessResult(ClaimsPrincipal principal, string appId, TypeLookupService typeLookupService, Func<WhitelistOptions> whiteListOptionsFunc)
+        public AccessResult(ClaimsPrincipal principal, string appId, TypeLookupService typeLookupService, WhitelistOptions whiteListOptions)
         {
-            _whiteListOptionsFunc = whiteListOptionsFunc;
+            _whiteListOptions = whiteListOptions;
             _appId = appId;
             Principal = principal;
             TypeLookupService = typeLookupService;
@@ -36,11 +36,11 @@ namespace PubHub.API.Domain.Auth
 
         public Guid AccountTypeId => _accountTypeId ??= Principal.GetAccountTypeId();
         public Guid SubjectId => _subjectId ??= Principal.GetSubjectId();
-        public string? SubjectName => _subjectName ??= TypeLookupService.GetAccountTypeName(SubjectId);
+        public string? SubjectName => _subjectName ??= TypeLookupService.GetAccountTypeName(AccountTypeId);
         /// <summary>
         /// Whitelist for application with <see cref="_appId"/>. Is <see langword="null"/> if the application isn't whitelisted.
         /// </summary>
-        public AppWhitelist? AppWhitelist => _appWhitelist ??= _whiteListOptionsFunc.Invoke().Apps.Where(a => a.AppId == _appId).FirstOrDefault();
+        public AppWhitelist? AppWhitelist => _appWhitelist ??= _whiteListOptions.Apps.Where(a => a.AppId == _appId).FirstOrDefault();
 
         /// <summary>
         /// Make this <see cref="AccessResult"/> allow access for <see cref="Principal"/>.

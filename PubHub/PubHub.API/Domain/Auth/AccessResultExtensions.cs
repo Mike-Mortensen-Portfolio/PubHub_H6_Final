@@ -69,6 +69,8 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
             }
 
+            accessResult.Allow();
+
             return accessResult;
         }
 
@@ -76,16 +78,20 @@ namespace PubHub.API.Domain.Auth
         /// Check if <see cref="AccessResult.SubjectName"/> is included in the <see cref="AccessResult.AppWhitelist"/>.
         /// </summary>
         /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="subjectName">Name of subject to use if of <see cref="AccessResult.SubjectName"/> is null.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult CheckWhitelistSubject(this AccessResult accessResult)
+        public static AccessResult CheckWhitelistSubject(this AccessResult accessResult, string? subjectNameFallback = null)
         {
             if (accessResult.Concluded)
                 return accessResult;
 
-            if (!(accessResult.SubjectName != null && (accessResult.AppWhitelist?.Subjects.Contains(accessResult.SubjectName) ?? false)))
+            var subjectName = accessResult.SubjectName ?? subjectNameFallback;
+            if (!(subjectName != null && (accessResult.AppWhitelist?.Subjects.Contains(subjectName) ?? false)))
             {
                 accessResult.Disallow();
             }
+
+            accessResult.Allow();
 
             return accessResult;
         }

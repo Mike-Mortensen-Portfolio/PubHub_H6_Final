@@ -34,8 +34,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<AuthorInfoModel>))]
         public async Task<IResult> GetAuthorsAsync([FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var authors = await _context.Set<Author>()
                 .Select(author => new AuthorInfoModel
@@ -53,8 +55,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetAuthorAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var author = await _context.Set<Author>()
                  .Select(author => new AuthorInfoModel
@@ -82,13 +86,11 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AuthorInfoModel))]
         public async Task<IResult> AddAuthorAsync([FromBody] AuthorCreateModel authorModel, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
-
-            if (!_accessService.Access(User)
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
                 .AllowOperator()
-                .TryVerify(out IResult? subjectAccessProblem))
-                return subjectAccessProblem;
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var entityAuthor = await _context.Set<Author>()
                 .FirstOrDefaultAsync(author => author.Name.ToUpper() == authorModel.Name.ToUpper());
@@ -137,13 +139,11 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteAuthorAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
-
-            if (!_accessService.Access(User)
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
                 .AllowOperator()
-                .TryVerify(out IResult? subjectAccessProblem))
-                return subjectAccessProblem;
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var entityAuthor = await _context.Set<Author>()
                 .FirstOrDefaultAsync(author => author.Id == id);

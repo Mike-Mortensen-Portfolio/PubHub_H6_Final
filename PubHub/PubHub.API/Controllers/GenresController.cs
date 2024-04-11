@@ -34,8 +34,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<GenreInfoModel>))]
         public async Task<IResult> GetGenresAsync([FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var genres = await _context.Set<Genre>()
                 .Select(genre => new GenreInfoModel
@@ -53,8 +55,10 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetGenreAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var genre = await _context.Set<Genre>()
                  .Select(genre => new GenreInfoModel
@@ -82,13 +86,11 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenreInfoModel))]
         public async Task<IResult> AddGenreAsync([FromBody] GenreCreateModel genreModel, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
-
-            if (!_accessService.Access(User)
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
                 .AllowOperator()
-                .TryVerify(out IResult? subjectAccessProblem))
-                return subjectAccessProblem;
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var entityGenre = await _context.Set<Genre>()
                 .FirstOrDefaultAsync(genre => genre.Name.ToUpper() == genreModel.Name.ToUpper());
@@ -135,13 +137,11 @@ namespace PubHub.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteGenreAsync(Guid id, [FromHeader] string appId)
         {
-            if (!_accessService.TryVerifyApplicationAccess(appId, GetType().Name, out IResult? applicationAccessProblem))
-                return applicationAccessProblem;
-
-            if (!_accessService.Access(User)
+            if (!_accessService.AccessFor(User, appId)
+                .CheckWhitelistEndpoint(GetType().Name)
                 .AllowOperator()
-                .TryVerify(out IResult? subjectAccessProblem))
-                return subjectAccessProblem;
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
 
             var entityGenre = await _context.Set<Genre>()
                 .FirstOrDefaultAsync(genre => genre.Id == id);
