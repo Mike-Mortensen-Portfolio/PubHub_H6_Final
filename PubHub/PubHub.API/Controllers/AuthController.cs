@@ -349,8 +349,6 @@ namespace PubHub.API.Controllers
                     });
             }
 
-            //var trimmedRefreshToken = refreshToken.Split(",").Select(t => t.Trim()).FirstOrDefault() ?? string.Empty;
-
             // Get stored refresh token matching passed refresh token.
             var storedRefreshToken = await _context.Set<AccountRefreshToken>()
                 .Include(art => art.Account)
