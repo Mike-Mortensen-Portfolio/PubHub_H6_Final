@@ -1,6 +1,8 @@
 ﻿@inject ILocalStorageService LocalStorage;
 @inject CustomAuthStateProvider CustomAuthProvider
 @inject NavigationManager NavigationManager
+@inject Radzen.NotificationService NotificationService
+@inject PubHub.Common.Services.IAuthenticationService AuthenticationService
 
 <AuthorizeView>
     <Authorized>
@@ -24,6 +26,14 @@
 
     async Task SignOut()
     {
+        var result = await AuthenticationService.RevokeTokenAsync();
+
+        if (!result.IsSuccess)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Duration = 5000 });
+            return;
+        }
+
         await LocalStorage.RemoveItemAsync("token");
         await LocalStorage.RemoveItemAsync("refreshToken");
         await CustomAuthProvider.GetAuthenticationStateAsync();
