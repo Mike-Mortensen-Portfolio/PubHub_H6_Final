@@ -1,15 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using System.Reflection;
 using CommunityToolkit.Maui;
-using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using PubHub.BookMobile.Auth;
 using PubHub.BookMobile.Extensions;
+using PubHub.BookMobile.Services;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
-using PubHub.BookMobile.Auth;
 using PubHub.Common.Models.Authentication;
-using Android.Content.Res;
-using Microsoft.Maui.Controls.PlatformConfiguration;
-using static Java.Text.Normalizer;
 
 namespace PubHub.BookMobile
 {
@@ -47,13 +45,11 @@ namespace PubHub.BookMobile
                     };
                 });
 
-            //  Remove underline from entries on Android
-            Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(nameof(Entry), (handler, view) => handler.PlatformView.BackgroundTintList = ColorStateList.ValueOf(Android.Graphics.Color.Transparent));
+            MauiHandlerService.AppendCustomMapping();
 
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-
 
             return builder.Build();
         }

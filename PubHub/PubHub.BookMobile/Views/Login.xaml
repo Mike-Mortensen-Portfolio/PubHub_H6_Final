@@ -23,9 +23,13 @@
                            VerticalOptions="Center"
                            FontAttributes="Bold"
                            WidthRequest="80"/>
-                    <Entry WidthRequest="200"
-                           Keyboard="Email"
-                           Text="{Binding Email}"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            HeightRequest="30"
+                            Stroke="Transparent">
+                        <Entry WidthRequest="200"
+                               Keyboard="Email"
+                               Text="{Binding Email}"/>
+                    </Border>
                 </StackLayout>
                 <StackLayout Orientation="Horizontal"
                              HeightRequest="40">
@@ -33,9 +37,13 @@
                            VerticalOptions="Center"
                            FontAttributes="Bold"
                            WidthRequest="80"/>
-                    <Entry WidthRequest="200"
-                           IsPassword="True"
-                           Text="{Binding Password}"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            HeightRequest="30"
+                            Stroke="Transparent">
+                        <Entry WidthRequest="200"
+                               IsPassword="True"
+                               Text="{Binding Password}"/>
+                    </Border>
                 </StackLayout>
                 <Button Margin="0,20,0,0"
                         Text="Sign in"
