@@ -103,19 +103,19 @@ namespace PubHub.Common.Extensions
                     .AddChaosLatency(new()
                     {
                         EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
-                        InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
+                        //InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
                         Latency = TimeSpan.FromSeconds(10)
                     })
                     .AddChaosFault(new()
                     {
-                        EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
-                        InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
+                        EnabledGenerator = args => chaosService.IsFaultInjectionEnabledAsync(args.Context),
+                        InjectionRateGenerator = args => chaosService.GetFaultInjectionRateAsync(args.Context),
                         FaultGenerator = new FaultGenerator().AddException(() => new InvalidOperationException("Injected by chaos strategy!"))
                     })
                     .AddChaosOutcome(new()
                     {
                         EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
-                        InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
+                        //InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
                         OutcomeGenerator = new OutcomeGenerator<HttpResponseMessage>().AddResult(() => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError))
                     });
             });

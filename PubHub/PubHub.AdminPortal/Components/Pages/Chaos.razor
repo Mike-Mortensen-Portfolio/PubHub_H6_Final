@@ -1,0 +1,29 @@
+﻿@page "/chaos"
+@inject PubHub.Common.Services.IChaosService ChaosService
+
+<h3>Chaos</h3>
+
+<div class="mb-4">
+    <RadzenSwitch @bind-Value=ChaosService.Enabled Name="MasterSwitch" />
+    <RadzenLabel Text="Chaos injection" Component="MasterSwitch" />
+</div>
+
+<hr />
+
+<div>
+    <div class="chaos-header">
+        <h4>Fault injection</h4>
+        <RadzenSwitch @bind-Value=ChaosService.FaultInjectionEnabled Name="FaultInjectionSwitch" />
+    </div>
+    
+    <div>
+        <inline>
+            <RadzenSlider @bind-Value=ChaosService.FaultInjectionRate TValue="double" Min="0" Max="1" Step=".01" />
+            <i>Test</i>
+        </inline>
+    </div>
+</div>
+
+@code{
+    bool value;
+}

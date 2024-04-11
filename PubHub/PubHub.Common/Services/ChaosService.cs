@@ -2,18 +2,41 @@
 
 namespace PubHub.Common.Services
 {
-    internal class ChaosService : IChaosService
+    public class ChaosService : IChaosService
     {
+        private double _faultInjectionRate = 0.1; // 10%
+
         public ChaosService() { }
 
-        public ValueTask<double> GetInjectionRateAsync(ResilienceContext context)
+        public bool Enabled { get; set; }
+        public bool FaultInjectionEnabled { get; set; }
+
+        public double FaultInjectionRate
         {
-            return ValueTask.FromResult(0.1); // 10%
+            get => _faultInjectionRate;
+            set => SetInjectionRate(out _faultInjectionRate, value);
         }
 
+        #region Enabled Generators
         public ValueTask<bool> IsChaosEnabledAsync(ResilienceContext context)
         {
-            return ValueTask.FromResult(true);
+            return ValueTask.FromResult(Enabled);
         }
+
+        public ValueTask<bool> IsFaultInjectionEnabledAsync(ResilienceContext context)
+        {
+            return ValueTask.FromResult(FaultInjectionEnabled);
+        }
+        #endregion
+
+        #region Injection Rate Generators
+        public ValueTask<double> GetFaultInjectionRateAsync(ResilienceContext context)
+        {
+            return ValueTask.FromResult(FaultInjectionRate);
+        }
+        #endregion
+
+        private static void SetInjectionRate(out double field, double input) =>
+            field = Math.Max(0, Math.Min(input, 1));
     }
 }

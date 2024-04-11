@@ -98,3 +98,13 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* Chaos page */
+div.chaos-header > * {
+    display: inline-block;
+}
+
+div.chaos-header > .rz-switch {
+    margin-bottom: 0.2rem;
+    margin-left: 0.5rem;
+}
