@@ -72,16 +72,17 @@
     public IReadOnlyList<BookInfoModel> BookInfos { get; set; } = [];
     private PublisherInfoModel? Publisher { get; set; }
 
-    private AuthenticationState? AuthenticationState { get; set; }
-
     private PublisherQuery publisherQuery = new() { Descending = true, OrderBy = OrderPublisherBy.Name, Max = 10, Page = 1 };
 
     private BookInfoModel? bookInfoModel;
 
+    protected AuthenticationState? AuthenticationState { get; private set; }
+
     protected async override Task OnInitializedAsync()
     {
         AuthenticationState = await CustomAuthProvider.GetAuthenticationStateAsync();
-        var accountClaim = AuthenticationState.User.Claims.FirstOrDefault(c => c.Type == "sub");
+
+        var accountClaim = AuthenticationState.User.Claims.FirstOrDefault(c => c.Type == Common.TokenClaimConstants.ID);
         if (accountClaim != null)
         {
             Guid accountGuid = new Guid(accountClaim.Value.ToString());

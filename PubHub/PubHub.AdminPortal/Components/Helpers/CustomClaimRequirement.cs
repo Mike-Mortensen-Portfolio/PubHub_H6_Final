@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace PubHub.AdminPortal.Components
+namespace PubHub.AdminPortal.Components.Helpers
 {
     public class CustomClaimRequirement : IAuthorizationRequirement
     {

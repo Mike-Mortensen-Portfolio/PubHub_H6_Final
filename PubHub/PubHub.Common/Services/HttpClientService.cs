@@ -16,6 +16,7 @@ namespace PubHub.Common.Services
         {
             _client = client;
             _tokenInfoAsync = tokenInfoAsync;
+            _client.DefaultRequestHeaders.Add("refreshToken", string.Empty);
         }
 
         /// <inheritdoc/>
@@ -33,7 +34,8 @@ namespace PubHub.Common.Services
                 {
                     Debug.WriteLine($"{nameof(GetAsync)}: {_client.BaseAddress}{uri}");
                     var tokenInfo = await _tokenInfoAsync.Invoke();
-                    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
+                    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);                    
+                    _client.DefaultRequestHeaders.Remove("refreshToken"); 
                     _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
                     return await _client.GetAsync(uri);
                 });
@@ -42,7 +44,7 @@ namespace PubHub.Common.Services
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> PostAsync(string uri, HttpContent? httpContent = null)
         {
-            CheckNetwork();
+            CheckNetwork();            
 
             return await Policy
                 .HandleResult(_retryPredicate)
@@ -55,6 +57,7 @@ namespace PubHub.Common.Services
                     Debug.WriteLine($"{nameof(PostAsync)}: {_client.BaseAddress}{uri}");
                     var tokenInfo = await _tokenInfoAsync.Invoke();
                     _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
+                    _client.DefaultRequestHeaders.Remove("refreshToken");
                     _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
                     return await _client.PostAsync(uri, httpContent);
                 });
@@ -76,6 +79,7 @@ namespace PubHub.Common.Services
                     Debug.WriteLine($"{nameof(PutAsync)}: {_client.BaseAddress}{uri}");
                     var tokenInfo = await _tokenInfoAsync.Invoke();
                     _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
+                    _client.DefaultRequestHeaders.Remove("refreshToken");
                     _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
                     return await _client.PutAsync(uri, httpContent);
                 });
@@ -97,6 +101,7 @@ namespace PubHub.Common.Services
                     Debug.WriteLine($"{nameof(DeleteAsync)}: {_client.BaseAddress}{uri}");
                     var tokenInfo = await _tokenInfoAsync.Invoke();
                     _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
+                    _client.DefaultRequestHeaders.Remove("refreshToken");
                     _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
                     return await _client.DeleteAsync(uri);
                 });

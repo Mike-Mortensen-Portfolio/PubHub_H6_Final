@@ -46,6 +46,11 @@
                         </div>
                     </div>
                     <div class="form-group mb-2">
+                        <label for="createBookCoverImg" class="form-label"><b>Summary of book:</b></label>
+                        <textarea @bind="bookCreateForm.Summary" id="createBookCoverImg" class="form-text form-control" />
+                    </div>
+                    <ValidationMessage For="@(() => bookCreateForm.Summary)" />
+                    <div class="form-group mb-2">
                         <label for="createBookCoverImg" class="form-label"><b>Cover image:</b></label>
                         <InputFile OnChange="@BookCoverImgFileChanged" id="createBookCoverImg" class="form-control">Cover image</InputFile>
                     </div>

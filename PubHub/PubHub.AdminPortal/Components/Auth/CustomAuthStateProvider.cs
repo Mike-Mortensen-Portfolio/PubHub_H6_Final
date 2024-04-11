@@ -30,27 +30,26 @@ namespace PubHub.AdminPortal.Components.Auth
                 var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
 
                 if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(refreshToken))
-                    return await Task.FromResult(new AuthenticationState(_anonymous));
-
-                TokenInfo tokenInfo = new() { Token = token, RefreshToken = refreshToken };                
+                    return await Task.FromResult(new AuthenticationState(_anonymous));            
 
                 var claimsPrincipal = GetClaims(token);
 
-                if (claimsPrincipal.FindFirst("exp") != null)
-                {
-                    var expireClaim = long.Parse(claimsPrincipal.FindFirst("exp")?.Value ?? "0");
+                // Check if token is about to expire
+                var expireClaim = claimsPrincipal.FindFirst("exp");
 
-                    var utcExpire = DateTimeOffset.FromUnixTimeSeconds(expireClaim);
-                    var expiredate = utcExpire.DateTime;
-                    // If the token has expired, then we want to refresh the token and update the existing token and refresh token in our local storage.
-                    if (expiredate < DateTime.UtcNow)
+                if (expireClaim != null)
+                {
+                    var expireUnixTime = long.Parse(expireClaim.Value);
+                    var expireDateTime = DateTimeOffset.FromUnixTimeSeconds(expireUnixTime).UtcDateTime;
+                    // If the token expires in 5 minutes, then we want to refresh the token and update the existing token and refresh token in our local storage.
+                    if (expireDateTime < DateTime.UtcNow.AddMinutes(14))
                     {
-                        var tokenResponse = await _authenticationService.RefreshTokenAsync(tokenInfo);
+                        var tokenResponse = await _authenticationService.RefreshesTokenAsync();
                         if (tokenResponse != null && tokenResponse.Instance != null)
                         {
                             await _localStorage.SetItemAsync<string>("token", tokenResponse.Instance.Token);
                             await _localStorage.SetItemAsync<string>("refreshToken", tokenResponse.Instance.RefreshToken);
-                            UpdateAuhenticationState(tokenResponse.Instance.Token);
+                            claimsPrincipal = GetClaims(tokenResponse.Instance.Token);
                         }
                         else
                         {
@@ -75,8 +74,7 @@ namespace PubHub.AdminPortal.Components.Auth
             {
                 Debug.WriteLine("Unable to retrieve the AuthenticationState, ", ex.Message);
                 return await Task.FromResult(new AuthenticationState(_anonymous)); 
-            }          
-            
+            }                 
         }
 
         /// <summary>
