@@ -43,7 +43,8 @@ namespace PubHub.API.Domain.Seeding
                     EmailConfirmed = true,
                     LastSignIn = DateTime.UtcNow,
                     SecurityStamp = "UserSeedSecurityStamp",
-                    PhoneNumber = "4587654321"
+                    PhoneNumber = "4587654321",
+                    LockoutEnabled = true
                 },
                 new Account
                 {
@@ -54,7 +55,8 @@ namespace PubHub.API.Domain.Seeding
                     EmailConfirmed = true,
                     LastSignIn = DateTime.UtcNow,
                     SecurityStamp = "PublisherSeedSecurityStamp",
-                    PhoneNumber = "4576543210"
+                    PhoneNumber = "4576543210",
+                    LockoutEnabled = true
                 },
                 new Account
                 {
@@ -65,7 +67,8 @@ namespace PubHub.API.Domain.Seeding
                     EmailConfirmed = true,
                     LastSignIn = DateTime.UtcNow,
                     SecurityStamp = "Publisher2SeedSecurityStamp",
-                    PhoneNumber = "4565432109"
+                    PhoneNumber = "4565432109",
+                    LockoutEnabled = true
                 },
                 new Account
                 {
@@ -76,7 +79,8 @@ namespace PubHub.API.Domain.Seeding
                     EmailConfirmed = true,
                     LastSignIn = DateTime.UtcNow,
                     SecurityStamp = "OperatorSeedSecurityStamp",
-                    PhoneNumber = "4554321098"
+                    PhoneNumber = "4554321098",
+                    LockoutEnabled = true
                 },
             ];
 
