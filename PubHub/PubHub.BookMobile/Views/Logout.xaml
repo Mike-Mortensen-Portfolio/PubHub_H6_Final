@@ -3,10 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PubHub.BookMobile.Views.Logout"
              Title="Logout">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <StackLayout Orientation="Vertical"
+                 VerticalOptions="CenterAndExpand">
+        <Image Source="https://raw.githubusercontent.com/Mike-Mortensen-Portfolio/PubHub_H6_Final/developer/Images/PubHub.png"
+                WidthRequest="256"
+                HeightRequest="256"
+               HorizontalOptions="Center"/>
+        <ActivityIndicator HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           IsRunning="True"/>
+    </StackLayout>
 </ContentPage>
