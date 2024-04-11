@@ -87,9 +87,7 @@ namespace PubHub.API.Domain.Auth
 
             var subjectName = accessResult.SubjectName ?? subjectNameFallback;
             if (!(subjectName != null && (accessResult.AppWhitelist?.Subjects.Contains(subjectName) ?? false)))
-            {
                 accessResult.Disallow();
-            }
 
             accessResult.Allow();
 
@@ -107,9 +105,7 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
 
             if (accessResult.TypeLookupService.IsUser(accessResult.AccountTypeId))
-            {
                 accessResult.Allow();
-            }
 
             return accessResult;
         }
@@ -145,9 +141,7 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
 
             if (accessResult.TypeLookupService.IsPublisher(accessResult.AccountTypeId))
-            {
                 accessResult.Allow();
-            }
 
             return accessResult;
         }
@@ -164,10 +158,8 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
 
             if (accessResult.TypeLookupService.IsPublisher(accessResult.AccountTypeId))
-            {
                 if (publisherId == accessResult.SubjectId)
                     accessResult.Allow();
-            }
 
             return accessResult;
         }
@@ -183,9 +175,7 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
 
             if (accessResult.TypeLookupService.IsOperator(accessResult.AccountTypeId))
-            {
                 accessResult.Allow();
-            }
 
             return accessResult;
         }

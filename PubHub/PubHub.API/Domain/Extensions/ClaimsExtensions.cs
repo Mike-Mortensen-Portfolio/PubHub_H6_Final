@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using PubHub.API.Domain.Entities;
 using PubHub.Common;
 
 namespace PubHub.API.Domain.Extensions
@@ -14,9 +13,7 @@ namespace PubHub.API.Domain.Extensions
         public static Guid GetSubjectId(this ClaimsPrincipal claimsPrincipal)
         {
             if (Guid.TryParse(claimsPrincipal.FindFirstValue(TokenClaimConstants.ID), out var subjectId))
-            {
                 return subjectId;
-            }
 
             return Guid.Empty;
         }
@@ -29,9 +26,7 @@ namespace PubHub.API.Domain.Extensions
         public static Guid GetAccountTypeId(this ClaimsPrincipal claimsPrincipal)
         {
             if (Guid.TryParse(claimsPrincipal.FindFirstValue(TokenClaimConstants.ACCOUNT_TYPE), out var accountTypeId))
-            {
                 return accountTypeId;
-            }
 
             return Guid.Empty;
         }
