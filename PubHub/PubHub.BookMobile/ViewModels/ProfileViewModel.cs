@@ -97,6 +97,12 @@ namespace PubHub.BookMobile.ViewModels
                 return;
             }
 
+            _userInfo = result.Instance;
+
+            Name = result.Instance.Name;
+            Surname = result.Instance.Surname;
+            Email = result.Instance.Email;
+
             IsBusy = false;
             NotInEditMode = true;
         }
