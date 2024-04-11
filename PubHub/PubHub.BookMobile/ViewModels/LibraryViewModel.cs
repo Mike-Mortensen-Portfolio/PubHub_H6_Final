@@ -306,7 +306,7 @@ namespace PubHub.BookMobile.ViewModels
         {
             IsBusy = true;
             Genres.Clear();
-
+            
             var result = await _genreService.GetAllGenresAsync();
 
             if (!result.IsSuccess || result.Instance is null)

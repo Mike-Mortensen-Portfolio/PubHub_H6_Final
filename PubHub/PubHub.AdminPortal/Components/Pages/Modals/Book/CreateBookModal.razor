@@ -228,12 +228,12 @@
             var result = await BookService.AddBookAsync(bookCreateForm.CreateBookModel());
             if (result.StatusCode == ResponseCodeConstants.CREATED_CODE)
             {
-                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = "You've successfully created a book.", Detail = "Success", Duration = 5000 });
                 await ModalOptions(false);
             }
             else
             {
-                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to create book.", Detail = "Error", Duration = 5000 });
             }
         }
         catch (Exception ex)
