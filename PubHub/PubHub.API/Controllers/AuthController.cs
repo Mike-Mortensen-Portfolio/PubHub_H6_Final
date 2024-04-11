@@ -14,6 +14,7 @@ using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
 using PubHub.Common;
 using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.Authentication;
 using PubHub.Common.Models.Users;
 using static PubHub.Common.IntegrityConstants;
 
@@ -173,7 +174,7 @@ namespace PubHub.API.Controllers
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(TokenResponseModel))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetTokenAsync([FromHeader] string email, [FromHeader] string password, [FromHeader] string appId)
+        public async Task<IResult> GetTokenAsync([FromBody] LoginInfo loginInfo, [FromHeader] string appId)
         {
             if (!ModelState.IsValid)
             {
@@ -189,10 +190,10 @@ namespace PubHub.API.Controllers
 
             // Validate user email and password.
             bool passwordIsCorrect = false;
-            var account = await _userManager.FindByEmailAsync(email);
+            var account = await _userManager.FindByEmailAsync(loginInfo.Email);
             if (account != null)
             {
-                passwordIsCorrect = await _userManager.CheckPasswordAsync(account, password);
+                passwordIsCorrect = await _userManager.CheckPasswordAsync(account, loginInfo.Password);
             }
             if (account == null || !passwordIsCorrect)
             {
