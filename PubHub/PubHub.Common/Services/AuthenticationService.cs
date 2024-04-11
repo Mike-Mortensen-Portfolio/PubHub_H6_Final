@@ -30,16 +30,14 @@ namespace PubHub.Common.Services
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
         public async Task<ServiceResult<UserCreatedResponseModel>> RegisterUserAsync(UserCreateModel userCreateModel)
-        {           
+        {
             try
             {
                 ArgumentNullException.ThrowIfNull(userCreateModel);
 
                 var userModelValues = JsonSerializer.Serialize(userCreateModel) ?? throw new NullReferenceException($"Unable to serialize the userCreateModel to json.");
 
-                HttpContent httpContent = new StringContent(userModelValues.ToString(), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await Client.PostAsync("auth/user", httpContent);
+                HttpResponseMessage response = await Client.PostAsync("auth/user", userModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -77,11 +75,9 @@ namespace PubHub.Common.Services
             {
                 ArgumentNullException.ThrowIfNull(loginInfo);
 
-                HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-                httpContent.Headers.Add("Email", loginInfo.Email);
-                httpContent.Headers.Add("Password", loginInfo.Password);
+                var loginInfoJson = JsonSerializer.Serialize(loginInfo);
 
-                HttpResponseMessage response = await Client.PostAsync($"auth/token", httpContent);
+                HttpResponseMessage response = await Client.PostAsync($"auth/token", loginInfoJson);
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -113,48 +109,11 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="ServiceInstanceResult{TokenResponseModel}"/> with the new token and refresh token.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult<TokenResponseModel>> RefreshesTokenAsync()
+        public async Task<ServiceResult<TokenResponseModel>> RefreshTokenAsync()
         {
             try
             {
-                HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await Client.PostAsync($"auth/refresh", httpContent);
-                string content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
-                    if (errorResponse == null)
-                        return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
-
-                    return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
-                }
-
-                var tokenResponseModel = JsonSerializer.Deserialize<TokenResponseModel>(content, _serializerOptions);
-                if (tokenResponseModel == null)
-                    return new ServiceResult<TokenResponseModel>(response.StatusCode, null, $"Unable to handle the Token response, status code: {response.StatusCode}");
-
-                return new ServiceResult<TokenResponseModel>(response.StatusCode, tokenResponseModel, $"Successfully refreshed token.");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to refresh the token, ", ex.Message);
-                return new ServiceResult<TokenResponseModel>(HttpStatusCode.Unused, null, $"Failed to refresh token: {ex.Message}.");
-            }
-        }
-
-        public async Task<ServiceResult<TokenResponseModel>> RefreshTokenAsync(TokenInfo tokenInfo)
-        {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(tokenInfo);
-
-                HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-                httpContent.Headers.Add("ExpiredToken", tokenInfo.Token);
-                httpContent.Headers.Add("RefreshToken", tokenInfo.RefreshToken);
-
-                HttpResponseMessage response = await Client.PostAsync($"auth/refresh", httpContent);
+                HttpResponseMessage response = await Client.PostAsync($"auth/refresh");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -190,9 +149,7 @@ namespace PubHub.Common.Services
         {
             try
             {
-                HttpContent httpContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await Client.PostAsync($"auth/revoke", httpContent);
+                HttpResponseMessage response = await Client.PostAsync($"auth/revoke");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)

@@ -55,30 +55,5 @@ namespace PubHub.Common.Services
                 return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(HttpStatusCode.Unused, null, $"Unable to retrieve all content types: {ex.Message}.");
             }
         }
-
-        public async Task<IReadOnlyList<ContentTypeInfoModel>> GetContentTypesAsync()
-        {
-            try
-            {
-                HttpResponseMessage response = await Client.GetAsync($"contentTypes");
-                string content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
-
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
-                }
-
-                var contentTypeInfoModels = JsonSerializer.Deserialize<List<ContentTypeInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
-
-                return contentTypeInfoModels;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Unable to get content types:", ex.Message);
-                return [];
-            }
-        }
     }
 }

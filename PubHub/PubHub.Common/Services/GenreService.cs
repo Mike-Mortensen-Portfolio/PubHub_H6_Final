@@ -56,31 +56,6 @@ namespace PubHub.Common.Services
             }
         }
 
-        public async Task<IReadOnlyList<GenreInfoModel>> GetGenresAsync()
-        {
-            try
-            {
-                HttpResponseMessage response = await Client.GetAsync($"genres");
-                string content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to handle the Error response, status code: {response.StatusCode}");
-
-                    throw new Exception($"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
-                }
-
-                var genreInfoModels = JsonSerializer.Deserialize<List<GenreInfoModel>>(content, _serializerOptions) ?? throw new NullReferenceException($"Unable to map the request over to the client.");
-
-                return genreInfoModels;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Unable to get genres:", ex.Message);
-                return [];
-            }
-        }
-
         /// <summary>
         /// Calls the API end point for retrieving <see cref="GenreInfoModel">, to use in the client applications.
         /// </summary>
@@ -135,9 +110,7 @@ namespace PubHub.Common.Services
 
                 var genreModelValues = JsonSerializer.Serialize(genreCreateModel) ?? throw new NullReferenceException($"Unable to serialize the genreCreateModel to json.");
 
-                HttpContent httpContent = new StringContent(genreModelValues.ToString(), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await Client.PostAsync("genres", httpContent);
+                HttpResponseMessage response = await Client.PostAsync("genres", genreModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)

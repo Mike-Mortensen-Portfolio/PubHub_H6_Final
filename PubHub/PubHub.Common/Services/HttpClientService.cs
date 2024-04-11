@@ -1,12 +1,14 @@
 ﻿using Polly;
 using PubHub.Common.Models.Authentication;
 using System.Diagnostics;
+using System.Net.Mime;
 
 namespace PubHub.Common.Services
 {
     public class HttpClientService : IHttpClientService
     {
         private const int RETRY_COUNT = 5;
+        private const string BEARER_KEY = "Bearer";
 
         private readonly HttpClient _client;
         private readonly Func<Task<TokenInfo>> _tokenInfoAsync;
@@ -42,7 +44,7 @@ namespace PubHub.Common.Services
         }
 
         /// <inheritdoc/>
-        public async Task<HttpResponseMessage> PostAsync(string uri, HttpContent? httpContent = null)
+        public async Task<HttpResponseMessage> PostAsync(string uri, string? content = null)
         {
             CheckNetwork();            
 
@@ -59,12 +61,13 @@ namespace PubHub.Common.Services
                     _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
                     _client.DefaultRequestHeaders.Remove("refreshToken");
                     _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
-                    return await _client.PostAsync(uri, httpContent);
+
+                    return await _client.PostAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json));
                 });
         }
 
         /// <inheritdoc/>
-        public async Task<HttpResponseMessage> PutAsync(string uri, HttpContent? httpContent = null)
+        public async Task<HttpResponseMessage> PutAsync(string uri, string? content = null)
         {
             CheckNetwork();
 
@@ -81,7 +84,7 @@ namespace PubHub.Common.Services
                     _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.Token);
                     _client.DefaultRequestHeaders.Remove("refreshToken");
                     _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
-                    return await _client.PutAsync(uri, httpContent);
+                    return await _client.PutAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json));
                 });
         }
 

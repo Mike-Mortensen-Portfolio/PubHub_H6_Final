@@ -20,7 +20,7 @@ namespace PubHub.BookMobile
         {
             if (User.GetCachedToken(out TokenInfo? result) && result != null)
             {
-                var response = await _authService.RefreshTokenAsync(result);
+                var response = await _authService.RefreshTokenAsync();
 
                 if (response.IsSuccess && response.Instance != null)
                 {
@@ -36,7 +36,7 @@ namespace PubHub.BookMobile
         {
             if (User.GetCachedToken(out TokenInfo? result) && result != null)
             {
-                var response = await _authService.RefreshTokenAsync(result);
+                var response = await _authService.RefreshTokenAsync();
 
                 if (response.IsSuccess && response.Instance != null)
                 {

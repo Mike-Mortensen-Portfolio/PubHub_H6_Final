@@ -121,9 +121,7 @@ namespace PubHub.Common.Services
 
                 var userModelValues = JsonSerializer.Serialize(userUpdateModel) ?? throw new NullReferenceException($"Unable to serialize the userUpdateModel to json.");
 
-                HttpContent httpContent = new StringContent(userModelValues.ToString(), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await Client.PutAsync($"users/{userId}", httpContent);
+                HttpResponseMessage response = await Client.PutAsync($"users/{userId}", userModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)

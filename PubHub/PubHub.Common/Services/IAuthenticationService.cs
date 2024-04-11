@@ -8,9 +8,7 @@ namespace PubHub.Common.Services
     {
         Task<ServiceResult<UserCreatedResponseModel>> RegisterUserAsync(UserCreateModel userCreateModel);
         Task<ServiceResult<TokenResponseModel>> LoginAsync(LoginInfo loginInfo);
-        Task<ServiceResult<TokenResponseModel>> RefreshesTokenAsync();
-        [Obsolete($"Use {nameof(RefreshesTokenAsync)} instead.")]
-        Task<ServiceResult<TokenResponseModel>> RefreshTokenAsync(TokenInfo tokenInfo);
+        Task<ServiceResult<TokenResponseModel>> RefreshTokenAsync();
         Task<ServiceResult> RevokeTokenAsync();
     }
 }
