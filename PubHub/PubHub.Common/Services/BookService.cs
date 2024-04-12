@@ -217,5 +217,43 @@ namespace PubHub.Common.Services
                 return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the book: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Simulate a purchase of the book with the given <paramref name="bookId"/> through the API
+        /// <br/>
+        /// <br/>
+        /// <strong>Note:</strong> This doesn't perform any payment process and simply create the necessary installments to simulate a purchase.
+        /// </summary>
+        /// <param name="bookCreateModel">The <see cref="BookCreateModel"/> holding the new book.</param>
+        /// <returns>A <see cref="Task"/> that represents the <see langword="asynchronous"/> operation, yielding a <see cref="ServiceResult"/> that defines the outcome of the API request</returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="NullReferenceException"></exception>
+        public async Task<ServiceResult> PurchaseBookAsync(Guid bookId)
+        {
+            try
+            {
+                if (bookId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The book Id wasn't a valid Id.");
+
+                HttpResponseMessage response = await Client.PostAsync($"books/{bookId}/purchase");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
+                    if (errorResponse == null)
+                        return new ServiceResult(response.StatusCode, $"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    return new ServiceResult(response.StatusCode, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                return new ServiceResult(response.StatusCode, $"Purchase complete");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Get book info failed:", ex.Message);
+                return new ServiceResult(HttpStatusCode.Unused, $"Failed to purchase book: {ex.Message}.");
+            }
+        }
     }
 }
