@@ -5,7 +5,7 @@ using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class PublisherSeed : SeedBase<Publisher, string>
+    internal class PublisherSeed : SeedBase<Publisher, string>
     {
         private readonly AccountSeed _accountSeed;
 

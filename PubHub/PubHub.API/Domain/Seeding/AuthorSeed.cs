@@ -4,7 +4,7 @@ using PubHub.API.Domain.UUID;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class AuthorSeed : SeedBase<Author, Guid>
+    internal class AuthorSeed : SeedBase<Author, Guid>
     {
         /// <summary>
         /// Find the first <see cref="Author"/> in the seed data where the ID matches the <paramref name="key"/>

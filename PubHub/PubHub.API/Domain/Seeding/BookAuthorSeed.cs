@@ -4,7 +4,7 @@ using PubHub.API.Domain.Entities;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class BookAuthorSeed : IEntityTypeConfiguration<BookAuthor>
+    internal class BookAuthorSeed : IEntityTypeConfiguration<BookAuthor>
     {
         private readonly BookSeed _bookSeed;
         private readonly AuthorSeed _authorSeed;

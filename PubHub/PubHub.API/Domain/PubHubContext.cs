@@ -345,6 +345,7 @@ namespace PubHub.API.Domain
                 var bookGenres = new BookGenreSeed(books, genres);
                 var operators = new OperatorSeed(accounts);
                 var users = new UserSeed(accounts);
+                var userBooks = new UserBookSeed(users, books, accessTypes);
 
                 builder.ApplyConfiguration(accessTypes);
                 builder.ApplyConfiguration(accountTypes);
@@ -358,6 +359,7 @@ namespace PubHub.API.Domain
                 builder.ApplyConfiguration(bookGenres);
                 builder.ApplyConfiguration(operators);
                 builder.ApplyConfiguration(users);
+                builder.ApplyConfiguration(userBooks);
             }
             #endregion
         }
