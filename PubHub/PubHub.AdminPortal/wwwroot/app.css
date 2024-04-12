@@ -118,3 +118,48 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* Chaos page */
+div.chaos-header {
+    margin-bottom: 1rem;
+}
+
+    div.chaos-header > * {
+        display: inline-block;
+    }
+    
+    div.chaos-header > .rz-switch {
+        margin-bottom: 0.2rem;
+        margin-left: 0.5rem;
+    }
+
+div.chaos-control {
+    margin: auto;
+}
+
+div.chaos-control-row {
+    margin-bottom: 3rem;
+}
+
+/* Misc. */
+inline {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+    inline.space-between {
+      display: flex;
+      justify-content: space-between;
+    }
+
+        inline.space-between > div {
+          display: inline-flex;
+        }
+
+    inline *:not(*:first-child) {
+      margin-left: 0.3rem;
+    }
+
+        inline *:not(*:first-child) *:not(inline) > * {
+          margin-left: unset;
+        }
