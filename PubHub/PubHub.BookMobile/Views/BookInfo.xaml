@@ -9,7 +9,7 @@
              x:Class="PubHub.BookMobile.Views.BookInfo"
              x:DataType="viewModels:BookInfoViewModel"
              Title="{Binding BookListing.Title}">
-    <ScrollView>
+    <ScrollView IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
         <StackLayout Orientation="Vertical"
                      Padding="10,20,10,20"
                      Spacing="20">
@@ -102,8 +102,8 @@
                                     Stroke="Gray"
                                     Padding="10,0,10,0">
                                 <Label FontAttributes="Bold"
-                                   FontSize="{StaticResource Small}"
-                                   Text="{Binding Name}"/>
+                                       FontSize="{StaticResource Small}"
+                                       Text="{Binding Name}"/>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -171,9 +171,13 @@
                     </Border>
                 </StackLayout>
             </Grid>
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"/>
             <Button IsEnabled="{Binding IsAuthenticated}"
                     IsVisible="{Binding IsAuthenticated}"
-                    BackgroundColor="Green" Text="Buy"/>
+                    BackgroundColor="Green"
+                    Text="{Binding ButtonText}"
+                    Command="{Binding BuyBookCommand}"/>
         </StackLayout>
     </ScrollView>
 </ContentPage>
