@@ -141,6 +141,48 @@ namespace PubHub.Common.Services
         }
 
         /// <summary>
+        /// Calls the API endpoint to retrieve the content of a specific book.
+        /// </summary>
+        /// <param name="publisherId">Id of the Publisher trying to access the content.</param>
+        /// <param name="bookId">Id of the book where content is requested.</param>
+        /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
+        /// <exception cref="NullReferenceException"></exception>
+        public async Task<ServiceResult<BookContentModel>> GetPublisherBookContentAsync(Guid publisherId, Guid bookId)
+        {
+            try
+            {
+                if (publisherId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The publisher Id wasn't a valid Id.");
+
+                if (bookId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The book Id wasn't a valid Id.");
+
+                HttpResponseMessage response = await Client.GetAsync($"publishers/{publisherId}/books/{bookId}");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
+                    if (errorResponse == null)
+                        return new ServiceResult<BookContentModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    return new ServiceResult<BookContentModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var bookContentModel = JsonSerializer.Deserialize<BookContentModel>(content, _serializerOptions);
+                if (bookContentModel == null)
+                    return new ServiceResult<BookContentModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
+
+                return new ServiceResult<BookContentModel>(response.StatusCode, bookContentModel, $"Successfully retrieved the content of the book.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Get book content failed: {publisherId}", ex.Message);
+                return new ServiceResult<BookContentModel>(HttpStatusCode.Unused, null, $"Failed to retrieve content of the book: {ex.Message}.");
+            }
+        }
+
+        /// <summary>
         /// Calls the API end point for retrieving <see cref="PublisherInfoModel">, to use in the client applications.
         /// </summary>
         /// <param name="publisherId">Id of the publisher wanting information about.</param>

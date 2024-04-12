@@ -5,7 +5,7 @@ using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class AccountTypeSeed : SeedBase<AccountType, string>
+    internal class AccountTypeSeed : SeedBase<AccountType, string>
     {
         /// <summary>
         /// Find the <see cref="AccountType"/> where the name matches <paramref name="key"/>

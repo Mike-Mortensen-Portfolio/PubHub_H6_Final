@@ -149,6 +149,50 @@ namespace PubHub.API.Controllers
         }
 
         /// <summary>
+        /// Get specific book information on the authenticated user.
+        /// </summary>
+        /// <param name="id">Id of user.</param>
+        /// <param name="bookId">Id of the book.</param>
+        /// <returns></returns>
+        [HttpGet("{id}/books/{bookId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserBookContentModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> GetBookContentAsync(Guid id, Guid bookId, [FromHeader] string appId)
+        {
+            if (!_accessService.AccessFor(appId, User)
+                .AllowUser(id)
+                .AllowUserOnlyIfOwns(bookId, _context)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
+
+            var query = _context.Set<UserBook>()
+                .Include(userBook => userBook.Book);
+
+            var entityUserBook = await query.Where(book => book.BookId == bookId && book.UserId == id)
+                .FirstOrDefaultAsync();
+
+            if (entityUserBook is null)
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "We couldn't locate a book with the given ID.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
+
+            var userBookContent = new UserBookContentModel()
+            {
+                AccessTypeId = entityUserBook.AccessTypeId,
+                ProgressInProcent = entityUserBook.ProgressInProcent,
+                AcquireDate = entityUserBook.AcquireDate,
+                BookContent = entityUserBook.Book!.BookContent
+            };
+
+            return Results.Ok(userBookContent);
+        }
+
+        /// <summary>
         /// Update information of a specific user.
         /// </summary>
         /// <param name="id">Id of user.</param>

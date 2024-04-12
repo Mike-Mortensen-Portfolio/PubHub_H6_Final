@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using PubHub.API.Controllers.Problems;
 using System.Runtime.CompilerServices;
+using PubHub.API.Domain.Entities;
 
 namespace PubHub.API.Domain.Auth
 {
@@ -135,6 +136,32 @@ namespace PubHub.API.Domain.Auth
         }
 
         /// <summary>
+        /// For users: Allow only user with access to specific book.
+        /// </summary>
+        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="bookId">Id of the book.</param>
+        /// <param name="context">The <see cref="PubHubContext"/> to query the database.</param>
+        /// <returns></returns>
+        public static AccessResult AllowUserOnlyIfOwns(this AccessResult accessResult, Guid bookId, PubHubContext context)
+        {
+            if (accessResult.Concluded || accessResult.Success)
+                return accessResult;
+
+            if (accessResult.TypeLookupService.IsUser(accessResult.AccountTypeId))
+            {
+                var ownsBook = context.Set<UserBook>()
+                    .Any(x => x.UserId == accessResult.SubjectId && x.BookId == bookId);
+
+                if (ownsBook)
+                    accessResult.Allow();
+                else
+                    accessResult.Disallow();
+            }
+
+            return accessResult;
+        }
+
+        /// <summary>
         /// For publishers: Allow any.
         /// </summary>
         /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
@@ -164,6 +191,30 @@ namespace PubHub.API.Domain.Auth
             if (accessResult.TypeLookupService.IsPublisher(accessResult.AccountTypeId))
                 if (publisherId == accessResult.SubjectId)
                     accessResult.Allow();
+
+            return accessResult;
+        }
+
+        /// <summary>
+        /// For users: Allow only publisher with access to specific book.
+        /// </summary>
+        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="bookId">Id of the book.</param>
+        /// <param name="context">The <see cref="PubHubContext"/> to query the database.</param>
+        /// <returns></returns>
+        public static AccessResult AllowPublisherOnlyIfOwns(this AccessResult accessResult, Guid bookId, PubHubContext context)
+        {
+            if (accessResult.Concluded || accessResult.Success)
+                return accessResult;
+
+            if (accessResult.TypeLookupService.IsUser(accessResult.AccountTypeId))
+            {
+                var ownsBook = context.Set<Book>()
+                    .Any(x => x.PublisherId == accessResult.SubjectId && x.Id == bookId);
+
+                if (ownsBook)
+                    accessResult.Allow();
+            }
 
             return accessResult;
         }
@@ -199,5 +250,5 @@ namespace PubHub.API.Domain.Auth
 
             return accessResult;
         }
-    }
+    } 
 }

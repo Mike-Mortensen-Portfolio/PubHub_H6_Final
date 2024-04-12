@@ -280,6 +280,52 @@ namespace PubHub.API.Controllers
         }
 
         /// <summary>
+        /// Get specific book information on the authenticated publisher.
+        /// </summary>
+        /// <param name="id">Id of user.</param>
+        /// <param name="bookId">Id of the book.</param>
+        /// <returns></returns>
+        [HttpGet("{id}/books/{bookId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookContentModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> GetBookContentAsync(Guid id, Guid bookId, [FromHeader] string appId)
+        {
+            if (!_accessService.AccessFor(appId, User)
+                .AllowPublisher(id)
+                .AllowPublisherOnlyIfOwns(bookId, _context)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
+
+            var query = _context.Set<Book>()
+                .Include(book => book.ContentType)
+                .Include(book => book.Publisher)
+                .Include(book => book.BookGenres)
+                    .ThenInclude(bookGenres => bookGenres.Genre)
+                .Include(book => book.BookAuthors)
+                    .ThenInclude(bookAuthors => bookAuthors.Author);
+
+            var entityBook = await query.Where(book => book.Id == bookId)
+                .FirstOrDefaultAsync();
+
+            if (entityBook is null)
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "We couldn't locate a book with the given ID.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
+
+            var bookContent = new BookContentModel()
+            {
+                BookContent = entityBook.BookContent
+            };
+
+            return Results.Ok(bookContent);
+        }
+
+        /// <summary>
         /// Update information of a specific publisher.
         /// </summary>
         /// <param name="id">ID of publisher.</param>

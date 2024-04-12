@@ -5,7 +5,7 @@ using PubHub.API.Domain.UUID;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class GenreSeed : SeedBase<Genre, string>
+    internal class GenreSeed : SeedBase<Genre, string>
     {
         public override Genre this[string key]
         {

@@ -102,6 +102,48 @@ namespace PubHub.Common.Services
         }
 
         /// <summary>
+        /// Calls the API endpoint to retrieve the content of a specific book that the user should own.
+        /// </summary>
+        /// <param name="userId">Id of the user trying to access the book content.</param>
+        /// <param name="bookId">Id of the book where content is requested.</param>
+        /// <returns>A <see cref="ServiceResult"/> on how the request was handled.</returns>
+        /// <exception cref="NullReferenceException"></exception>
+        public async Task<ServiceResult<UserBookContentModel>> GetUserBookContentAsync(Guid userId, Guid bookId)
+        {
+            try
+            {
+                if (userId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
+
+                if (bookId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The book Id wasn't a valid Id.");
+
+                HttpResponseMessage response = await Client.GetAsync($"users/{userId}/books/{bookId}");
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
+                    if (errorResponse == null)
+                        return new ServiceResult<UserBookContentModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    return new ServiceResult<UserBookContentModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var userBookContent = JsonSerializer.Deserialize<UserBookContentModel>(content, _serializerOptions);
+                if (userBookContent == null)
+                    return new ServiceResult<UserBookContentModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
+
+                return new ServiceResult<UserBookContentModel>(response.StatusCode, userBookContent, $"Successfully retrieved the content of the book.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Get book content failed: {userId}", ex.Message);
+                return new ServiceResult<UserBookContentModel>(HttpStatusCode.Unused, null, $"Failed to retrieve content of the book: {ex.Message}.");
+            }
+        }
+
+        /// <summary>
         /// Calls the API endpoint for updating <see cref="UserUpdateModel"/> values in the database.
         /// </summary>
         /// <param name="userId">The id of the user being updated.</param>
