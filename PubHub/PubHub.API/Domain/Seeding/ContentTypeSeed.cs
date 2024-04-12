@@ -5,7 +5,7 @@ using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class ContentTypeSeed : SeedBase<ContentType, string>
+    internal class ContentTypeSeed : SeedBase<ContentType, string>
     {
         /// <summary>
         /// Find the <see cref="ContentType"/> where the name matches <paramref name="key"/>

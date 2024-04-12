@@ -304,7 +304,7 @@ namespace PubHub.API.Controllers
                 .Include(book => book.BookAuthors)
                     .ThenInclude(bookAuthors => bookAuthors.Author);
 
-            var entityBook = await query.Where(book => book.Id == id)
+            var entityBook = await query.Where(book => book.Id == bookId)
                 .FirstOrDefaultAsync();
 
             if (entityBook is null)

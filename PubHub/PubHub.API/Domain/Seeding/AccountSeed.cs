@@ -6,7 +6,7 @@ using static PubHub.API.Domain.Seeding.SeedContants;
 
 namespace PubHub.API.Domain.Seeding
 {
-    public class AccountSeed : SeedBase<Account, string>
+    internal class AccountSeed : SeedBase<Account, string>
     {
         private readonly AccountTypeSeed _accountTypeSeed;
 
