@@ -23,6 +23,8 @@ namespace PubHub.BookMobile.ViewModels
         private BookQuery _query;
         [ObservableProperty]
         private bool _isAuthenticated;
+        [ObservableProperty]
+        private bool _hasBooksToShow;
 
         public LibraryViewModel(IBookService bookService, IGenreService genreService)
         {
@@ -260,6 +262,7 @@ namespace PubHub.BookMobile.ViewModels
                 else
                     await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
 
+                HasBooksToShow = Books.Any();
                 IsBusy = false;
                 return;
             }
@@ -284,6 +287,7 @@ namespace PubHub.BookMobile.ViewModels
                     Books.Add(bookListing);
             }
 
+            HasBooksToShow = Books.Any();
             IsBusy = false;
         }
 
@@ -306,7 +310,7 @@ namespace PubHub.BookMobile.ViewModels
         {
             IsBusy = true;
             Genres.Clear();
-            
+
             var result = await _genreService.GetAllGenresAsync();
 
             if (!result.IsSuccess || result.Instance is null)

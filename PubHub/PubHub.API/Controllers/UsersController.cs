@@ -8,13 +8,13 @@ using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Identity;
-using PubHub.API.Domain.Services;
 using PubHub.Common;
 using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
 using PubHub.Common.Models.Genres;
 using PubHub.Common.Models.Users;
+using PubHub.Common.Extensions;
 using static PubHub.Common.IntegrityConstants;
 
 namespace PubHub.API.Controllers
@@ -79,7 +79,7 @@ namespace PubHub.API.Controllers
         [HttpGet("{id}/books")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> GetBooksAsync(Guid id, [FromHeader] string appId)
+        public async Task<IResult> GetBooksAsync(Guid id, [FromQuery] BookQuery queryOptions, [FromHeader] string appId)
         {
             if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
@@ -114,6 +114,7 @@ namespace PubHub.API.Controllers
                     .ThenInclude(b => b!.BookAuthors)
                         .ThenInclude(ba => ba.Author)
                 .Where(ub => ub.UserId == id)
+                .Filter (queryOptions)
                 .Select(ub => new BookInfoModel()
                 {
                     ContentType = new ContentTypeInfoModel
@@ -173,7 +174,7 @@ namespace PubHub.API.Controllers
             // Get current entry.
             var user = _context.Set<User>()
                 .Include(u => u.Account)
-                    .ThenInclude(a => a.AccountType)
+                    .ThenInclude(a => a!.AccountType)
                 .FirstOrDefault(u => u.Id == id);
             if (user == null)
             {

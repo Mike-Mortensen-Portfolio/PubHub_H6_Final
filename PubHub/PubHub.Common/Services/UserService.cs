@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
+using PubHub.Common.Extensions;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Users;
@@ -69,14 +70,15 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetUserBooksAsync(Guid userId)
+        public async Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetUserBooksAsync(Guid userId, BookQuery queryOptions = null!)
         {
             try
             {
+                var filter = queryOptions ?? new BookQuery();
                 if (userId == INVALID_ENTITY_ID)
                     throw new NullReferenceException($"The user Id wasn't a valid Id.");
 
-                HttpResponseMessage response = await Client.GetAsync($"users/{userId}/books");
+                HttpResponseMessage response = await Client.GetAsync($"users/{userId}/books?{filter.ToQuery(ignoreNull: true)}");
                 string content = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -88,11 +90,11 @@ namespace PubHub.Common.Services
                     return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
-                var bookInfoModel = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions);
-                if (bookInfoModel == null)
-                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
+                var books = JsonSerializer.Deserialize<List<BookInfoModel>>(content, _serializerOptions);
+                if (books == null)
+                    return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, new List<BookInfoModel>(), $"Unable to map the request over to the client.");
 
-                return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, "Successfully retrieved user's books!");
+                return new ServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, books, "Successfully retrieved user's books!");
             }
             catch (Exception ex)
             {

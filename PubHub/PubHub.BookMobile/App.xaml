@@ -20,6 +20,8 @@
             <toolkit:IsNotNullConverter x:Key="IsNotNullConverter"/>
             <converters:IsAudiobookConverter x:Key="IsAudiobookConverter"/>
             <converters:IsEbookConverter x:Key="IsEbookConverter"/>
+            <converters:IsEmptyCollectionConverter x:Key="IsEmptyCollectionConverter"/>
+            <converters:IsNotEmptyCollectionConverter x:Key="IsNotEmptyCollectionConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

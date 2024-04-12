@@ -1,80 +1,77 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PubHub.BookMobile.Views.Library"
+             x:Class="PubHub.BookMobile.Views.PersonalLibrary"
+             xmlns:views="clr-namespace:PubHub.BookMobile.Views"
              xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
              xmlns:genreModels="clr-namespace:PubHub.Common.Models.Genres;assembly=PubHub.Common"
              xmlns:models="clr-namespace:PubHub.BookMobile.Models"
-             xmlns:views="clr-namespace:PubHub.BookMobile.Views"
-             xmlns:auth="clr-namespace:PubHub.BookMobile.Auth"
-             Title="Search books"
-             x:DataType="viewModels:LibraryViewModel">
-
+             x:DataType="viewModels:PersonalLibraryViewModel">
     <Shell.TitleView>
         <Grid ColumnDefinitions=".5*, .5*"
-              Padding="0,0,20,0">
-            <Label x:DataType="views:Library"
-                   Grid.Column="0"
-                   VerticalTextAlignment="Center"
-                   FontSize="{StaticResource Subheader}"
-                   FontAttributes="Bold"
-                   TextColor="{StaticResource WarmWhite}"
-                   Text="{Binding Title}"/>
+          Padding="0,0,20,0">
+            <Label x:DataType="views:PersonalLibrary"
+               Grid.Column="0"
+               VerticalTextAlignment="Center"
+               FontSize="{StaticResource Subheader}"
+               FontAttributes="Bold"
+               TextColor="{StaticResource WarmWhite}"
+               Text="{Binding Title}"/>
             <Button Grid.Column="1"
-                    Text="Sign in"
-                    IsVisible="{Binding IsAuthenticated, Converter={StaticResource InvertedBoolConverter}}"
-                    FontAttributes="Bold"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    Command="{Binding NavigateToPageCommand}"
-                    CommandParameter="Login"/>
+                Text="Sign in"
+                IsVisible="{Binding IsAuthenticated, Converter={StaticResource InvertedBoolConverter}}"
+                FontAttributes="Bold"
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                Command="{Binding NavigateToPageCommand}"
+                CommandParameter="Login"/>
             <Button Grid.Column="1"
-                    Text="Sign out"
-                    IsVisible="{Binding IsAuthenticated}"
-                    FontAttributes="Bold"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    Command="{Binding NavigateToPageCommand}"
-                    CommandParameter="Logout"/>
+                Text="Sign out"
+                IsVisible="{Binding IsAuthenticated}"
+                FontAttributes="Bold"
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                Command="{Binding NavigateToPageCommand}"
+                CommandParameter="Logout"/>
         </Grid>
     </Shell.TitleView>
 
     <RefreshView IsRefreshing="{Binding IsBusy}"
-                 Command="{Binding FetchBooksCommand}">
+             Command="{Binding FetchBooksCommand}">
         <StackLayout Orientation="Vertical"
-                     Padding="10"
-                     Spacing="25">
+                 Padding="10"
+                 Spacing="25">
             <Grid RowDefinitions="1*, AUTO"
-                  ColumnDefinitions="1*, .20*">
+              ColumnDefinitions="1*, .20*">
                 <Frame Grid.Column="0"
-                       CornerRadius="25"
-                       BackgroundColor="LightGray"
-                       HeightRequest="40">
+                   CornerRadius="25"
+                   BackgroundColor="LightGray"
+                   HeightRequest="40">
                     <SearchBar HeightRequest="40"
-                               Placeholder="Search"
-                               Text="{Binding SearchTerm}"
-                               SearchCommand="{Binding FetchBooksCommand}"
-                               CancelButtonColor="Red"
-                               IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"/>
+                           Placeholder="Search"
+                           Text="{Binding SearchTerm}"
+                           SearchCommand="{Binding FetchBooksCommand}"
+                           CancelButtonColor="Red"
+                           IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"/>
                 </Frame>
                 <Button Grid.Column="1"
-                        FontFamily="IcoFont"
-                        Text="{StaticResource Gear}"
-                        BackgroundColor="Transparent"
-                        FontSize="30"
-                        TextColor="{StaticResource Primary}"
-                        Command="{Binding ToggleGenreViewCommand}"/>
+                    FontFamily="IcoFont"
+                    Text="{StaticResource Gear}"
+                    BackgroundColor="Transparent"
+                    FontSize="30"
+                    TextColor="{StaticResource Primary}"
+                    Command="{Binding ToggleGenreViewCommand}"/>
                 <Border Grid.Row="1"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        IsVisible="{Binding IsGenreVisible}"
-                        StrokeShape="RoundRectangle 10,10"
-                        HeightRequest="200"
-                        Padding="2">
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    IsVisible="{Binding IsGenreVisible}"
+                    StrokeShape="RoundRectangle 10,10"
+                    HeightRequest="200"
+                    Padding="2">
                     <CollectionView ItemsSource="{Binding Genres}"
-                                    SelectionMode="Multiple"
-                                    SelectionChanged="FilterByGenre"
-                                    VerticalOptions="FillAndExpand">
+                                SelectionMode="Multiple"
+                                SelectionChanged="FilterByGenre"
+                                VerticalOptions="FillAndExpand">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="genreModels:GenreInfoModel">
                                 <Border WidthRequest="200">
@@ -97,8 +94,8 @@
                                     </VisualStateManager.VisualStateGroups>
 
                                     <Label VerticalOptions="Center"
-                                           HorizontalOptions="Center"
-                                           Text="{Binding Name}"/>
+                                       HorizontalOptions="Center"
+                                       Text="{Binding Name}"/>
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -133,40 +130,40 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             <Grid RowDefinitions="1*, 1*, 1*, 1*"
-                                  ColumnDefinitions="2*, 4*"
-                                  Margin="0,0,0,20">
+                              ColumnDefinitions="2*, 4*"
+                              Margin="0,0,0,20">
                                 <Border Grid.Row="0"
-                                        Grid.RowSpan="4"
-                                        Grid.Column="0"
-                                        StrokeShape="RoundRectangle 10,10"
-                                        Padding="0"
-                                        HeightRequest="140"
-                                        WidthRequest="95">
+                                    Grid.RowSpan="4"
+                                    Grid.Column="0"
+                                    StrokeShape="RoundRectangle 10,10"
+                                    Padding="0"
+                                    HeightRequest="140"
+                                    WidthRequest="95">
                                     <Image Source="{Binding ListingCover, Mode=OneWay}"
-                                       Aspect="Fill"/>
+                                   Aspect="Fill"/>
                                 </Border>
                                 <Label Grid.Row="0"
-                                   Grid.Column="1"
-                                   FontAttributes="Bold"
-                                   FontSize="{StaticResource Small}"
-                                   Text="{Binding Title}"/>
+                               Grid.Column="1"
+                               FontAttributes="Bold"
+                               FontSize="{StaticResource Small}"
+                               Text="{Binding Title}"/>
                                 <Label Grid.Row="1"
-                                   Grid.Column="1"
-                                   FontSize="Small"
-                                   FontFamily="IcoFont"
-                                   IsVisible="{Binding EBookInStock}"
-                                   Text="{Binding Source={x:StaticResource Ebook}, StringFormat='{0} E-Book'}"/>
+                               Grid.Column="1"
+                               FontSize="Small"
+                               FontFamily="IcoFont"
+                               IsVisible="{Binding EBookInStock}"
+                               Text="{Binding Source={x:StaticResource Ebook}, StringFormat='{0} E-Book'}"/>
 
                                 <Label Grid.Row="2"
-                                   Grid.Column="1"
-                                   FontSize="Small"
-                                   FontFamily="IcoFont"
-                                   IsVisible="{Binding AudiobookInStock}"
-                                   Text="{Binding Source={x:StaticResource Audio}, StringFormat='{0} Audiobook'}"/>
+                               Grid.Column="1"
+                               FontSize="Small"
+                               FontFamily="IcoFont"
+                               IsVisible="{Binding AudiobookInStock}"
+                               Text="{Binding Source={x:StaticResource Audio}, StringFormat='{0} Audiobook'}"/>
                                 <Label Grid.Row="3"
-                                   Grid.Column="1"
-                                   FontSize="Small"
-                                   Text="{Binding PublicationDate.Year, StringFormat='Published in: {0}'}"/>
+                               Grid.Column="1"
+                               FontSize="Small"
+                               Text="{Binding PublicationDate.Year, StringFormat='Published in: {0}'}"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -176,7 +173,7 @@
                    HorizontalTextAlignment="Center"
                    FontAttributes="Italic"
                    TextColor="{StaticResource Gray200}"
-                   Text="No books to show..."
+                   Text="You have no books..."
                    IsVisible="{Binding HasBooksToShow, Converter={StaticResource InvertedBoolConverter}}"/>
         </StackLayout>
     </RefreshView>

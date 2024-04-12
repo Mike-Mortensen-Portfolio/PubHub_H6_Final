@@ -27,6 +27,8 @@ namespace PubHub.BookMobile.ViewModels
         private string? _surname;
         [ObservableProperty]
         private string? _email;
+        [ObservableProperty]
+        private bool _isAuthenticated;
         private bool FormIsFilled => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Surname) && !string.IsNullOrWhiteSpace(Email);
         private bool CanUpdate => FormIsFilled && _emailRegex.Match(Email!).Success;
 

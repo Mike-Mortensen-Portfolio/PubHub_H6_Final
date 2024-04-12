@@ -18,8 +18,9 @@ namespace PubHub.BookMobile.Extensions
 
                 .AddTransientWithShellRoute<Login, LoginViewModel>("Login")
                 .AddTransientWithShellRoute<Logout>("Logout")
-                .AddTransientWithShellRoute<Register,RegisterViewModel>("Register")
+                .AddTransientWithShellRoute<Register, RegisterViewModel>("Register")
                 .AddTransientWithShellRoute<Library, LibraryViewModel>("Library")
+                .AddTransientWithShellRoute<PersonalLibrary, PersonalLibraryViewModel>("PersonalLibrary")
                 .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo")
                 .AddTransientWithShellRoute<Profile, ProfileViewModel>("Profile");
 
