@@ -119,7 +119,7 @@
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
                         IsReadOnly="True"
-                        Text="Kentucky, 1850. An enslaved groom named Jarret and a bay foal forge a bond of understanding that will carry the horse to record-setting victories across the South. When the nation erupts in civil war, an itinerant young artist who has made his name on paintings of the racehorse takes up arms for the Union."/>
+                        Text="{Binding CurrentViewedItem.Summary}"/>
 
                 <StackLayout Grid.Row="5"
                              Grid.Column="0"
@@ -171,7 +171,9 @@
                     </Border>
                 </StackLayout>
             </Grid>
-            <!--<Button BackgroundColor="Green" Text="Buy"/>-->
+            <Button IsEnabled="{Binding IsAuthenticated}"
+                    IsVisible="{Binding IsAuthenticated}"
+                    BackgroundColor="Green" Text="Buy"/>
         </StackLayout>
     </ScrollView>
 </ContentPage>

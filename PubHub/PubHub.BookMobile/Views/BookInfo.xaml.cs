@@ -1,4 +1,5 @@
-﻿using PubHub.BookMobile.ViewModels;
+﻿using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.ViewModels;
 
 namespace PubHub.BookMobile.Views;
 
@@ -12,5 +13,12 @@ public partial class BookInfo : ContentPage
         _viewModel = viewModel;
 
         BindingContext = _viewModel;
+    }
+
+    protected override void OnAppearing()
+    {
+        _viewModel.IsAuthenticated = User.IsAuthenticated;
+
+        base.OnAppearing();
     }
 }
