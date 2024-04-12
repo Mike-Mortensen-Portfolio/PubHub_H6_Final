@@ -7,7 +7,7 @@
              x:DataType="viewModels:LoginViewModel"
              Title="Login">
     <StackLayout Padding="10">
-        <ActivityIndicator/>
+        <ActivityIndicator IsRunning="{Binding IsBusy}"/>
         <Image Source="https://raw.githubusercontent.com/Mike-Mortensen-Portfolio/PubHub_H6_Final/developer/Images/PubHub.png"
                WidthRequest="256"
                HeightRequest="256"/>
@@ -44,6 +44,16 @@
                                IsPassword="True"
                                Text="{Binding Password}"/>
                     </Border>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal"
+                             HorizontalOptions="StartAndExpand">
+                    <Button Text="Register"
+                            Padding="0"
+                            HeightRequest="25"
+                            BackgroundColor="Transparent"
+                            TextColor="DeepSkyBlue"
+                            Command="{Binding NavigateToPageCommand}"
+                            CommandParameter="Register"/>
                 </StackLayout>
                 <Button Margin="0,20,0,0"
                         Text="Sign in"
