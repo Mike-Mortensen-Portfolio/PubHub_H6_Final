@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Simmy;
-using Polly.Simmy.Fault;
-using Polly.Simmy.Outcomes;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Authentication;
 using PubHub.Common.Services;
@@ -91,14 +90,17 @@ namespace PubHub.Common.Extensions
                 {
                     ShouldHandle = static args =>
                     {
-                        if (args.Outcome.Result?.IsSuccessStatusCode ?? false)
+                        var result = args.Outcome.Result;
+                        if (result == null ||
+                            result.StatusCode == HttpStatusCode.InternalServerError ||
+                            result.StatusCode == HttpStatusCode.NotFound)
                         {
-                            // Request succeeded.
-                            return new ValueTask<bool>(false);
+                            // Request failed.
+                            return new ValueTask<bool>(true);
                         }
 
-                        // Request failed.
-                        return new ValueTask<bool>(true);
+                        // Request succeeded.
+                        return new ValueTask<bool>(false);
                     },
                     MaxRetryAttempts = 5,
                     DelayGenerator = static args => new ValueTask<TimeSpan?>(TimeSpan.FromSeconds(0.2 * Math.Pow(2, args.AttemptNumber))),
