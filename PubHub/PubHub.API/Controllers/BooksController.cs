@@ -7,6 +7,8 @@ using PubHub.API.Domain;
 using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
+using PubHub.API.Domain.Services;
+using PubHub.Common;
 using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
@@ -26,18 +28,21 @@ namespace PubHub.API.Controllers
         private readonly ILogger<BooksController> _logger;
         private readonly PubHubContext _context;
         private readonly AccessService _accessService;
+        private readonly TypeLookupService _accessTypeLookupService;
 
-        public BooksController(ILogger<BooksController> logger, PubHubContext context, AccessService accessService)
+        public BooksController(ILogger<BooksController> logger, PubHubContext context, AccessService accessService, TypeLookupService accessTypeLookupService)
         {
             _logger = logger;
             _context = context;
             _accessService = accessService;
+            _accessTypeLookupService = accessTypeLookupService;
         }
 
         /// <summary>
         /// Get all books that matches the criteria <paramref name="queryOptions"/>
         /// </summary>
         /// <param name="BookQuery">Filtering options</param>
+        [AllowAnonymous]
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<BookInfoModel>))]
         public async Task<IResult> GetBooksAsync([FromQuery] BookQuery queryOptions, [FromHeader] string appId)
@@ -90,6 +95,7 @@ namespace PubHub.API.Controllers
             return Results.Ok(books);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
@@ -152,6 +158,74 @@ namespace PubHub.API.Controllers
             };
 
             return Results.Ok(book);
+        }
+
+        [HttpPost("{id}/purchase")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> PurchaseBookAsync(Guid id, [FromHeader] string appId)
+        {
+            if (!_accessService.AccessFor(appId, User)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .AllowUser()
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
+
+            // Find book.
+            var book = await _context.Set<Book>()
+                .FirstOrDefaultAsync(b => b.Id == id);
+            if (book is null)
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "We couldn't locate a book with the given ID.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
+
+            // Get user ID.
+            var userId = User.GetSubjectId();
+
+            // Check if user already owns the book.
+            var alreadyOwned = await _context.Set<UserBook>()
+                .AnyAsync(ub => ub.UserId == userId);
+            if (alreadyOwned)
+                return Results.Problem(
+                    type: DuplicateProblemSpecification.TYPE,
+                    statusCode: DuplicateProblemSpecification.STATUS_CODE,
+                    title: DuplicateProblemSpecification.TITLE,
+                    detail: "A matching book already exists.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", book.Id }
+                    });
+
+            // Create a UserBook record.
+            await _context.Set<UserBook>().AddAsync(new()
+            {
+                UserId = userId,
+                AccessTypeId = _accessTypeLookupService.GetAccessTypeId(AccessTypeConstants.OWNER_ACCESS_TYPE) ?? Guid.Empty,
+                ProgressInProcent = 0,
+                AcquireDate = DateTime.UtcNow,
+                Book = book
+            });
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when purchasing book: {BookId}", book.Id);
+
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the book couldn't be purchased. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "BookId", book.Id },
+                        { "UserId", userId }
+                    });
+            }
+
+            return Results.Ok();
         }
 
         [HttpPost()]
