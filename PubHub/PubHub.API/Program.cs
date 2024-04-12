@@ -45,9 +45,19 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);    // Long-term security assurance and reduced vulnerability window.
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts(); // Enable HSTS middleware for non-development environments
+}
+
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 

@@ -50,6 +50,11 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 });
 
+builder.Services.AddHsts(options =>
+{ 
+    options.MaxAge = TimeSpan.FromDays(365);    // Long-term security assurance and reduced vulnerability window.
+});
+
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<FileHandler>();
