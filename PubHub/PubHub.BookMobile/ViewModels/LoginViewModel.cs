@@ -55,7 +55,7 @@ namespace PubHub.BookMobile.ViewModels
 
             try
             {
-                User.Set(tokens);
+                await User.Set(tokens);
             }
             catch (Exception)
             {

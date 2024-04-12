@@ -74,7 +74,7 @@ namespace PubHub.BookMobile.ViewModels
                 return;
             }
 
-            User.Set(result.Instance.TokenResponseModel);
+            await User.Set(result.Instance.TokenResponseModel);
             Application.Current!.MainPage = new AuthorizedShell();
         }
 

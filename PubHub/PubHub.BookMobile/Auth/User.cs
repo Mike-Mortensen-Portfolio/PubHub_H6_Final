@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using IntelliJ.Lang.Annotations;
 using PubHub.Common;
@@ -24,12 +25,12 @@ namespace PubHub.BookMobile.Auth
         /// </summary>
         /// <param name="tokens"></param>
         /// <exception cref="Exception"></exception>
-        internal static void Set(TokenResponseModel tokens)
+        internal static async Task Set(TokenResponseModel tokens)
         {
             _identity = GetIdentity(tokens.Token) ?? throw new Exception($"Token validation failed: {tokens.Token}");
 
-            Preferences.Set(PreferenceConstants.TOKEN_KEY, tokens.Token);
-            Preferences.Set(PreferenceConstants.REFRESH_TOKEN_KEY, tokens.RefreshToken);
+            await SecureStorage.Default.SetAsync(PreferenceConstants.TOKEN_KEY, tokens.Token);
+            await SecureStorage.Default.SetAsync(PreferenceConstants.REFRESH_TOKEN_KEY, tokens.RefreshToken);
         }
 
         private static ClaimsPrincipal? GetIdentity(string token)
@@ -51,31 +52,36 @@ namespace PubHub.BookMobile.Auth
         {
             _identity = null;
 
-            Preferences.Clear();
+            SecureStorage.Default.RemoveAll();
         }
 
+        [Obsolete($"This is no longer considered secure. Use {nameof(TryGetCachedToken)}", true)]
         private static bool HasChachedUser()
         {
             return Preferences.ContainsKey(PreferenceConstants.TOKEN_KEY) && Preferences.ContainsKey(PreferenceConstants.REFRESH_TOKEN_KEY);
         }
 
-        internal static bool TryGetCachedToken(out TokenInfo? tokens)
+        internal static async Task<Tuple<bool, TokenInfo?>> TryGetCachedToken()
         {
-            tokens = null;
-            if (!HasChachedUser())
-                return false;
+            TokenInfo? tokens = null;
+            try
+            {
+                tokens = await GetChachedToken();
+            }
+            catch (Exception) 
+            { 
+                /*Save guard to avoid a crash. It's up to the consumer of this method to ensure the program acts accordingly when failing to retrieve tokens*/ 
+            }
 
-            tokens = GetChachedToken();
-
-            return true;
+            return new Tuple<bool, TokenInfo?>(tokens is not null, tokens);
         }
 
-        internal static TokenInfo GetChachedToken()
+        internal static async Task<TokenInfo> GetChachedToken()
         {
             return new TokenInfo
             {
-                RefreshToken = Preferences.Get(PreferenceConstants.REFRESH_TOKEN_KEY, null) ?? throw new Exception($"No {PreferenceConstants.REFRESH_TOKEN_KEY} found!"),
-                Token = Preferences.Get(PreferenceConstants.TOKEN_KEY, null) ?? throw new Exception($"No {PreferenceConstants.TOKEN_KEY} found!")
+                RefreshToken = await SecureStorage.Default.GetAsync(PreferenceConstants.REFRESH_TOKEN_KEY) ?? throw new Exception($"No {PreferenceConstants.REFRESH_TOKEN_KEY} found!"),
+                Token = await SecureStorage.Default.GetAsync(PreferenceConstants.TOKEN_KEY) ?? throw new Exception($"No {PreferenceConstants.TOKEN_KEY} found!")
             };
         }
 
