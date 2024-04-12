@@ -42,6 +42,7 @@ namespace PubHub.API.Controllers
         /// Get all books that matches the criteria <paramref name="queryOptions"/>
         /// </summary>
         /// <param name="BookQuery">Filtering options</param>
+        [AllowAnonymous]
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<BookInfoModel>))]
         public async Task<IResult> GetBooksAsync([FromQuery] BookQuery queryOptions, [FromHeader] string appId)
@@ -94,6 +95,7 @@ namespace PubHub.API.Controllers
             return Results.Ok(books);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
