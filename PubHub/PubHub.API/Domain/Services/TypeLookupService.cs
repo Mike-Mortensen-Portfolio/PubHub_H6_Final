@@ -7,6 +7,7 @@ namespace PubHub.API.Domain.Services
     {
         private readonly PubHubContext _context = context;
 
+        #region AccountType
         public bool IsUser(Guid accountTypeId) => _context.Set<AccountType>()
             .Any(at => at.Name == AccountTypeConstants.USER_ACCOUNT_TYPE && at.Id == accountTypeId);
 
@@ -18,5 +19,11 @@ namespace PubHub.API.Domain.Services
 
         public string? GetAccountTypeName(Guid accountTypeId) => _context.Set<AccountType>()
             .FirstOrDefault(at => at.Id == accountTypeId)?.Name;
+        #endregion
+
+        #region AccessType
+        public Guid? GetAccessTypeId(string accessTypeName) => _context.Set<AccessType>()
+            .FirstOrDefault(at => at.Name == accessTypeName)?.Id;
+        #endregion
     }
 }
