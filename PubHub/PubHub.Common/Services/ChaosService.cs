@@ -39,49 +39,40 @@ namespace PubHub.Common.Services
         }
 
         #region Enabled Generators
-        public ValueTask<bool> IsChaosEnabledAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(Enabled);
-        }
+        public ValueTask<bool> IsChaosEnabledAsync(ResilienceContext context) =>
+            ValueTask.FromResult(Enabled);
 
-        public ValueTask<bool> IsFaultEnabledAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(Enabled && FaultEnabled);
-        }
+        public ValueTask<bool> IsFaultEnabledAsync(ResilienceContext context) =>
+            ValueTask.FromResult(Enabled && FaultEnabled);
 
-        public ValueTask<bool> IsLatencyEnabledAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(Enabled && LatencyEnabled);
-        }
+        public ValueTask<bool> IsLatencyEnabledAsync(ResilienceContext context) => 
+            ValueTask.FromResult(Enabled && LatencyEnabled);
 
-        public ValueTask<bool> IsOutcomeEnabledAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(Enabled && OutcomeEnabled);
-        }
+        public ValueTask<bool> IsOutcomeEnabledAsync(ResilienceContext context) =>
+            ValueTask.FromResult(Enabled && OutcomeEnabled);
         #endregion
 
         #region Injection Rate Generators
-        public ValueTask<double> GetFaultInjectionRateAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(FaultInjectionRate);
-        }
+        public ValueTask<double> GetFaultInjectionRateAsync(ResilienceContext context) =>
+            ValueTask.FromResult(FaultInjectionRate);
 
-        public ValueTask<double> GetLatencyInjectionRateAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(LatencyInjectionRate);
-        }
+        public ValueTask<double> GetLatencyInjectionRateAsync(ResilienceContext context) =>
+            ValueTask.FromResult(LatencyInjectionRate);
 
-        public ValueTask<double> GetOutcomeInjectionRateAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(OutcomeInjectionRate);
-        }
+        public ValueTask<double> GetOutcomeInjectionRateAsync(ResilienceContext context) =>
+            ValueTask.FromResult(OutcomeInjectionRate);
         #endregion
 
         #region Value Generators
-        public ValueTask<TimeSpan> GetLatencyAsync(ResilienceContext context)
-        {
-            return ValueTask.FromResult(TimeSpan.FromSeconds(LatencySeconds));
-        }
+        public ValueTask<Exception?> GetFaultAsync(ResilienceContext context) =>
+            ValueTask.FromResult<Exception?>(new InvalidOperationException("Injected by chaos strategy!"));
+
+        public ValueTask<TimeSpan> GetLatencyAsync(ResilienceContext context) =>
+            ValueTask.FromResult(TimeSpan.FromSeconds(LatencySeconds));
+
+        public ValueTask<Outcome<HttpResponseMessage>?> GetOutcomeAsync(ResilienceContext context) =>
+            ValueTask.FromResult<Outcome<HttpResponseMessage>?>(
+                Outcome.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError)));
         #endregion
 
         private static void SetInjectionRate(out double field, double input) =>

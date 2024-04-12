@@ -27,6 +27,8 @@ namespace PubHub.Common.Services
         public ValueTask<double> GetLatencyInjectionRateAsync(ResilienceContext context);
         public ValueTask<double> GetOutcomeInjectionRateAsync(ResilienceContext context);
 
+        public ValueTask<Exception?> GetFaultAsync(ResilienceContext context);
         public ValueTask<TimeSpan> GetLatencyAsync(ResilienceContext context);
+        public ValueTask<Outcome<HttpResponseMessage>?> GetOutcomeAsync(ResilienceContext context);
     }
 }

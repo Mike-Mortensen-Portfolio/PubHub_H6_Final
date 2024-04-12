@@ -110,13 +110,13 @@ namespace PubHub.Common.Extensions
                     {
                         EnabledGenerator = args => chaosService.IsFaultEnabledAsync(args.Context),
                         InjectionRateGenerator = args => chaosService.GetFaultInjectionRateAsync(args.Context),
-                        FaultGenerator = new FaultGenerator().AddException(() => new InvalidOperationException("Injected by chaos strategy!"))
+                        FaultGenerator = args => chaosService.GetFaultAsync(args.Context)
                     })
                     .AddChaosOutcome(new()
                     {
                         EnabledGenerator = args => chaosService.IsOutcomeEnabledAsync(args.Context),
                         InjectionRateGenerator = args => chaosService.GetOutcomeInjectionRateAsync(args.Context),
-                        OutcomeGenerator = new OutcomeGenerator<HttpResponseMessage>().AddResult(() => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError))
+                        OutcomeGenerator = args => chaosService.GetOutcomeAsync(args.Context)
                     });
             });
 
