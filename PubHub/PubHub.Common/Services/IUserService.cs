@@ -7,6 +7,7 @@ namespace PubHub.Common.Services
     {
         Task<ServiceResult<UserInfoModel>> GetUserAsync(Guid userId);
         Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetUserBooksAsync(Guid userId);
+        Task<ServiceResult<UserBookContentModel>> GetUserBookContentAsync(Guid userId, Guid bookId)
         Task<ServiceResult<UserInfoModel>> UpdateUserAsync(Guid userId, UserUpdateModel userUpdateModel);
         Task<ServiceResult> DeleteUserAsync(Guid userId);
         Task<ServiceResult> SuspendUserAsync(Guid userId);
