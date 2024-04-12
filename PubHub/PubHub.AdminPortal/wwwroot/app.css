@@ -100,11 +100,23 @@ h1:focus {
 }
 
 /* Chaos page */
-div.chaos-header > * {
-    display: inline-block;
+div.chaos-header {
+    margin-bottom: 1rem;
 }
 
-div.chaos-header > .rz-switch {
-    margin-bottom: 0.2rem;
-    margin-left: 0.5rem;
+    div.chaos-header > * {
+        display: inline-block;
+    }
+    
+    div.chaos-header > .rz-switch {
+        margin-bottom: 0.2rem;
+        margin-left: 0.5rem;
+    }
+
+div.chaos-control {
+    margin: auto;
+}
+
+div.chaos-control-row {
+    margin-bottom: 3rem;
 }

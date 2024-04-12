@@ -102,20 +102,20 @@ namespace PubHub.Common.Extensions
                 builder
                     .AddChaosLatency(new()
                     {
-                        EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
-                        //InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
-                        Latency = TimeSpan.FromSeconds(10)
+                        EnabledGenerator = args => chaosService.IsLatencyEnabledAsync(args.Context),
+                        InjectionRateGenerator = args => chaosService.GetLatencyInjectionRateAsync(args.Context),
+                        LatencyGenerator = args => chaosService.GetLatencyAsync(args.Context)
                     })
                     .AddChaosFault(new()
                     {
-                        EnabledGenerator = args => chaosService.IsFaultInjectionEnabledAsync(args.Context),
+                        EnabledGenerator = args => chaosService.IsFaultEnabledAsync(args.Context),
                         InjectionRateGenerator = args => chaosService.GetFaultInjectionRateAsync(args.Context),
                         FaultGenerator = new FaultGenerator().AddException(() => new InvalidOperationException("Injected by chaos strategy!"))
                     })
                     .AddChaosOutcome(new()
                     {
-                        EnabledGenerator = args => chaosService.IsChaosEnabledAsync(args.Context),
-                        //InjectionRateGenerator = args => chaosService.GetInjectionRateAsync(args.Context),
+                        EnabledGenerator = args => chaosService.IsOutcomeEnabledAsync(args.Context),
+                        InjectionRateGenerator = args => chaosService.GetOutcomeInjectionRateAsync(args.Context),
                         OutcomeGenerator = new OutcomeGenerator<HttpResponseMessage>().AddResult(() => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError))
                     });
             });

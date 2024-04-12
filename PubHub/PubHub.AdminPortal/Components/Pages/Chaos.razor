@@ -10,20 +10,88 @@
 
 <hr />
 
-<div>
-    <div class="chaos-header">
-        <h4>Fault injection</h4>
-        <RadzenSwitch @bind-Value=ChaosService.FaultInjectionEnabled Name="FaultInjectionSwitch" />
-    </div>
-    
-    <div>
-        <inline>
-            <RadzenSlider @bind-Value=ChaosService.FaultInjectionRate TValue="double" Min="0" Max="1" Step=".01" />
-            <i>Test</i>
-        </inline>
+<div class="chaos-header">
+    <h4>Fault injection</h4>
+    <RadzenSwitch @bind-Value=ChaosService.FaultEnabled Name="FaultSwitch" />
+</div>
+<div class="container">
+    <div class="row chaos-control-row">
+        <div class="col">
+
+            <div class="row" style="width: 300px;">
+                <div class="col col-12">
+                    <label class="form-label"><b>Injection rate:</b></label>
+                </div>
+                <div class="col chaos-control">
+                    <RadzenSlider @bind-Value=ChaosService.FaultInjectionRate TValue="double" Min="0" Max="1" Step=".01" />
+                </div>
+                <div class="col chaos-control">
+                    <RadzenNumeric @bind-Value=ChaosService.FaultInjectionRate Step="0.01" />
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
-@code{
-    bool value;
+<div class="chaos-header">
+    <h4>Latency injection</h4>
+    <RadzenSwitch @bind-Value=ChaosService.LatencyEnabled Name="LatencySwitch" />
+</div>
+<div class="container">
+    <div class="row chaos-control-row">
+        <div class="col col-12">
+
+            <div class="row" style="width: 300px;">
+                <div class="col col-12">
+                    <label class="form-label"><b>Injection rate:</b></label>
+                </div>
+                <div class="col chaos-control">
+                    <RadzenSlider @bind-Value=ChaosService.LatencyInjectionRate TValue="double" Min="0" Max="1" Step=".01" />
+                </div>
+                <div class="col chaos-control">
+                    <RadzenNumeric @bind-Value=ChaosService.LatencyInjectionRate Step="0.01" />
+                </div>
+            </div>
+
+            <div class="row" style="width: 100px;">
+                <div class="col col-12">
+                    <label class="form-label"><b>Latency rate:</b></label>
+                </div>
+                <div class="col chaos-control">
+                    <RadzenNumeric @bind-Value=ChaosService.LatencySeconds Step="0.1" /> seconds
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="chaos-header">
+    <h4>Outcome injection</h4>
+    <RadzenSwitch @bind-Value=ChaosService.OutcomeEnabled Name="OutcomeSwitch" />
+</div>
+
+<div class="container">
+    <div class="row chaos-control-row">
+        <div class="col">
+
+            <div class="row" style="width: 300px;">
+                <div class="col col-12">
+                    <label class="form-label"><b>Injection rate:</b></label>
+                </div>
+                <div class="col chaos-control">
+                    <RadzenSlider @bind-Value=ChaosService.OutcomeInjectionRate TValue="double" Min="0" Max="1" Step=".01" />
+                </div>
+                <div class="col chaos-control">
+                    <RadzenNumeric @bind-Value=ChaosService.OutcomeInjectionRate Step="0.01" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
 }
