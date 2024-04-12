@@ -7,18 +7,18 @@ namespace PubHub.Common.Services
 {
     public class HttpClientService : IHttpClientService
     {
-        private const int RETRY_COUNT = 5;
         private const string BEARER_KEY = "Bearer";
 
         private readonly HttpClient _client;
+        private readonly ResiliencePipeline<HttpResponseMessage> _resiliencePipeline;
         private readonly Func<Task<TokenInfo>> _tokenInfoAsync;
-        private readonly Func<HttpResponseMessage, bool> _retryPredicate = res => !res.IsSuccessStatusCode;
 
-        public HttpClientService(HttpClient client, Func<Task<TokenInfo>> tokenInfoAsync)
+        public HttpClientService(HttpClient client, ResiliencePipeline<HttpResponseMessage> resiliencePipeline, Func<Task<TokenInfo>> tokenInfoAsync)
         {
             _client = client;
-            _tokenInfoAsync = tokenInfoAsync;
             _client.DefaultRequestHeaders.Add("refreshToken", string.Empty);
+            _resiliencePipeline = resiliencePipeline;
+            _tokenInfoAsync = tokenInfoAsync;
         }
 
         /// <inheritdoc/>
@@ -26,21 +26,15 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            return await Policy
-                .HandleResult(_retryPredicate)
-                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                {
-                    Debug.WriteLine($"{nameof(GetAsync)}: Retrying in {time} ...");
-                })
-                .ExecuteAsync(async () =>
-                {
-                    Debug.WriteLine($"{nameof(GetAsync)}: {_client.BaseAddress}{uri}");
-                    var tokenInfo = await _tokenInfoAsync.Invoke();
-                    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);                    
-                    _client.DefaultRequestHeaders.Remove("refreshToken"); 
-                    _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
-                    return await _client.GetAsync(uri);
-                });
+            return await _resiliencePipeline.ExecuteAsync(async cancellationToken =>
+            {
+                var tokenInfo = await _tokenInfoAsync.Invoke();
+                _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);                    
+                _client.DefaultRequestHeaders.Remove("refreshToken"); 
+                _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
+
+                return await _client.GetAsync(uri, cancellationToken);
+            });
         }
 
         /// <inheritdoc/>
@@ -48,22 +42,15 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();            
 
-            return await Policy
-                .HandleResult(_retryPredicate)
-                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                {
-                    Debug.WriteLine($"{nameof(PostAsync)}: Retrying in {time} ...");
-                })
-                .ExecuteAsync(async () =>
-                {
-                    Debug.WriteLine($"{nameof(PostAsync)}: {_client.BaseAddress}{uri}");
-                    var tokenInfo = await _tokenInfoAsync.Invoke();
-                    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);
-                    _client.DefaultRequestHeaders.Remove("refreshToken");
-                    _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
+            return await _resiliencePipeline.ExecuteAsync(async cancellationToken =>
+            {
+                var tokenInfo = await _tokenInfoAsync.Invoke();
+                _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);
+                _client.DefaultRequestHeaders.Remove("refreshToken");
+                _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
 
-                    return await _client.PostAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json));
-                });
+                return await _client.PostAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), cancellationToken);
+            });
         }
 
         /// <inheritdoc/>
@@ -71,21 +58,15 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            return await Policy
-                .HandleResult(_retryPredicate)
-                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                {
-                    Debug.WriteLine($"{nameof(PutAsync)}: Retrying in {time} ...");
-                })
-                .ExecuteAsync(async () =>
-                {
-                    Debug.WriteLine($"{nameof(PutAsync)}: {_client.BaseAddress}{uri}");
-                    var tokenInfo = await _tokenInfoAsync.Invoke();
-                    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);
-                    _client.DefaultRequestHeaders.Remove("refreshToken");
-                    _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
-                    return await _client.PutAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json));
-                });
+            return await _resiliencePipeline.ExecuteAsync(async cancellationToken =>
+            {
+                var tokenInfo = await _tokenInfoAsync.Invoke();
+                _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);
+                _client.DefaultRequestHeaders.Remove("refreshToken");
+                _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
+
+                return await _client.PutAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), cancellationToken);
+            });
         }
 
         /// <inheritdoc/>
@@ -93,21 +74,15 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            return await Policy
-                .HandleResult(_retryPredicate)
-                .WaitAndRetryAsync(retryCount: RETRY_COUNT, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(0.2 * Math.Pow(2, retryAttempt)), onRetry: (result, time) =>
-                {
-                    Debug.WriteLine($"{nameof(DeleteAsync)}: Retrying in {time} ...");
-                })
-                .ExecuteAsync(async () =>
-                {
-                    Debug.WriteLine($"{nameof(DeleteAsync)}: {_client.BaseAddress}{uri}");
-                    var tokenInfo = await _tokenInfoAsync.Invoke();
-                    _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);
-                    _client.DefaultRequestHeaders.Remove("refreshToken");
-                    _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
-                    return await _client.DeleteAsync(uri);
-                });
+            return await _resiliencePipeline.ExecuteAsync(async cancellationToken =>
+            {
+                var tokenInfo = await _tokenInfoAsync.Invoke();
+                _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);
+                _client.DefaultRequestHeaders.Remove("refreshToken");
+                _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
+
+                return await _client.DeleteAsync(uri, cancellationToken);
+            });
         }
 
         /// <summary>

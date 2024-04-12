@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.BookMobile", "PubHub
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.API.UT", "..\Test\PubHub.API.UT\PubHub.API.UT.csproj", "{B2A1C344-9D6D-4C1E-8D3B-B584E8611798}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubHub.Common.UT", "..\Test\PubHub.Common.UT\PubHub.Common.UT.csproj", "{D1766227-4F71-4FE2-806E-1DB6E4497A0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.Common.UT", "..\Test\PubHub.Common.UT\PubHub.Common.UT.csproj", "{D1766227-4F71-4FE2-806E-1DB6E4497A0B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubHub.TestUtils", "..\Test\PubHub.TestUtils\PubHub.TestUtils.csproj", "{9226A806-2F2A-491C-B9E7-5FD383F5C392}"
 EndProject
