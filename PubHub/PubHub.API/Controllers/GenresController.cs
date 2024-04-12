@@ -30,6 +30,7 @@ namespace PubHub.API.Controllers
             _logger = logger;
         }
 
+        [AllowAnonymous]
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<GenreInfoModel>))]
         public async Task<IResult> GetGenresAsync([FromHeader] string appId)
@@ -50,6 +51,7 @@ namespace PubHub.API.Controllers
             return Results.Ok(genres);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenreInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
