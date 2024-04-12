@@ -17,6 +17,8 @@ namespace PubHub.BookMobile.ViewModels
         private bool _isEBook = true;
         [ObservableProperty]
         private bool _isAudioBook = false;
+        [ObservableProperty]
+        private bool _isAuthenticated = false;
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
