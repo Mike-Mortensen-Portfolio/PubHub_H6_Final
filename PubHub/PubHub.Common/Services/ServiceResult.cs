@@ -2,7 +2,7 @@
 
 namespace PubHub.Common.Services
 {
-    public class ServiceResult 
+    public class ServiceResult
     {     
         internal ServiceResult(HttpStatusCode statusCode, string errorDescriptor) 
         {
