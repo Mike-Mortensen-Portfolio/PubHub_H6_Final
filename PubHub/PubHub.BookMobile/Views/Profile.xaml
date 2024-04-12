@@ -219,7 +219,7 @@
                         WidthRequest="200"
                         HeightRequest="55"
                         Command="{Binding NavigateToPageCommand}"
-                        CommandParameter="Library"/>
+                        CommandParameter="PersonalLibrary"/>
             </StackLayout>
         </StackLayout>
     </RefreshView>

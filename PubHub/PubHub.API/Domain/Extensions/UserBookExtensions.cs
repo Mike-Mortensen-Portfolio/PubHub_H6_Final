@@ -3,16 +3,16 @@ using PubHub.Common.Models.Books;
 
 namespace PubHub.API.Domain.Extensions
 {
-    public static class BookExtensions
+    public static class UserBookExtensions
     {
         /// <summary>
         /// Filter the <paramref name="query"/> result and performs pagination based on the provided <paramref name="options"/>
         /// </summary>
         /// <param name="query"></param>
         /// <param name="options"></param>
-        /// <returns>The filtered <see cref="IQueryable{T}"/> of type <see cref="Book"/></returns>
+        /// <returns>The filtered <see cref="IQueryable{T}"/> of type <see cref="UserBook"/></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IQueryable<Book> Filter(this IQueryable<Book> query, BookQuery options)
+        public static IQueryable<UserBook> Filter(this IQueryable<UserBook> query, BookQuery options)
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query), "Query can't be null");
@@ -26,42 +26,42 @@ namespace PubHub.API.Domain.Extensions
             return query;
         }
         /// <summary>
-        /// Finds all books in the <paramref name="query"/> where the <paramref name="searchTerms"/> can be identified.
+        /// Finds all userBooks in the <paramref name="query"/> where the <paramref name="searchTerms"/> can be identified.
         /// <br/>
         /// <br/>
-        /// <strong>Note:</strong> This will search for the key in the books title, publisher and authors
+        /// <strong>Note:</strong> This will search for the key in the userBooks title, publisher and authors
         /// </summary>
         /// <param name="query"></param>
         /// <param name="searchTerms"></param>
-        /// <returns>An <see cref="IQueryable{T}"/> of type <see cref="Book"/> where the <paramref name="searchTerms"/> could be found</returns>
+        /// <returns>An <see cref="IQueryable{T}"/> of type <see cref="UserBook"/> where the <paramref name="searchTerms"/> could be found</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IQueryable<Book> Find(this IQueryable<Book> query, BookQuery searchTerms)
+        public static IQueryable<UserBook> Find(this IQueryable<UserBook> query, BookQuery searchTerms)
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query), "Query can't be null");
 
             var normalizedSearchKey = searchTerms.SearchKey?.ToUpper();
-            query = query.Where(b =>
+            query = query.Where(ub =>
             (normalizedSearchKey == null ||
-                b.BookAuthors.Any(ba => ba.Author != null && ba.Author.Name.ToUpper().Contains(normalizedSearchKey)) ||
-                b.Title.ToUpper().Contains(normalizedSearchKey) ||
-                (b.Publisher != null && b.Publisher.Name.ToUpper().Contains(normalizedSearchKey))));
+                ub.Book!.BookAuthors.Any(ba => ba.Author != null && ba.Author.Name.ToUpper().Contains(normalizedSearchKey)) ||
+                ub.Book.Title.ToUpper().Contains(normalizedSearchKey) ||
+                (ub.Book.Publisher != null && ub.Book.Publisher.Name.ToUpper().Contains(normalizedSearchKey))));
 
             if (searchTerms.Genres != null && searchTerms.Genres.Length > 0)
-                query = query.Where(b => b.BookGenres.Select(bg => bg.GenreId).Intersect(searchTerms.Genres).Any());
+                query = query.Where(ub => ub.Book!.BookGenres.Select(bg => bg.GenreId).Intersect(searchTerms.Genres).Any());
 
             return query;
         }
 
         /// <summary>
-        /// Orders the <paramref name="query"/> of type <see cref="Book"/> according to <paramref name="orderBy"/> and <paramref name="descending"/>
+        /// Orders the <paramref name="query"/> of type <see cref="UserBook"/> according to <paramref name="orderBy"/> and <paramref name="descending"/>
         /// </summary>
         /// <param name="query"></param>
         /// <param name="orderBy"></param>
         /// <param name="descending"></param>
-        /// <returns>An <see cref="IQueryable{T}"/> of type <see cref="Book"/> as an ordered collection</returns>
+        /// <returns>An <see cref="IQueryable{T}"/> of type <see cref="UserBook"/> as an ordered collection</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IQueryable<Book> Order(this IQueryable<Book> query, OrderBooksBy orderBy, bool descending = true)
+        public static IQueryable<UserBook> Order(this IQueryable<UserBook> query, OrderBooksBy orderBy, bool descending = true)
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query), "Query can't be null");
@@ -70,11 +70,11 @@ namespace PubHub.API.Domain.Extensions
             {
                 case OrderBooksBy.PublicationDate:
                     if (descending)
-                        query = query.OrderByDescending(b => b.PublicationDate)
-                            .ThenBy(b => b.Title);
+                        query = query.OrderByDescending(ub => ub.Book!.PublicationDate)
+                            .ThenBy(ub => ub.Book!.Title);
                     else
-                        query = query.OrderBy(b => b.PublicationDate)
-                            .ThenBy(b => b.Title);
+                        query = query.OrderBy(ub => ub.Book!.PublicationDate)
+                            .ThenBy(ub => ub.Book!.Title);
                     break;
             }
 
