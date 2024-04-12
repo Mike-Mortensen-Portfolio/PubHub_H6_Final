@@ -161,7 +161,7 @@ namespace PubHub.API.Controllers
         }
 
         [HttpPost("{id}/purchase")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> PurchaseBookAsync(Guid id, [FromHeader] string appId)
         {
@@ -189,7 +189,7 @@ namespace PubHub.API.Controllers
 
             // Check if user already owns the book.
             var alreadyOwned = await _context.Set<UserBook>()
-                .AnyAsync(ub => ub.UserId == userId);
+                .AnyAsync(ub => ub.BookId == id && ub.UserId == userId);
             if (alreadyOwned)
                 return Results.Problem(
                     type: DuplicateProblemSpecification.TYPE,
