@@ -120,3 +120,26 @@ div.chaos-control {
 div.chaos-control-row {
     margin-bottom: 3rem;
 }
+
+/* Misc. */
+inline {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+    inline.space-between {
+      display: flex;
+      justify-content: space-between;
+    }
+
+        inline.space-between > div {
+          display: inline-flex;
+        }
+
+    inline *:not(*:first-child) {
+      margin-left: 0.3rem;
+    }
+
+        inline *:not(*:first-child) *:not(inline) > * {
+          margin-left: unset;
+        }

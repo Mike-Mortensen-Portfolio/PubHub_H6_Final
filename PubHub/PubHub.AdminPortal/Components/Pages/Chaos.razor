@@ -39,9 +39,8 @@
     <RadzenSwitch @bind-Value=ChaosService.LatencyEnabled Name="LatencySwitch" />
 </div>
 <div class="container">
-    <div class="row chaos-control-row">
-        <div class="col col-12">
-
+    <div class="row chaos-control-row"> 
+        <div class="col col-4">
             <div class="row" style="width: 300px;">
                 <div class="col col-12">
                     <label class="form-label"><b>Injection rate:</b></label>
@@ -53,17 +52,22 @@
                     <RadzenNumeric @bind-Value=ChaosService.LatencyInjectionRate Step="0.01" />
                 </div>
             </div>
+        </div>
 
+        <div class="col col-4">
             <div class="row" style="width: 100px;">
                 <div class="col col-12">
-                    <label class="form-label"><b>Latency rate:</b></label>
+                    <label class="form-label"><b>Latency:</b></label>
                 </div>
                 <div class="col chaos-control">
-                    <RadzenNumeric @bind-Value=ChaosService.LatencySeconds Step="0.1" /> seconds
+                    <inline>
+                        <RadzenNumeric Style="min-width: 100px;" @bind-Value=ChaosService.LatencySeconds Step="0.1" />
+                        <div>sec.</div>
+                    </inline>
                 </div>
             </div>
-
         </div>
+
     </div>
 </div>
 
