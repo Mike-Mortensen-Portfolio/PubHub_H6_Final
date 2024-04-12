@@ -61,24 +61,6 @@ namespace PubHub.BookMobile.Extensions
             return services;
         }
 
-        ///// <summary>
-        ///// Add <typeparamref name="TService"/> configured with <typeparamref name="TSettings"/> to the DI container as a <strong>singleton</strong>
-        ///// </summary>
-        ///// <typeparam name="TService"></typeparam>
-        ///// <typeparam name="TSettings"></typeparam>
-        ///// <param name="services"></param>
-        ///// <returns></returns>
-        //public static IServiceCollection AddSingletonServiceWithSettings<TService, TSettings>(this IServiceCollection services) where TService : ServiceBase where TSettings : IServiceSettings
-        //{
-        //    return services.AddSingleton(provider =>
-        //    {
-        //        var appSettings = provider.GetRequiredService<TSettings>();
-
-        //        var service = Activator.CreateInstance(typeof(TService), appSettings) as TService;
-        //        return service;
-        //    });
-        //}
-
         private static void RegisterShellRoute<TView>(string route, RouteFactory factory = null!) where TView : NavigableElement
         {
             if (factory is null)

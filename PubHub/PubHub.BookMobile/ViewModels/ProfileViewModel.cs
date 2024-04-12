@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.Common;
 using PubHub.Common.Models.Users;
 using PubHub.Common.Services;
@@ -45,7 +46,7 @@ namespace PubHub.BookMobile.ViewModels
             IsBusy = true;
             if (!User.IsAuthenticated || User.Id is null)
             {
-                await Application.Current!.MainPage!.DisplayAlert("Error", $"You do not have permission to view this content.{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 IsBusy = false;
                 return;
             }
@@ -55,9 +56,9 @@ namespace PubHub.BookMobile.ViewModels
             if (!result.IsSuccess || result.Instance == null)
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"You do not have permission to view this content.{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Something went wrong...{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
                 IsBusy = false;
                 return;
             }
@@ -91,9 +92,9 @@ namespace PubHub.BookMobile.ViewModels
             if (!result.IsSuccess || result.Instance is null)
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"You do not have permission to view this content.{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Something went wrong while updating your data...{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
                 IsBusy = false;
                 return;

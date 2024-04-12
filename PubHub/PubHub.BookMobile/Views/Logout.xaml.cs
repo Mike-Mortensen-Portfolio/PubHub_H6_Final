@@ -1,4 +1,5 @@
-﻿using PubHub.BookMobile.Auth;
+﻿using Microsoft.Maui.Controls;
+using PubHub.BookMobile.Auth;
 using PubHub.Common;
 using PubHub.Common.Services;
 
@@ -20,9 +21,9 @@ public partial class Logout : ContentPage
         if (!result.IsSuccess)
         {
             if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                await Application.Current!.MainPage!.DisplayAlert("Error", $"Something went wrong... We'll sign you out anyways but contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert("Error", $"Something went wrong... We'll sign you out anyways but contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
             else
-                await Application.Current!.MainPage!.DisplayAlert("Error", $"Something went wrong... We'll sign you out anyways but contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert("Error", $"Something went wrong... We'll sign you out anyways but contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
         }
 
         User.Unset();

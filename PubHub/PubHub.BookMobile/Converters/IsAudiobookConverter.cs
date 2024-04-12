@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using CommunityToolkit.Maui.Converters;
 using PubHub.Common.Models.ContentTypes;
+using Xamarin.Google.Crypto.Tink.Shaded.Protobuf;
 
 namespace PubHub.BookMobile.Converters
 {
@@ -10,7 +11,7 @@ namespace PubHub.BookMobile.Converters
 
         public override bool ConvertFrom(ContentTypeInfoModel value, CultureInfo? culture)
         {
-            return value.Name.ToUpperInvariant() == "AUDIOBOOK";
+            return value is not null && value.Name.ToUpperInvariant() == "AUDIOBOOK";
         }
     }
 }

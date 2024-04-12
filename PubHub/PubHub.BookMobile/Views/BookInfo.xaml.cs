@@ -1,4 +1,5 @@
 ﻿using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.ViewModels;
 using PubHub.Common.Services;
 
@@ -21,7 +22,19 @@ public partial class BookInfo : ContentPage
     protected override async void OnAppearing()
     {
         _viewModel.IsAuthenticated = User.IsAuthenticated;
-        _viewModel.AlreadyOwnsBook = ((User.Id.HasValue) && (await _userService.GetUserBooksAsync(User.Id!.Value)).Instance!.Any(book => book.Id == _viewModel.CurrentViewedItem.Id));
+
+        var result = await _userService.GetUserBooksAsync(User.Id!.Value);
+
+        if (!result.IsSuccess)
+        {
+            await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
+
+
+            await Shell.Current.GoToAsync("..");
+            return;
+        }
+
+        _viewModel.AlreadyOwnsBook = User.Id.HasValue && (result.Instance?.Any(book => book.Id == _viewModel.CurrentViewedItem.Id) ?? false);
         base.OnAppearing();
     }
 }
