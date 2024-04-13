@@ -2,10 +2,8 @@
 using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Xamarin.Google.Crypto.Tink.Proto;
-using PubHub.Common.ErrorSpecifications;
 using PubHub.BookMobile.Models;
-using PubHub.Common;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Genres;
 using PubHub.Common.Services;

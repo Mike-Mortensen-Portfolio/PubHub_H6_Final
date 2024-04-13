@@ -1,4 +1,4 @@
-﻿namespace PubHub.AdminPortal.Components.Constants
+﻿namespace PubHub.Common
 {
     public class ValidationAnnotationConstants
     {
