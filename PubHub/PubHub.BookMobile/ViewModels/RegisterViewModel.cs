@@ -13,6 +13,9 @@ namespace PubHub.BookMobile.ViewModels
 {
     public partial class RegisterViewModel : ObservableObject
     {
+        public const int MAX_NAME_LENGTH = 128;
+        public const int MAX_EMAIL_LENGTH = 256;
+        public const int MAX_PASSWORD_LENGTH = 64;
         private readonly IAuthenticationService _authService;
         private readonly Regex _emailRegex;
 
@@ -45,11 +48,11 @@ namespace PubHub.BookMobile.ViewModels
         public string AtLeastTwelve => DateOnly.FromDateTime(DateTime.Today.AddYears(-12)).ToString("dd/MM/yyyy");
         public string AtMostHundredAndTwenty => DateOnly.FromDateTime(DateTime.Today.AddYears(-120)).ToString("dd/MM/yyyy");
 #pragma warning restore CA1822 // Mark members as static
-        public bool IsValidName => !string.IsNullOrWhiteSpace(Name);
-        public bool IsValidSurname => !string.IsNullOrWhiteSpace(Surname);
+        public bool IsValidName => !string.IsNullOrWhiteSpace(Name) && Name.Length <= MAX_NAME_LENGTH;
+        public bool IsValidSurname => !string.IsNullOrWhiteSpace(Surname) && Surname.Length <= MAX_NAME_LENGTH;
         public bool IsValidBirthday => Birthday.Date >= DateTime.Parse(AtMostHundredAndTwenty) && Birthday.Date <= DateTime.Parse(AtLeastTwelve);
-        public bool IsValidEmail => !string.IsNullOrWhiteSpace(Email) && _emailRegex.Match(Email).Success;
-        public bool IsValidPassword => !string.IsNullOrWhiteSpace(Password) && !string.IsNullOrWhiteSpace(PasswordConfirm) && Password.Equals(PasswordConfirm);
+        public bool IsValidEmail => !string.IsNullOrWhiteSpace(Email) && _emailRegex.Match(Email).Success && Email.Length <= MAX_EMAIL_LENGTH;
+        public bool IsValidPassword => !string.IsNullOrWhiteSpace(Password) && Password.Length <= MAX_PASSWORD_LENGTH && !string.IsNullOrWhiteSpace(PasswordConfirm) && Password.Equals(PasswordConfirm);
         public bool CanRequestRegistration => IsValidName && IsValidSurname && IsValidBirthday && IsValidEmail && IsValidPassword;
 
         [RelayCommand(CanExecute = nameof(CanRequestRegistration))]
