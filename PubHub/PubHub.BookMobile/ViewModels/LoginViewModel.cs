@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using PubHub.BookMobile.Auth;
-using PubHub.BookMobile.ErrorSpecifications;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
 using PubHub.Common.Services;

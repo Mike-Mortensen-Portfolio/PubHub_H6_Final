@@ -41,17 +41,28 @@
 
     private async Task RemovePublisher()
     {
-        var result = await PublisherService.DeletePublisherAsync(PublisherId);
-        if (result.StatusCode == ResponseCodeConstants.OK_CODE)
+        try
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = $"Successfully removed the publisher: {PublisherName}.", Detail = "Success", Duration = 5000 });
-            await ModalOptions(false);
+            var result = await PublisherService.DeletePublisherAsync(PublisherId);
+            if (result.StatusCode == HttpStatusCode.NotFound)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = NotFoundError.ERROR_MESSAGE, Detail = NotFoundError.TITLE, Duration = 5000 });
+                unsuccessfulResult = true;
+                StateHasChanged();
+            }
+            if(result.IsSuccess)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = $"Successfully removed the publisher: {PublisherName}.", Detail = "Success", Duration = 5000 });
+                await ModalOptions(false);
+
+            }
         }
-        else
+        catch (Exception ex)
         {
-            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = "Unable to remove the publisher.", Detail = "Success", Duration = 5000 });
-            unsuccessfulResult = true;
+            Debug.WriteLine("Unable to remove publisher, ", ex.Message);
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = $"Unable to remove the publisher, {NoConnectionError.ERROR_MESSAGE}", Detail = NoConnectionError.TITLE, Duration = 5000 });
         }
+
     }
 
     Task ModalOptions(bool IsClosing)
