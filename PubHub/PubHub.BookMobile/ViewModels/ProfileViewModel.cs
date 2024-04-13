@@ -12,6 +12,9 @@ namespace PubHub.BookMobile.ViewModels
 {
     public partial class ProfileViewModel : NavigationObject
     {
+        public const int MAX_NAME_LENGTH = 128;
+        public const int MAX_EMAIL_LENGTH = 256;
+
         private readonly IUserService _userService;
         private readonly Regex _emailRegex;
         private UserInfoModel? _userInfo;
@@ -30,8 +33,9 @@ namespace PubHub.BookMobile.ViewModels
         private string? _email;
         [ObservableProperty]
         private bool _isAuthenticated;
-        private bool FormIsFilled => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Surname) && !string.IsNullOrWhiteSpace(Email);
-        private bool CanUpdate => FormIsFilled && _emailRegex.Match(Email!).Success;
+        private bool FormIsFilled => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Surname) && !string.IsNullOrWhiteSpace(Email) && Name.Length <= MAX_NAME_LENGTH && Surname.Length <= MAX_NAME_LENGTH;
+        private bool IsValidEmail => !string.IsNullOrWhiteSpace(Email) && _emailRegex.Match(Email!).Success && Email.Length <= MAX_EMAIL_LENGTH;
+        private bool CanUpdate => FormIsFilled && IsValidEmail;
 
         public ProfileViewModel(IUserService userService, IConfiguration configuration)
         {

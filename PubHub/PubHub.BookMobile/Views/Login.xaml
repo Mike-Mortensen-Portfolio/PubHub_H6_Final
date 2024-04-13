@@ -28,6 +28,7 @@
                             Stroke="Transparent">
                         <Entry WidthRequest="200"
                                Keyboard="Email"
+                               MaxLength="{x:Static viewModels:RegisterViewModel.MAX_NAME_LENGTH}"
                                Text="{Binding Email}"/>
                     </Border>
                 </StackLayout>
@@ -42,6 +43,7 @@
                             Stroke="Transparent">
                         <Entry WidthRequest="200"
                                IsPassword="True"
+                               MaxLength="{x:Static viewModels:RegisterViewModel.MAX_PASSWORD_LENGTH}"
                                Text="{Binding Password}"/>
                     </Border>
                 </StackLayout>

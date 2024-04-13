@@ -13,6 +13,8 @@ namespace PubHub.BookMobile.ViewModels
 {
     public partial class LibraryViewModel : NavigationObject
     {
+        public const int MAX_SEARCH_LENGTH = 64;
+
         private readonly IBookService _bookService;
         private readonly IGenreService _genreService;
         [ObservableProperty]

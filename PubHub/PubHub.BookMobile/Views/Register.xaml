@@ -2,9 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PubHub.BookMobile.Views.Register"
-             xmlns:viewsModels="clr-namespace:PubHub.BookMobile.ViewModels"
+             xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
              Title="Register"
-             x:DataType="viewsModels:RegisterViewModel">
+             x:DataType="viewModels:RegisterViewModel">
     <ScrollView>
         <StackLayout Padding="10">
             <ActivityIndicator IsRunning="{Binding IsBusy}"/>
@@ -31,11 +31,12 @@
                            FontAttributes="Bold"
                            WidthRequest="150"/>
                         <Border StrokeShape="RoundRectangle 10,10"
-                            HeightRequest="30"
-                            Stroke="Transparent">
+                                HeightRequest="30"
+                                Stroke="Transparent">
                             <Entry WidthRequest="200"
-                               Keyboard="Email"
-                               Text="{Binding Name}"/>
+                                   Keyboard="Email"
+                                   MaxLength="{x:Static viewModels:RegisterViewModel.MAX_NAME_LENGTH}"
+                                   Text="{Binding Name}"/>
                         </Border>
                     </StackLayout>
                     <StackLayout Orientation="Horizontal"
@@ -48,8 +49,9 @@
                             HeightRequest="30"
                             Stroke="Transparent">
                             <Entry WidthRequest="200"
-                               Keyboard="Email"
-                               Text="{Binding Surname}"/>
+                                   Keyboard="Email"
+                                   MaxLength="{x:Static viewModels:RegisterViewModel.MAX_NAME_LENGTH}"
+                                   Text="{Binding Surname}"/>
                         </Border>
                     </StackLayout>
                     <StackLayout Orientation="Horizontal"
@@ -77,8 +79,9 @@
                             HeightRequest="30"
                             Stroke="Transparent">
                             <Entry WidthRequest="200"
-                            Keyboard="Email"
-                            Text="{Binding Email}"/>
+                                   Keyboard="Email"
+                                   MaxLength="{x:Static viewModels:RegisterViewModel.MAX_EMAIL_LENGTH}"
+                                   Text="{Binding Email}"/>
                         </Border>
                     </StackLayout>
                     <StackLayout Orientation="Horizontal"
@@ -91,8 +94,9 @@
                             HeightRequest="30"
                             Stroke="Transparent">
                             <Entry WidthRequest="200"
-                               IsPassword="True"
-                               Text="{Binding Password}"/>
+                                   IsPassword="True"
+                                   MaxLength="{x:Static viewModels:RegisterViewModel.MAX_PASSWORD_LENGTH}"
+                                   Text="{Binding Password}"/>
                         </Border>
                     </StackLayout>
                     <StackLayout Orientation="Horizontal"
@@ -105,8 +109,9 @@
                             HeightRequest="30"
                             Stroke="Transparent">
                             <Entry WidthRequest="200"
-                               IsPassword="True"
-                               Text="{Binding PasswordConfirm}"/>
+                                   IsPassword="True"
+                                   MaxLength="{x:Static viewModels:RegisterViewModel.MAX_PASSWORD_LENGTH}"
+                                   Text="{Binding PasswordConfirm}"/>
                         </Border>
                     </StackLayout>
                     <Button Margin="0,20,0,0"
