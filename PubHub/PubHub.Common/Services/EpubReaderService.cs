@@ -7,14 +7,14 @@ namespace PubHub.Common.Services
 {
     public class EpubReaderService : IEpubReaderService
     {
-        private readonly int _currentChapterIndex = 0;
+        // A thing to be aware of here, is that the first few pages can contain only little information and maybe images, which haven't been dealt with for now.
 
         /// <summary>
         /// Retrieves the <see cref="EpubBook"/> from the <see cref="byte[]"/> with the book content stored in the db.
         /// </summary>
         /// <param name="epubContent"><see cref="byte[]"/> containing the book content.</param>
         /// <returns>A <see cref="ServiceResult{TResult}"/> with how the request was handled.</returns>
-        public async Task<ServiceResult<EpubBook>> GetEpubBook(byte[] epubContent)
+        public async Task<ServiceResult<EpubBook>> GetEpubBookAsync(byte[] epubContent)
         {
             try
             {
@@ -34,17 +34,37 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="epubBook">The <see cref="EpubBook"/> containing all information about a book.</param>
         /// <returns>A <see cref="ServiceResult{TResult}"/> with how the request was handled.</returns>
-        public ServiceResult<string> GetCurrentBookChapterAsync(EpubBook epubBook)
+        public ServiceResult<string> GetCurrentBookChapter(int currentChapterIndex, EpubBook epubBook)
         {
             try
             {
-                var currentChapter = DisplayChapterContent(_currentChapterIndex, epubBook);              
-                return new ServiceResult<string>((string?)currentChapter.Instance, errorDescriptor: "Successfully retrieved the current chapter.");
+                var currentChapter = DisplayChapterContent(currentChapterIndex, epubBook);              
+                return new ServiceResult<string>(currentChapter.Instance, errorDescriptor: "Successfully retrieved the current chapter.");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error retrieving the current chapter: {ex.Message}");
                 return new ServiceResult<string>(string.Empty, errorDescriptor: $"Error retrieving the current chapter: {ex.Message}.");
+            }
+        }
+
+        /// <summary>
+        /// Gets the next chapter, the interation of chapterIndex++ should happen before calling this method.
+        /// </summary>
+        /// <param name="chapterIndex">The next chapter index.</param>
+        /// <param name="epubBook">The <see cref="EpubBook"/> which needs to be read from.</param>
+        /// <returns></returns>
+        public ServiceResult<string> GetNextChapter(int chapterIndex, EpubBook epubBook)
+        {
+            try
+            {
+                var nextChapter = DisplayChapterContent(chapterIndex, epubBook);
+                return new ServiceResult<string>(nextChapter.Instance, errorDescriptor: "Successfully retrieved the current chapter.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error retrieving the next chapter: {ex.Message}");
+                return new ServiceResult<string>(string.Empty, errorDescriptor: $"Error retrieving the next chapter: {ex.Message}.");
             }
         }
 
@@ -73,8 +93,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 return new ServiceResult<string>(string.Empty, $"Unable to retrieve the content of the book: {ex.Message}.");
-            }
-            
+            }            
         }
     }
 }
