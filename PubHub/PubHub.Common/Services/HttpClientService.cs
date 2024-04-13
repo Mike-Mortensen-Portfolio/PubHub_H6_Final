@@ -1,6 +1,7 @@
 ﻿using Polly;
 using PubHub.Common.Models.Authentication;
 using System.Net.Mime;
+using System.Text;
 
 namespace PubHub.Common.Services
 {
@@ -116,7 +117,8 @@ namespace PubHub.Common.Services
             var context = ResilienceContextPool.Shared.Get();
             if (!string.IsNullOrWhiteSpace(content))
             {
-                context.Properties.Set(new(ResilienceConstants.CONTENT_MEGABYTES_RESILIENCE_KEY), content?.Length * 0.000001 * sizeof(char) ?? 0d);
+                var megabytes = (decimal)Encoding.UTF8.GetByteCount(content) / 1048576;
+                context.Properties.Set(new(ResilienceConstants.CONTENT_MEGABYTES_RESILIENCE_KEY), megabytes);
             }
 
             return context;

@@ -127,7 +127,7 @@ namespace PubHub.Common.Extensions
                     {
                         TimeoutGenerator = static args =>
                         {
-                            var contentMegabytes = args.Context.Properties.GetValue(new(ResilienceConstants.CONTENT_MEGABYTES_RESILIENCE_KEY), 0d);
+                            var contentMegabytes = args.Context.Properties.GetValue(new(ResilienceConstants.CONTENT_MEGABYTES_RESILIENCE_KEY), (decimal)0);
                             double timeoutSeconds = 30;
                             if (contentMegabytes >= 2)
                             {
