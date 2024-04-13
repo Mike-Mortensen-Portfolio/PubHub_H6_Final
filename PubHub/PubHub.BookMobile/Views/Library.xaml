@@ -54,6 +54,7 @@
                                Placeholder="Search"
                                Text="{Binding SearchTerm}"
                                SearchCommand="{Binding FetchBooksCommand}"
+                               MaxLength="{x:Static viewModels:LibraryViewModel.MAX_SEARCH_LENGTH}"
                                CancelButtonColor="Red"
                                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"/>
                 </Frame>
