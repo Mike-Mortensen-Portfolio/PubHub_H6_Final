@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.Models;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
@@ -52,10 +54,10 @@ namespace PubHub.BookMobile.ViewModels
 
             if (!result.IsSuccess || result.Instance is null)
             {
-                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                if (result.StatusCode == HttpStatusCode.Unauthorized)
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
                 HasBooksToShow = Books.Any();
                 IsBusy = false;
@@ -96,7 +98,7 @@ namespace PubHub.BookMobile.ViewModels
                 }
             };
 
-            await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo { PageName = "BookInfo", Parameters = parameters });
+            await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo { RouteName = "BookInfo", Parameters = parameters });
 
             return;
         }
@@ -111,9 +113,9 @@ namespace PubHub.BookMobile.ViewModels
             if (!result.IsSuccess || result.Instance is null)
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve genres. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve genres. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
                 IsBusy = false;
                 return;

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.Models;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
@@ -8,7 +9,7 @@ using PubHub.Common.Services;
 
 namespace PubHub.BookMobile.ViewModels
 {
-    public partial class BookInfoViewModel : ObservableObject, IQueryAttributable
+    public partial class BookInfoViewModel : NavigationObject, IQueryAttributable
     {
         public const string BOOK_LISTING_QUERY_NAME = "BookListing";
         private readonly IUserService _userService;
@@ -38,9 +39,19 @@ namespace PubHub.BookMobile.ViewModels
             _bookService = bookService;
         }
 
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        public async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            BookListing = (BookListingViewModel)query[BOOK_LISTING_QUERY_NAME];
+            var book = query[BOOK_LISTING_QUERY_NAME];
+            if (!book.GetType().IsAssignableTo(typeof(BookListingViewModel)))
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(NotFoundError.TITLE, NotFoundError.ERROR_MESSAGE, NotFoundError.BUTTON_TEXT);
+
+                await NavigateToPage("..");
+
+                return;
+            }
+
+            BookListing = (BookListingViewModel)book;
 
             CurrentViewedItem = ((BookListing.EBookInStock) ? (BookListing.EBook) : (BookListing.AudioBook))!;
             IsEBook = CurrentViewedItem.ContentType.Name.ToUpperInvariant() == "EBOOK";
@@ -50,19 +61,68 @@ namespace PubHub.BookMobile.ViewModels
         [RelayCommand(CanExecute = nameof(IsAudioBook))]
         public async Task ShowEbookBook()
         {
-            CurrentViewedItem = BookListing.EBook!;
+            IsBusy = true;
+            if (BookListing.EBook is null)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(NotFoundError.TITLE, NotFoundError.ERROR_MESSAGE, NotFoundError.BUTTON_TEXT);
+
+                await NavigateToPage("..");
+
+                IsBusy = false;
+                return;
+            }
+
+            CurrentViewedItem = BookListing.EBook;
             IsEBook = true;
             IsAudioBook = false;
-            AlreadyOwnsBook = ((User.Id.HasValue) && (await _userService.GetUserBooksAsync(User.Id!.Value)).Instance!.Any(book => book.Id == CurrentViewedItem.Id));
+
+            var result = await _userService.GetUserBooksAsync(User.Id!.Value);
+
+            if (!result.IsSuccess)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
+
+                await NavigateToPage("..");
+
+                IsBusy = false;
+                return;
+            }
+
+            AlreadyOwnsBook = User.Id.HasValue && (result.Instance?.Any(book => book.Id == CurrentViewedItem.Id) ?? false);
+            IsBusy = false;
         }
 
         [RelayCommand(CanExecute = nameof(IsEBook))]
         public async Task ShowAudiobook()
         {
-            CurrentViewedItem = BookListing.AudioBook!;
+            IsBusy = true;
+            if (BookListing.AudioBook is null)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(NotFoundError.TITLE, NotFoundError.ERROR_MESSAGE, NotFoundError.BUTTON_TEXT);
+
+                await NavigateToPage("..");
+                IsBusy = false;
+                return;
+            }
+
+            CurrentViewedItem = BookListing.AudioBook;
             IsEBook = false;
             IsAudioBook = true;
-            AlreadyOwnsBook = ((User.Id.HasValue) && (await _userService.GetUserBooksAsync(User.Id!.Value)).Instance!.Any(book => book.Id == CurrentViewedItem.Id));
+
+            var result = await _userService.GetUserBooksAsync(User.Id!.Value);
+
+            if (!result.IsSuccess)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
+
+                await NavigateToPage("..");
+                IsBusy = false;
+                return;
+            }
+
+            AlreadyOwnsBook = User.Id.HasValue && (result.Instance?.Any(book => book.Id == CurrentViewedItem.Id) ?? false);
+
+            IsBusy = false;
         }
 
         [RelayCommand(CanExecute = nameof(CanBuyBook))]
@@ -74,16 +134,16 @@ namespace PubHub.BookMobile.ViewModels
             if (!result.IsSuccess)
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
                 IsBusy = false;
                 return;
             }
 
             AlreadyOwnsBook = true;
-            await Application.Current!.MainPage!.DisplayAlert("Success", $"Purchase Complete", "OK");
+            await Shell.Current.CurrentPage.DisplayAlert("Success", $"Purchase Complete", "OK");
             IsBusy = false;
         }
 
