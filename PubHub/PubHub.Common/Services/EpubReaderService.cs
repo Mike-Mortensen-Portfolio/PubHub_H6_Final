@@ -58,7 +58,7 @@ namespace PubHub.Common.Services
             try
             {
                 var nextChapter = DisplayChapterContent(chapterIndex, epubBook);
-                return new ServiceResult<string>(nextChapter.Instance, errorDescriptor: "Successfully retrieved the current chapter.");
+                return new ServiceResult<string>(nextChapter.Instance, errorDescriptor: "Successfully retrieved the next chapter.");
             }
             catch (Exception ex)
             {
