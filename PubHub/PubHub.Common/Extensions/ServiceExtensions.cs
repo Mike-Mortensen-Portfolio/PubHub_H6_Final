@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Simmy;
+using Polly.Timeout;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Authentication;
 using PubHub.Common.Services;
@@ -86,31 +87,47 @@ namespace PubHub.Common.Extensions
             services.AddResiliencePipeline<string, HttpResponseMessage>(POLLY_PIPELINE, (builder, context) =>
             {
                 // Configure Polly.
-                builder.AddRetry(new()
-                {
-                    ShouldHandle = static args =>
+                builder
+                    .AddRetry(new()
                     {
-                        var result = args.Outcome.Result;
-                        if (result == null ||
-                            result.StatusCode == HttpStatusCode.InternalServerError ||
-                            result.StatusCode == HttpStatusCode.NotFound)
+                        ShouldHandle = static args =>
                         {
-                            // Request failed.
-                            return new ValueTask<bool>(true);
+                            var result = args.Outcome.Result;
+                            if (result == null ||
+                                result.StatusCode == HttpStatusCode.InternalServerError ||
+                                result.StatusCode == HttpStatusCode.NotFound)
+                            {
+                                // Request failed.
+                                return new ValueTask<bool>(true);
+                            }
+
+                            // Request succeeded.
+                            return new ValueTask<bool>(false);
+                        },
+                        MaxRetryAttempts = 5,
+                        DelayGenerator = static args => new ValueTask<TimeSpan?>(TimeSpan.FromSeconds(0.2 * Math.Pow(2, args.AttemptNumber))),
+                        OnRetry = static args =>
+                        {
+                            Debug.WriteLine($"Polly: Retrying in {args.RetryDelay} ...");
+
+                            return default;
                         }
-
-                        // Request succeeded.
-                        return new ValueTask<bool>(false);
-                    },
-                    MaxRetryAttempts = 5,
-                    DelayGenerator = static args => new ValueTask<TimeSpan?>(TimeSpan.FromSeconds(0.2 * Math.Pow(2, args.AttemptNumber))),
-                    OnRetry = static args =>
+                    })
+                    .AddTimeout(new TimeoutStrategyOptions()
                     {
-                        Debug.WriteLine($"Polly: Retrying in {args.RetryDelay} ...");
+                        TimeoutGenerator = static args =>
+                        {
+                            var contentMegabytes = args.Context.Properties.GetValue(new(ResilienceConstants.CONTENT_MEGABYTES_RESILIENCE_KEY), 0d);
+                            double timeoutSeconds = 30;
+                            if (contentMegabytes >= 2)
+                            {
+                                // Content is more than 2 MB; use 5 min. timeout.
+                                timeoutSeconds = 300;
+                            }
 
-                        return default;
-                    }
-                });
+                            return ValueTask.FromResult(TimeSpan.FromSeconds(timeoutSeconds));
+                        }
+                    });
 
                 // Configure Simmy.
                 var chaosService = context.ServiceProvider.GetRequiredService<IChaosService>();
