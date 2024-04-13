@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace PubHub.Common.Services
+﻿namespace PubHub.Common.Services
 {
     public class ServiceResult<TResult> : ServiceResult
     {
