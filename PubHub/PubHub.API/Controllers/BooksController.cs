@@ -228,6 +228,7 @@ namespace PubHub.API.Controllers
             return Results.Ok();
         }
 
+        [DisableRequestSizeLimit]
         [HttpPost()]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
@@ -392,6 +393,7 @@ namespace PubHub.API.Controllers
             return Results.Created($"books/{bookInfo!.Id}", bookInfo);
         }
 
+        [DisableRequestSizeLimit]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
