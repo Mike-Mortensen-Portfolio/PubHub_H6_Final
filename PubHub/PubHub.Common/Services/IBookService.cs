@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PubHub.Common.Models.Books;
 
 namespace PubHub.Common.Services
 {
     public interface IBookService
     {
-        Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetAllBooksAsync(BookQuery queryOptions);
-        Task<ServiceResult<BookInfoModel>> GetBookAsync(Guid bookId);
-        Task<ServiceResult<BookInfoModel>> AddBookAsync(BookCreateModel bookCreateModel);
-        Task<ServiceResult<BookInfoModel>> UpdateBookAsync(Guid bookId, BookUpdateModel bookUpdateModel);
+        Task<HttpServiceResult<IReadOnlyList<BookInfoModel>>> GetAllBooksAsync(BookQuery queryOptions);
+        Task<HttpServiceResult<BookInfoModel>> GetBookAsync(Guid bookId);
+        Task<HttpServiceResult<BookInfoModel>> AddBookAsync(BookCreateModel bookCreateModel);
+        Task<HttpServiceResult<BookInfoModel>> UpdateBookAsync(Guid bookId, BookUpdateModel bookUpdateModel);
+        Task<HttpServiceResult> DeleteBookAsync(Guid bookId);
         Task<ServiceResult> PurchaseBookAsync(Guid id);
-        Task<ServiceResult> DeleteBookAsync(Guid bookId);
     }
 }

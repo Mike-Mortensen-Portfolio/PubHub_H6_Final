@@ -26,7 +26,7 @@ namespace PubHub.Common.Services
         /// Calls the API enpoint to retrieve all genres through the <see cref="GenreInfoModel"/>.
         /// </summary>
         /// <returns>A list of <see cref="GenreInfoModel"/></returns>
-        public async Task<ServiceResult<IReadOnlyList<GenreInfoModel>>> GetAllGenresAsync()
+        public async Task<HttpServiceResult<IReadOnlyList<GenreInfoModel>>> GetAllGenresAsync()
         {
             try
             {
@@ -37,22 +37,22 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        return new ServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new HttpServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    return new ServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new HttpServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var genreInfoModel = JsonSerializer.Deserialize<List<GenreInfoModel>>(content, _serializerOptions);
 
                 if (genreInfoModel == null)
-                    return new ServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
+                    return new HttpServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
-                return new ServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, genreInfoModel, "Successfully retrieved all genres.");
+                return new HttpServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, genreInfoModel, "Successfully retrieved all genres.");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get genres:", ex.Message);
-                return new ServiceResult<IReadOnlyList<GenreInfoModel>>(HttpStatusCode.Unused, null, $"Unable retrieve all genres: {ex.Message}.");
+                return new HttpServiceResult<IReadOnlyList<GenreInfoModel>>(HttpStatusCode.Unused, null, $"Unable retrieve all genres: {ex.Message}.");
             }
         }
 
@@ -63,7 +63,7 @@ namespace PubHub.Common.Services
         /// <returns>A <see cref="GenreInfoModel"/> with a genre's information.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult<GenreInfoModel>> GetGenreAsync(Guid genreId)
+        public async Task<HttpServiceResult<GenreInfoModel>> GetGenreAsync(Guid genreId)
         {
             try
             {
@@ -77,21 +77,21 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        return new ServiceResult<GenreInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new HttpServiceResult<GenreInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    return new ServiceResult<GenreInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new HttpServiceResult<GenreInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var genreInfoModel = JsonSerializer.Deserialize<GenreInfoModel>(content, _serializerOptions);
                 if (genreInfoModel == null)
-                    return new ServiceResult<GenreInfoModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
+                    return new HttpServiceResult<GenreInfoModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
-                return new ServiceResult<GenreInfoModel>(response.StatusCode, genreInfoModel, $"Successfully retrieved the genre: {genreInfoModel.Name}");
+                return new HttpServiceResult<GenreInfoModel>(response.StatusCode, genreInfoModel, $"Successfully retrieved the genre: {genreInfoModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Get genre info failed:", ex.Message);
-                return new ServiceResult<GenreInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve the genre: {ex.Message}.");
+                return new HttpServiceResult<GenreInfoModel>(HttpStatusCode.Unused, null, $"Failed to retrieve the genre: {ex.Message}.");
             }
         }
 
@@ -102,7 +102,7 @@ namespace PubHub.Common.Services
         /// <returns>A status telling if a genre was successfully added to the database.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult<GenreCreateModel>> AddGenreAsync(GenreCreateModel genreCreateModel)
+        public async Task<HttpServiceResult<GenreCreateModel>> AddGenreAsync(GenreCreateModel genreCreateModel)
         {
             try
             {
@@ -117,17 +117,17 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        return new ServiceResult<GenreCreateModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new HttpServiceResult<GenreCreateModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    return new ServiceResult<GenreCreateModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new HttpServiceResult<GenreCreateModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
-                return new ServiceResult<GenreCreateModel>(response.StatusCode, genreCreateModel, $"Successfully added the genre: {genreCreateModel.Name}");
+                return new HttpServiceResult<GenreCreateModel>(response.StatusCode, genreCreateModel, $"Successfully added the genre: {genreCreateModel.Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to add the genre: {genreCreateModel.Name}, ", ex.Message);
-                return new ServiceResult<GenreCreateModel>(HttpStatusCode.Unused, null, $"Failed to add the genre: {ex.Message}.");
+                return new HttpServiceResult<GenreCreateModel>(HttpStatusCode.Unused, null, $"Failed to add the genre: {ex.Message}.");
             }
         }
 
@@ -135,10 +135,10 @@ namespace PubHub.Common.Services
         /// Calls the API endpoint to soft-delete a genre./>
         /// </summary>
         /// <param name="genreId">The Id of the genre who needs to be soft-deleted.</param>
-        /// <returns>A <see cref="ServiceResult"/> telling if the request was successful.</returns>
+        /// <returns>A <see cref="HttpServiceResult"/> telling if the request was successful.</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<ServiceResult> DeleteGenreAsync(Guid genreId)
+        public async Task<HttpServiceResult> DeleteGenreAsync(Guid genreId)
         {
             try
             {
@@ -152,17 +152,17 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        return new ServiceResult(response.StatusCode, $"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new HttpServiceResult(response.StatusCode, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    return new ServiceResult(response.StatusCode, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new HttpServiceResult(response.StatusCode, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
-                return new ServiceResult(response.StatusCode, $"Successfully deleted the genre: {genreId}");
+                return new HttpServiceResult(response.StatusCode, $"Successfully deleted the genre: {genreId}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to delete the genre: {genreId}, ", ex.Message);
-                return new ServiceResult(HttpStatusCode.Unused, $"Failed to delete the genre: {ex.Message}.");
+                return new HttpServiceResult(HttpStatusCode.Unused, $"Failed to delete the genre: {ex.Message}.");
             }
         }
     }

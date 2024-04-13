@@ -5,12 +5,12 @@ namespace PubHub.Common.Services
 {
     public interface IPublisherService
     {
-        Task<ServiceResult<PublisherInfoModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel);
-        Task<ServiceResult<PublisherInfoModel>> GetPublisherInfoAsync(Guid publisherId);
-        Task<ServiceResult<IReadOnlyList<BookInfoModel>>> GetAllPublisherBooksAsync(Guid publisherId);
-        Task<ServiceResult<BookContentModel>> GetPublisherBookContentAsync(Guid publisherId, Guid bookId);
-        Task<ServiceResult<PublisherInfoModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel);
-        Task<ServiceResult<IReadOnlyList<PublisherInfoModel>>> GetAllPublishersAsync(PublisherQuery queryOptions);
-        Task<ServiceResult> DeletePublisherAsync(Guid publisherId);
+        Task<HttpServiceResult<PublisherInfoModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel);
+        Task<HttpServiceResult<PublisherInfoModel>> GetPublisherInfoAsync(Guid publisherId);
+        Task<HttpServiceResult<IReadOnlyList<BookInfoModel>>> GetAllPublisherBooksAsync(Guid publisherId);
+        Task<HttpServiceResult<BookContentModel>> GetPublisherBookContentAsync(Guid publisherId, Guid bookId);
+        Task<HttpServiceResult<PublisherInfoModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel);
+        Task<HttpServiceResult<IReadOnlyList<PublisherInfoModel>>> GetAllPublishersAsync(PublisherQuery queryOptions);
+        Task<HttpServiceResult> DeletePublisherAsync(Guid publisherId);
     }
 }

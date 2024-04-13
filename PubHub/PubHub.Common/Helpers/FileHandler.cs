@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 
-namespace PubHub.AdminPortal.Components.Helpers
+namespace PubHub.Common.Helpers
 {
     public class FileHandler
     {

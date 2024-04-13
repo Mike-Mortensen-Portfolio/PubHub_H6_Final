@@ -6,9 +6,9 @@ namespace PubHub.Common.Services
 {
     public interface IAuthenticationService
     {
-        Task<ServiceResult<UserCreatedResponseModel>> RegisterUserAsync(UserCreateModel userCreateModel);
-        Task<ServiceResult<TokenResponseModel>> LoginAsync(LoginInfo loginInfo);
-        Task<ServiceResult<TokenResponseModel>> RefreshTokenAsync();
-        Task<ServiceResult> RevokeTokenAsync();
+        Task<HttpServiceResult<UserCreatedResponseModel>> RegisterUserAsync(UserCreateModel userCreateModel);
+        Task<HttpServiceResult<TokenResponseModel>> LoginAsync(LoginInfo loginInfo);
+        Task<HttpServiceResult<TokenResponseModel>> RefreshTokenAsync();
+        Task<HttpServiceResult> RevokeTokenAsync();
     }
 }

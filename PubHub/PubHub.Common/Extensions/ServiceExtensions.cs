@@ -67,6 +67,7 @@ namespace PubHub.Common.Extensions
                 .AddScoped<IGenreService, GenreService>()
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<IContentTypeService, ContentTypeService>()
+                .AddScoped<IEpubReaderService, EpubReaderService>()
                 .AddSingleton<IChaosService>(new ChaosService())
                 .AddPolly();
         }
