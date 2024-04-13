@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Security.Claims;
 using AutoFixture;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using NSubstitute.Extensions;
 using PubHub.API.Controllers;
 using PubHub.API.Domain.Auth;
 using PubHub.API.Domain.Entities;
@@ -34,7 +35,19 @@ namespace PubHub.API.UT.Controllers
                 Substitute.For<IdentityErrorDescriber>(),
                 Substitute.For<IServiceProvider>(),
                 Substitute.For<ILogger<UserManager<Account>>>());
-            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager, Substitute.For<AccessService>());
+
+            var accessResult = Substitute.For<IAccessResult>();
+            accessResult.ReturnsForAll(accessResult);
+            accessResult.TryVerify(out _)
+                .Returns(true);
+            accessResult.Concluded.Returns(true);
+            accessResult.Success.Returns(true);
+
+            var accessService = Substitute.For<IAccessService>();
+            accessService.AccessFor(Arg.Any<string>(), Arg.Any<ClaimsPrincipal>())
+                .Returns(accessResult);
+
+            _controller = new(Substitute.For<ILogger<PublishersController>>(), Context, userManager, accessService);
         }
 
         //[Fact]
