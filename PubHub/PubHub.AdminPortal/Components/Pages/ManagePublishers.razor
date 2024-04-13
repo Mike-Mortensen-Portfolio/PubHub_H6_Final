@@ -29,6 +29,7 @@
                             <tr>
                                 <th scope="col">Name</th>
                                 <th scope="col">Email</th>
+                                <th scope="col">Administration</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -37,11 +38,23 @@
                                 <tr>
                                     <td>@publisher.Name</td>
                                     <td>@publisher.Email</td>
+                                    <td>
+                                        <div class="combined-item">
+                                            @if (!string.IsNullOrWhiteSpace(publisher.Email))
+                                            {
+                                                <button class="btn btn-danger" @onclick="() => OpenRemoveModal(publisher)">Remove account</button>
+                                            }
+                                        </div>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
+                @if (showRemoveModal && publisher != null)
+                {
+                    <RemovePublisherModal OnClose="() => OnRemoveDialogClose()" PublisherId="@publisher.Id" PublisherName="@publisher.Name"></RemovePublisherModal>
+                }
             </div>
         }
     </Authorized>
@@ -52,9 +65,12 @@
 
 @code {
     bool showCreateModal;
+    bool showRemoveModal;
     public EventCallback<bool> OnClose { get; set; }
 
     private List<PublisherInfoModel>? Publishers { get; set; }
+
+    private PublisherInfoModel? publisher;
 
     private PublisherQuery publisherQuery = new() { OrderBy = OrderPublisherBy.Name, Descending = true, Max = 10, Page = 1, SearchKey = string.Empty };
 
@@ -67,10 +83,26 @@
         }
     }
 
+    public void OpenRemoveModal(PublisherInfoModel publisherInfo)
+    {
+        publisher = publisherInfo;
+        if (publisher != null)
+        {
+            showRemoveModal = true;
+        }
+    }
+
     #region Dialog closing methods.
     private async Task OnCreateDialogClose()
     {
         showCreateModal = false;
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async Task OnRemoveDialogClose()
+    {
+        showRemoveModal = false;
         await OnInitializedAsync();
         StateHasChanged();
     }
