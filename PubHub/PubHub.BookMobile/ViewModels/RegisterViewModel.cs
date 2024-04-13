@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.Common;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Users;
@@ -69,12 +70,36 @@ namespace PubHub.BookMobile.ViewModels
 
             if (!result.IsSuccess || result.Instance is null)
             {
+                switch (result.StatusCode)
+                {
+                    case System.Net.HttpStatusCode.BadRequest:
+                        await Shell.Current.CurrentPage.DisplayAlert(BadRequestError.TITLE, BadRequestError.ERROR_MESSAGE, BadRequestError.BUTTON_TEXT);
+                        break;
+                    case System.Net.HttpStatusCode.Unauthorized:
+                        await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
+                        break;
+                    case System.Net.HttpStatusCode.UnprocessableEntity:
+                        await Shell.Current.CurrentPage.DisplayAlert(UnprocessableEntityError.TITLE, UnprocessableEntityError.ERROR_MESSAGE, UnprocessableEntityError.BUTTON_TEXT);
+                        break;
+                    default:
+                        await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
+                        break;
+                }
+
                 IsBusy = false;
-                await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't register user.{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
                 return;
             }
 
-            User.Set(result.Instance.TokenResponseModel);
+            try
+            {
+                await User.Set(result.Instance.TokenResponseModel);
+            }
+            catch (Exception)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(SetSecureStorageError.TITLE, SetSecureStorageError.ERROR_MESSAGE, SetSecureStorageError.BUTTON_TEXT);
+                return;
+            }
+
             Application.Current!.MainPage = new AuthorizedShell();
         }
 

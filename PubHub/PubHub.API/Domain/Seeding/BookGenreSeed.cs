@@ -24,7 +24,11 @@ namespace PubHub.API.Domain.Seeding
                 new BookGenre { BookId = _bookSeed.Seeds[1].Id, GenreId = _genreSeed.Seeds[4].Id },
                 new BookGenre { BookId = _bookSeed.Seeds[1].Id, GenreId = _genreSeed.Seeds[7].Id },
                 new BookGenre { BookId = _bookSeed.Seeds[1].Id, GenreId = _genreSeed.Seeds[1].Id },
-                new BookGenre { BookId = _bookSeed.Seeds[1].Id, GenreId = _genreSeed.Seeds[5].Id });
+                new BookGenre { BookId = _bookSeed.Seeds[1].Id, GenreId = _genreSeed.Seeds[5].Id },
+                new BookGenre { BookId = _bookSeed.Seeds[2].Id, GenreId = _genreSeed.Seeds[4].Id },
+                new BookGenre { BookId = _bookSeed.Seeds[2].Id, GenreId = _genreSeed.Seeds[7].Id },
+                new BookGenre { BookId = _bookSeed.Seeds[2].Id, GenreId = _genreSeed.Seeds[1].Id },
+                new BookGenre { BookId = _bookSeed.Seeds[2].Id, GenreId = _genreSeed.Seeds[5].Id });
         }
     }
 }

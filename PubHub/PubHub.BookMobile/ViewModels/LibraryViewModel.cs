@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.Models;
 using PubHub.Common;
 using PubHub.Common.Models.Books;
@@ -34,212 +36,7 @@ namespace PubHub.BookMobile.ViewModels
         }
 
         public ObservableCollection<GenreInfoModel> Genres { get; } = [];
-        //[
-        //    new GenreInfoModel
-        //    {
-        //        Name ="Some Genre"
-        //    },
-        //    new GenreInfoModel
-        //    {
-        //        Name = "Some Genre 2"
-        //    },
-        //    new GenreInfoModel
-        //    {
-        //        Name = "Some Genre 3"
-        //    },
-        //    new GenreInfoModel
-        //    {
-        //        Name = "Some Genre 4"
-        //    },
-        //    new GenreInfoModel
-        //    {
-        //        Name = "Some Genre 5"
-        //    },
-        //    new GenreInfoModel
-        //    {
-        //        Name = "Some Genre 6"
-        //    }
-        //];
         public ObservableCollection<BookListingViewModel> Books { get; private set; } = [];
-        //[
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "EBook"
-        //        },
-        //        CoverImage = "https://ew.com/thmb/pnt94MeBfaOYwFbaMTG8_zGhSxU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/ootp-uk-kids-cover-art-aff4474a78554fe1bca287083eb185f1.jpg",
-        //        PublicationDate = new DateOnly (2014, 4,23),
-        //        AudiobookInStock = true,
-        //        EBookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    },
-        //    new BookListingViewModel ()
-        //    {
-        //        Title = "Some Book 2",
-        //        ContentType = new ContentTypeInfoModel
-        //        {
-        //           Name = "Audiobook"
-        //        },
-        //        CoverImage = "https://img0-placeit-net.s3-accelerate.amazonaws.com/uploads/stage/stage_image/40050/optimized_large_thumb_stage.jpg",
-        //        PublicationDate = new DateOnly (2013, 4,23),
-        //        AudiobookInStock = true
-        //    }
-        //];
 
         [RelayCommand]
         public void ToggleGenreView()
@@ -257,10 +54,10 @@ namespace PubHub.BookMobile.ViewModels
 
             if (!result.IsSuccess || result.Instance is null)
             {
-                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                if (result.StatusCode == HttpStatusCode.Unauthorized)
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve books. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
                 HasBooksToShow = Books.Any();
                 IsBusy = false;
@@ -301,7 +98,7 @@ namespace PubHub.BookMobile.ViewModels
                 }
             };
 
-            await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo { PageName = "BookInfo", Parameters = parameters });
+            await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo { RouteName = "BookInfo", Parameters = parameters });
 
             return;
         }
@@ -316,9 +113,9 @@ namespace PubHub.BookMobile.ViewModels
             if (!result.IsSuccess || result.Instance is null)
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve genres. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.UNAUTHORIZED}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't retrieve genres. Please try again, or contact PubHub support if the problem persists{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
                 IsBusy = false;
                 return;

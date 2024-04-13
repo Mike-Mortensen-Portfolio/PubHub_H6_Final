@@ -1,24 +1,40 @@
 ﻿using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.ViewModels;
+using PubHub.Common.Services;
 
 namespace PubHub.BookMobile.Views;
 
 public partial class BookInfo : ContentPage
 {
     private readonly BookInfoViewModel _viewModel;
-    public BookInfo(BookInfoViewModel viewModel)
+    private readonly IUserService _userService;
+
+    public BookInfo(BookInfoViewModel viewModel, IUserService userService)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
-
+        _userService = userService;
         BindingContext = _viewModel;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         _viewModel.IsAuthenticated = User.IsAuthenticated;
 
+        var result = await _userService.GetUserBooksAsync(User.Id!.Value);
+
+        if (!result.IsSuccess)
+        {
+            await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
+
+
+            await Shell.Current.GoToAsync("..");
+            return;
+        }
+
+        _viewModel.AlreadyOwnsBook = User.Id.HasValue && (result.Instance?.Any(book => book.Id == _viewModel.CurrentViewedItem.Id) ?? false);
         base.OnAppearing();
     }
 }
