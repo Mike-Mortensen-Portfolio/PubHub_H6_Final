@@ -9,5 +9,6 @@
         public const string COULDNT_SET_SECURE_STORAGE = "0x00005";
         public const string UNPROCESSABLE_ENTITY = "0x00006";
         public const string BAD_REQUEST = "0x00007";
+        public const string CONFLICT = "0x00008";
     }
 }
