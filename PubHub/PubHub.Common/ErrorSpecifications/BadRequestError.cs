@@ -1,8 +1,6 @@
-﻿using PubHub.Common;
-
-namespace PubHub.BookMobile.ErrorSpecifications
+﻿namespace PubHub.Common.ErrorSpecifications
 {
-    internal static class BadRequestError
+    public static class BadRequestError
     {
         public const string TITLE = "Bad Format";
         public const string ERROR_MESSAGE = $"We couldn't processs your action. Try again or contact PubHub support if the problem persists\nError: {ErrorsCodeConstants.BAD_REQUEST}";
