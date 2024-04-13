@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using VersOne.Epub;
-using Xamarin.Essentials;
 
 namespace PubHub.Common.Services
 {
