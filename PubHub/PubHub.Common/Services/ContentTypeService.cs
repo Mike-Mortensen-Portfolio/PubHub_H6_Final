@@ -26,7 +26,7 @@ namespace PubHub.Common.Services
         /// </summary>
         /// <param name="queryOptions">The query options that is requested.</param>
         /// <returns>A list of <see cref="ContentTypeInfoModel"/></returns>
-        public async Task<ServiceResult<IReadOnlyList<ContentTypeInfoModel>>> GetAllContentTypesAsync()
+        public async Task<HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>> GetAllContentTypesAsync()
         {
             try
             {
@@ -37,22 +37,22 @@ namespace PubHub.Common.Services
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
                     if (errorResponse == null)
-                        return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
+                        return new HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
 
-                    return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                    return new HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
                 }
 
                 var contentTypeInfoModel = JsonSerializer.Deserialize<List<ContentTypeInfoModel>>(content, _serializerOptions);
 
                 if (contentTypeInfoModel == null)
-                    return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
+                    return new HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Unable to map the request over to the client.");
 
-                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, contentTypeInfoModel, "Successfully retrieved all content types!");
+                return new HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, contentTypeInfoModel, "Successfully retrieved all content types!");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Unable to get content types:", ex.Message);
-                return new ServiceResult<IReadOnlyList<ContentTypeInfoModel>>(HttpStatusCode.Unused, null, $"Unable to retrieve all content types: {ex.Message}.");
+                return new HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>(HttpStatusCode.Unused, null, $"Unable to retrieve all content types: {ex.Message}.");
             }
         }
     }

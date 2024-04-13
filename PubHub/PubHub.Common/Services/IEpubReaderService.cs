@@ -9,8 +9,8 @@ namespace PubHub.Common.Services
 {
     public interface IEpubReaderService
     {
-        Task<EpubBook> GetEpubBook(byte[] epubContent);
-        Task<string> GetCurrentBookChapterAsync(byte[] epubContent);
-        string DisplayChapterContent(int chapterIndex, EpubBook epubBook);        
+        Task<ServiceResult<EpubBook>> GetEpubBook(byte[] epubContent);
+        ServiceResult<string> GetCurrentBookChapterAsync(EpubBook epubBook);
+        ServiceResult<string> DisplayChapterContent(int chapterIndex, EpubBook epubBook);        
     }
 }

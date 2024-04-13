@@ -4,16 +4,14 @@ namespace PubHub.Common.Services
 {
     public class ServiceResult
     {     
-        internal ServiceResult(HttpStatusCode statusCode, string errorDescriptor) 
+        internal ServiceResult(string? errorDescriptor) 
         {
-            StatusCode = statusCode;
             ErrorDescriptor = errorDescriptor;
         }
 
-        public bool IsSuccess => (StatusCode >= HttpStatusCode.OK) && (StatusCode <= HttpStatusCode.IMUsed);
+        public virtual bool IsSuccess => string.IsNullOrWhiteSpace(ErrorDescriptor);
 
-        public HttpStatusCode StatusCode { get; }
-        public string ErrorDescriptor { get; }
+        public string? ErrorDescriptor { get; }
 
     }
 }

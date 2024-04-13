@@ -7,43 +7,74 @@ namespace PubHub.Common.Services
 {
     public class EpubReaderService : IEpubReaderService
     {
-        private EpubBook? _epubBook;
-        private int _currentChapterIndex = 0;
+        private readonly int _currentChapterIndex = 0;
 
+        /// <summary>
+        /// Retrieves the <see cref="EpubBook"/> from the <see cref="byte[]"/> with the book content stored in the db.
+        /// </summary>
+        /// <param name="epubContent"><see cref="byte[]"/> containing the book content.</param>
+        /// <returns>A <see cref="ServiceResult{TResult}"/> with how the request was handled.</returns>
         public async Task<ServiceResult<EpubBook>> GetEpubBook(byte[] epubContent)
-        {
-            using (MemoryStream stream = new MemoryStream(epubContent))
-            {
-                return _epubBook = await EpubReader.ReadBookAsync(stream);
-            }
-        }
-
-        public async Task<string> GetCurrentBookChapterAsync(EpubBook epubBook)
         {
             try
             {
-                var currentChapter = DisplayChapterContent(_currentChapterIndex, epubBook);
-                return currentChapter;
+                using MemoryStream stream = new MemoryStream(epubContent);
+                var epubBook = await EpubReader.ReadBookAsync(stream);
+                return new ServiceResult<EpubBook>(epubBook, errorDescriptor: "Successfully retrieved the Epub book!");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error reading the ePub: {ex.Message}");
-                return string.Empty;
+                return new ServiceResult<EpubBook>(null, errorDescriptor: $"Unable to retrieve epub book: {ex.Message}");
+            }
+            
+        }
+
+        /// <summary>
+        /// Retrieves a current book chapter when a user is changing pages or starting a new e-book.
+        /// </summary>
+        /// <param name="epubBook">The <see cref="EpubBook"/> containing all information about a book.</param>
+        /// <returns>A <see cref="ServiceResult{TResult}"/> with how the request was handled.</returns>
+        public ServiceResult<string> GetCurrentBookChapterAsync(EpubBook epubBook)
+        {
+            try
+            {
+                var currentChapter = DisplayChapterContent(_currentChapterIndex, epubBook);              
+                return new ServiceResult<string>((string?)currentChapter.Instance, errorDescriptor: "Successfully retrieved the current chapter.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error retrieving the current chapter: {ex.Message}");
+                return new ServiceResult<string>(string.Empty, errorDescriptor: $"Error retrieving the current chapter: {ex.Message}.");
             }
         }
 
-        public string DisplayChapterContent(int chapterIndex, EpubBook epubBook)
+        /// <summary>
+        /// Gets the current chapter of the <see cref="EpubBook"/> and then builds up a string to display in the mobile.
+        /// </summary>
+        /// <param name="chapterIndex">Chapter index to get the next one.</param>
+        /// <param name="epubBook"></param>
+        /// <returns>A <see cref="ServiceResult{TResult}"/> with how the request was handled.</returns>
+        public ServiceResult<string> DisplayChapterContent(int chapterIndex, EpubBook epubBook)
         {
-            if (epubBook != null && chapterIndex >= 0 && chapterIndex < epubBook.ReadingOrder.Count)
+            try
             {
-                var chapter = epubBook.ReadingOrder[chapterIndex];
-                var htmlContent = new StringBuilder();
-                return htmlContent.Append(chapter.Content).ToString();
+                if (epubBook != null && chapterIndex >= 0 && chapterIndex < epubBook.ReadingOrder.Count)
+                {
+                    var chapter = epubBook.ReadingOrder[chapterIndex];
+                    var htmlContent = new StringBuilder();
+                    var stringHtml = htmlContent.Append(chapter.Content).ToString();
+                    return new ServiceResult<string>(stringHtml, errorDescriptor: $"Successfully retrieved the content of the book.");
+                }
+                else
+                {
+                    return new ServiceResult<string>(string.Empty, $"Unable to retrieve the content of the book.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return string.Empty;
+                return new ServiceResult<string>(string.Empty, $"Unable to retrieve the content of the book: {ex.Message}.");
             }
+            
         }
     }
 }
