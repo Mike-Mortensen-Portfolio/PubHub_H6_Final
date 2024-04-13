@@ -2,10 +2,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PubHub.BookMobile.Views.Profile"
-             xmlns:models="clr-namespace:PubHub.BookMobile.ViewModels"
+             xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
              xmlns:views="clr-namespace:PubHub.BookMobile.Views"
              xmlns:auth="clr-namespace:PubHub.BookMobile.Auth"
-             x:DataType="models:ProfileViewModel"
+             x:DataType="viewModels:ProfileViewModel"
              Title="{Binding FullName}">
 
     <Shell.TitleView>
@@ -76,6 +76,8 @@
                                     </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
                                 <Entry Text="{Binding Name}"
+                                       MaxLength="{x:Static viewModels:RegisterViewModel.MAX_NAME_LENGTH}"
+                                       MaximumWidthRequest="140"
                                        IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroupList>
@@ -116,6 +118,8 @@
                                     </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
                                 <Entry Text="{Binding Surname}"
+                                       MaximumWidthRequest="140"
+                                       MaxLength="{x:Static viewModels:RegisterViewModel.MAX_NAME_LENGTH}"
                                        IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroupList>
@@ -164,6 +168,9 @@
                                     </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
                                 <Entry Text="{Binding Email}"
+                                       MinimumWidthRequest="75"
+                                       MaximumWidthRequest="200"
+                                       MaxLength="{x:Static viewModels:RegisterViewModel.MAX_EMAIL_LENGTH}"
                                        IsEnabled="{Binding NotInEditMode, Converter={StaticResource InvertedBoolConverter}}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroupList>
