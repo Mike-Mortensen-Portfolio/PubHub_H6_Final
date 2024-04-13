@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using PubHub.BookMobile.Auth;
+using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.Common;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
@@ -43,9 +44,9 @@ namespace PubHub.BookMobile.ViewModels
             if (!result.IsSuccess || result.Instance is null)
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Email or password wasn't correct. Try again.", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert("Validation Error", $"Email or password wasn't correct. Try again.", "OK");
                 else
-                    await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't sign in.{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.NO_CONNECTION}", "OK");
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
                 IsBusy = false;
                 return;
@@ -55,12 +56,12 @@ namespace PubHub.BookMobile.ViewModels
 
             try
             {
-                User.Set(tokens);
+                await User.Set(tokens);
             }
             catch (Exception)
             {
 
-                await Application.Current!.MainPage!.DisplayAlert("Error", $"Couldn't sign in.{Environment.NewLine}Please try again or contact PubHub support if the problem persists.{Environment.NewLine}Error: {ErrorsCodeConstants.INVALID_TOKEN}", "OK");
+                await Shell.Current.CurrentPage.DisplayAlert(SetSecureStorageError.TITLE, SetSecureStorageError.ERROR_MESSAGE, SetSecureStorageError.BUTTON_TEXT);
             }
 
 

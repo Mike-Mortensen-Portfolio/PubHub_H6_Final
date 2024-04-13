@@ -10,7 +10,7 @@ namespace PubHub.BookMobile.Converters
 
         public override bool ConvertFrom(ContentTypeInfoModel value, CultureInfo? culture)
         {
-            return value.Name.ToUpperInvariant() == "EBOOK";
+            return value is not null && value.Name.ToUpperInvariant() == "EBOOK";
         }
     }
 }

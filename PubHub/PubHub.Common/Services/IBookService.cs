@@ -1,4 +1,5 @@
-﻿using PubHub.Common.Models.Books;
+using Microsoft.AspNetCore.Mvc;
+using PubHub.Common.Models.Books;
 
 namespace PubHub.Common.Services
 {
@@ -9,5 +10,6 @@ namespace PubHub.Common.Services
         Task<HttpServiceResult<BookInfoModel>> AddBookAsync(BookCreateModel bookCreateModel);
         Task<HttpServiceResult<BookInfoModel>> UpdateBookAsync(Guid bookId, BookUpdateModel bookUpdateModel);
         Task<HttpServiceResult> DeleteBookAsync(Guid bookId);
+        Task<ServiceResult> PurchaseBookAsync(Guid id);
     }
 }

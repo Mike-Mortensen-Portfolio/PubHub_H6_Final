@@ -22,7 +22,7 @@ namespace PubHub.BookMobile.ViewModels
             if (navInfo is null)
                 throw new ArgumentNullException(nameof(navInfo), "Page route can't be null");
 
-            await Shell.Current.GoToAsync(navInfo.PageName, navInfo.Parameters);
+            await Shell.Current.GoToAsync(navInfo.RouteName, navInfo.Parameters);
         }
 
         /// <summary>
