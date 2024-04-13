@@ -23,7 +23,6 @@ namespace PubHub.API.UT.Extensions
             Assert.Equal(publisher.Name, actualPublisher.Name);
             Assert.NotNull(actualPublisher.Account);
             Assert.Equal(publisher.Account.Email, actualPublisher.Account.Email);
-            Assert.False(string.IsNullOrWhiteSpace(actualPublisher.Account.PasswordHash));
         }
     }
 }
