@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
 using PubHub.BookMobile.Auth;
 using PubHub.BookMobile.ErrorSpecifications;
-using PubHub.Common;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
 using PubHub.Common.Services;
@@ -13,6 +12,9 @@ namespace PubHub.BookMobile.ViewModels
 {
     public partial class LoginViewModel : NavigationObject
     {
+        public const int MAX_EMAIL_LENGTH = 256;
+        public const int MAX_PASSWORD_LENGTH = 64;
+
         private readonly IAuthenticationService _authService;
         private readonly Regex _emailRegex;
 
@@ -30,8 +32,8 @@ namespace PubHub.BookMobile.ViewModels
             _authService = authService;
         }
 
-        private bool IsValidEmail => !string.IsNullOrWhiteSpace(Email) && _emailRegex.Match(Email).Success;
-        private bool IsValidPassword => !string.IsNullOrWhiteSpace(Password);
+        private bool IsValidEmail => !string.IsNullOrWhiteSpace(Email) && _emailRegex.Match(Email).Success && Email.Length <= MAX_EMAIL_LENGTH;
+        private bool IsValidPassword => !string.IsNullOrWhiteSpace(Password) && Password.Length <= MAX_PASSWORD_LENGTH;
         private bool CanSignIn => IsValidEmail && IsValidPassword && !IsBusy;
 
         [RelayCommand(CanExecute = nameof(CanSignIn))]
