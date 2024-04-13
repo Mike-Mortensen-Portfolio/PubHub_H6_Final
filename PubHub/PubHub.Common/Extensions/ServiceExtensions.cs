@@ -92,10 +92,10 @@ namespace PubHub.Common.Extensions
                     {
                         ShouldHandle = static args =>
                         {
-                            var result = args.Outcome.Result;
-                            if (result == null ||
-                                result.StatusCode == HttpStatusCode.InternalServerError ||
-                                result.StatusCode == HttpStatusCode.NotFound)
+                            var response = args.Outcome.Result;
+                            if (response == null ||
+                                response.StatusCode == HttpStatusCode.InternalServerError ||
+                                response.StatusCode == HttpStatusCode.NotFound)
                             {
                                 // Request failed.
                                 return new ValueTask<bool>(true);
@@ -105,7 +105,17 @@ namespace PubHub.Common.Extensions
                             return new ValueTask<bool>(false);
                         },
                         MaxRetryAttempts = 5,
-                        DelayGenerator = static args => new ValueTask<TimeSpan?>(TimeSpan.FromSeconds(0.2 * Math.Pow(2, args.AttemptNumber))),
+                        DelayGenerator = static args =>
+                        {
+                            var delay = args.AttemptNumber switch
+                            {
+                                0 => TimeSpan.Zero,
+                                1 => TimeSpan.FromSeconds(0.2),
+                                _ => TimeSpan.FromSeconds(0.2 * Math.Pow(2, args.AttemptNumber))
+                            };
+
+                            return new ValueTask<TimeSpan?>(delay);
+                        },
                         OnRetry = static args =>
                         {
                             Debug.WriteLine($"Polly: Retrying in {args.RetryDelay} ...");
