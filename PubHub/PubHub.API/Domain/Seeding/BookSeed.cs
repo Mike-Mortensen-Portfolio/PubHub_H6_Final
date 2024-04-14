@@ -61,6 +61,18 @@ namespace PubHub.API.Domain.Seeding
                     PublisherId = _publisherSeed[PUBLISHER2_EMAIL].Id,
                     Title = "Horse",
                     Summary = "Kentucky, 1850. An enslaved groom named Jarret and a bay foal forge a bond of understanding that will carry the horse to record-setting victories across the South. When the nation erupts in civil war, an itinerant young artist who has made his name on paintings of the racehorse takes up arms for the Union."
+                },
+                new Book
+                {
+                    Id = UuidValueGenerator.Next(),
+                    BookContent = File.ReadAllBytes(SHADOWGAME_CONTENT_PATH),
+                    CoverImage = File.ReadAllBytes(SHADOWGAME_COVER_PATH),
+                    ContentTypeId = _contentTypeSeed[E_BOOK_CONTENT_TYPE].Id,
+                    Length = 344,
+                    PublicationDate = new DateOnly(2021, 9, 28),
+                    PublisherId = _publisherSeed[PUBLISHER_EMAIL].Id,
+                    Title = "Shadow game",
+                    Summary = "I 1600-tallets Aalborg straffes trolddom med døden, og før 14-årige Gry ved af det, sender en hekseanklage hende på bålet.\r\nMen de glubske flammer brænder hende ikke som de burde. \r\nSyttenårige Akela har accepteret dronning Soras tilbud om en plads ved hoffet.\r\nHer skal hun gennemføre skyggespillet; en række magiske dueller der afgør de Udvalgtes fremtid.\r\nKun ved at udmærke sig og opnå en plads som dronningens rådgiver kan Akela beskytte sin søster og forhindre at krigen rammer deres by. Desværre er der seks Udvalgte og blot én plads i hofrådet.\r\nMens oprørerne angriber, og bedrageriske skygger dukker op uden for skyggespillet, optrevler Akela den royale slægts hemmeligheder. Men hvem tør hun stole på når alle bekriger hinanden i dronningens spil?"
                 }
             ];
 
