@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using PubHub.AdminPortal.Components.Constants;
+using PubHub.Common;
 using PubHub.Common.Models.Books;
 
 namespace PubHub.AdminPortal.Components.Models
