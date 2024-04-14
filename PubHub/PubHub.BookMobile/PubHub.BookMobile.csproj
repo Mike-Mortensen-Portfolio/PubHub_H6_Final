@@ -94,6 +94,9 @@
 	  <MauiXaml Update="AuthorizedShell.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\BookContentInfo.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\BookInfo.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

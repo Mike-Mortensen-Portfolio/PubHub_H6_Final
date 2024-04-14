@@ -20,7 +20,7 @@ namespace PubHub.BookMobile
         {
             base.OnStart();
 
-            (bool IsSuccess, _) = await User.TryGetCachedToken();
+            (bool IsSuccess, _) = await User.TryGetCachedTokenAsync();
             if (!IsSuccess)
             {
                 User.Unset();
@@ -37,7 +37,7 @@ namespace PubHub.BookMobile
                 return;
             }
 
-            await User.Set(response.Instance);
+            await User.SetAsync(response.Instance);
             MainPage = new AuthorizedShell();
         }
 
@@ -45,7 +45,7 @@ namespace PubHub.BookMobile
         {
             base.OnResume();
 
-            (bool IsSuccess, _) = await User.TryGetCachedToken();
+            (bool IsSuccess, _) = await User.TryGetCachedTokenAsync();
             if (!IsSuccess)
             {
                 User.Unset();
@@ -62,7 +62,7 @@ namespace PubHub.BookMobile
                 return;
             }
 
-            await User.Set(response.Instance);
+            await User.SetAsync(response.Instance);
             MainPage = new AuthorizedShell(); MainPage = new AppShell();
         }
     }

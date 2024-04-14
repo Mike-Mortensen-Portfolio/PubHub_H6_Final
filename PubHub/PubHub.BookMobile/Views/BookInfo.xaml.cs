@@ -9,18 +9,22 @@ public partial class BookInfo : ContentPage
 {
     private readonly BookInfoViewModel _viewModel;
     private readonly IUserService _userService;
+    private readonly IAuthenticationService _authService;
 
-    public BookInfo(BookInfoViewModel viewModel, IUserService userService)
+    public BookInfo(BookInfoViewModel viewModel, IUserService userService, IAuthenticationService authService)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
         _userService = userService;
+        _authService = authService;
         BindingContext = _viewModel;
     }
 
     protected override async void OnAppearing()
     {
+        await User.CheckStateAndTryRefreshAsync(_authService);
+
         _viewModel.IsAuthenticated = User.IsAuthenticated;
 
         var result = await _userService.GetUserBooksAsync(User.Id!.Value);

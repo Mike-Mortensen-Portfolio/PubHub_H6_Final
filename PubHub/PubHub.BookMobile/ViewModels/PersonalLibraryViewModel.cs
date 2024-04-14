@@ -13,6 +13,7 @@ namespace PubHub.BookMobile.ViewModels
 {
     public partial class PersonalLibraryViewModel : NavigationObject
     {
+        private const string BOOK_CONTENT_INFO_PAGE_NAME = "BookContentInfo";
         private readonly IUserService _userService;
         private readonly IGenreService _genreService;
 
@@ -45,11 +46,11 @@ namespace PubHub.BookMobile.ViewModels
             var parameters = new Dictionary<string, object>
             {
                 {
-                    BookInfoViewModel.BOOK_LISTING_QUERY_NAME, bookListing
+                    BookContentInfoViewModel.BOOK_LISTING_QUERY_NAME, bookListing
                 }
             };
 
-            await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo { RouteName = "BookInfo", Parameters = parameters });
+            await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo { RouteName = BOOK_CONTENT_INFO_PAGE_NAME, Parameters = parameters });
 
             return;
         }
