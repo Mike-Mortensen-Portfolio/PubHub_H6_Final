@@ -1,6 +1,7 @@
-﻿using System.Net;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 using PubHub.API;
 using PubHub.API.Controllers.Problems;
@@ -18,6 +19,26 @@ builder.Services.ConfigureCors();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger(new OpenApiInfo { Title = "PubHub API v1", Version = "v1" });
 
+builder.Services.AddRateLimiter(rateLimterOptions =>
+{
+    rateLimterOptions.AddFixedWindowLimiter("fixed", options =>
+    {
+        options.PermitLimit = 2;
+        options.Window = TimeSpan.FromSeconds(10);
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 1;
+    });
+
+    rateLimterOptions.AddConcurrencyLimiter("concurrency", options =>
+    {
+        options.PermitLimit = 10;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 5;
+    });
+
+    rateLimterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -32,14 +53,14 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     {
         var problemDetails = new ValidationProblemDetails(actionContext.ModelState);
 
-        var result = new BadRequestObjectResult(new 
+        var result = new BadRequestObjectResult(new
         {
             Status = ValidationProblemSpecification.STATUS_CODE,
             Title = ValidationProblemSpecification.TITLE,
             Type = ValidationProblemSpecification.TYPE,
             Extensions = problemDetails.Errors.ToDictionary()
         });
-        result.ContentTypes.Add("application/problem+json");        
+        result.ContentTypes.Add("application/problem+json");
 
         return result;
     };
@@ -57,6 +78,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHsts(); // Enable HSTS middleware for non-development environments
 }
+
+app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();

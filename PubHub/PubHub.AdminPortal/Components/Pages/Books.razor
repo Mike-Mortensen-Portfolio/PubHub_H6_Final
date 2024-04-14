@@ -92,7 +92,13 @@
 
         if (Publisher != null)
         {
-            BookInfos = (await PublisherService.GetAllPublisherBooksAsync(Publisher.Id)).Instance ?? [];
+            var response = (await PublisherService.GetAllPublisherBooksAsync(Publisher.Id));
+
+            if(!response.IsSuccess)
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = response.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+
+
+            BookInfos = response.Instance ?? [];
         }
     }
 
