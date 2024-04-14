@@ -1,7 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using PubHub.API;
 using PubHub.API.Controllers.Problems;
@@ -36,7 +38,19 @@ builder.Services.AddRateLimiter(rateLimterOptions =>
         options.QueueLimit = 5;
     });
 
-    rateLimterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    rateLimterOptions.OnRejected = (context, rateLimterOptions) =>
+    {
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter =
+                ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.");
+
+        return new ValueTask();
+    };
 });
 
 builder.Services.AddControllers()
