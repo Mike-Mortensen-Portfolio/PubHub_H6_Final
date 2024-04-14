@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
 using PubHub.Common;
+using PubHub.TestUtils.Extensions;
 using Respawn;
 using Testcontainers.MsSql;
 
@@ -11,7 +12,7 @@ namespace PubHub.API.UT.Utilities
     public class DatabaseFixture : IAsyncLifetime
     {
         private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder().Build();
-        private readonly Dictionary<string, Guid> _types = [];
+        private readonly Dictionary<string, (Type EntityType, Guid Id)> _types = [];
 
         private DbContextOptions<PubHubContext> _options = new();
         private SqlConnection? _connection;
@@ -66,7 +67,15 @@ namespace PubHub.API.UT.Utilities
         /// <param name="name">Name of type. Use <see cref="AccessTypeConstants"/>, <see cref="AccountTypeConstants"/> or <see cref="ContentTypeConstants"/>.</param>
         /// <returns>ID of type record in the database.</returns>
         public Guid GetTypeId(string name) =>
-            _types.GetValueOrDefault(name);
+            _types.GetValueOrDefault(name).Id;
+
+        /// <summary>
+        /// Get the ID of a random type of a given <see cref="EntityType"/>.
+        /// </summary>
+        /// <param name="type">Entity type.</param>
+        /// <returns>ID of a random type record of <paramref name="type"/> in the database.</returns>
+        public Guid GetRandomTypeId<T>() =>
+            _types.Where(t => t.Value.EntityType == typeof(T)).Random().Value.Id;
 
         /// <summary>
         /// Connect to Docker container and create the database.
@@ -116,10 +125,10 @@ namespace PubHub.API.UT.Utilities
         /// </summary>
         /// <param name="type">Information to store. <see cref="ITypeEntity.Name"/> must be globally unique.</param>
         /// <exception cref="InvalidOperationException"></exception>
-        private void RememberType(ITypeEntity type)
+        private void RememberType(ITypeEntity entity)
         {
-            if (!_types.TryAdd(type.Name, type.Id))
-                throw new InvalidOperationException($"Unable to store \"{type.Name}\" (key) and '{type.Id}' (value) in the '{nameof(_types)}' dictionary.");
+            if (!_types.TryAdd(entity.Name, (entity.GetType(), entity.Id)))
+                throw new InvalidOperationException($"Unable to store \"{entity.Name}\" (key) and '{entity.Id}' (value) in the '{nameof(_types)}' dictionary.");
         }
 
         /// <summary>

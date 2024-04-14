@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Data;
+using AutoFixture;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using PubHub.API.Domain.Identity;
 using PubHub.API.UT.Extensions;
 using PubHub.API.UT.Utilities;
 using PubHub.Common;
+using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Publishers;
 using PubHub.TestUtils.Extensions;
 
@@ -110,6 +112,85 @@ namespace PubHub.API.UT.Controllers
             Assert.NotNull(response.Value);
             Assert.Equal(expectedModels.Count, response.Value.Length);
             Assert.Equivalent(expectedModels, response.Value);
+        }
+
+        [Fact]
+        public async Task GetAllBooksOfPublisher()
+        {
+            // Arrange.
+            var expectedBookCount = 10;
+            var expectedPublisher = Fixture.Create<Publisher>();
+            var otherPublishers = Fixture.CreateMany<Publisher>(10);
+            var expectedBooks = Fixture.CreateMany<Book>(expectedBookCount).ToList();
+            expectedBooks.ForEach(b => b.Publisher = expectedPublisher);
+            var otherBooks = Fixture.CreateMany<Book>(expectedBookCount).ToList();
+            otherBooks.ForEach(b => b.Publisher = otherPublishers.Random());
+
+            await Context.Set<Publisher>().AddAsync(expectedPublisher);
+            await Context.Set<Publisher>().AddRangeAsync(otherPublishers);
+            await Context.Set<Book>().AddRangeAsync(expectedBooks);
+            await Context.Set<Book>().AddRangeAsync(otherBooks);
+            await Context.SaveChangesAsync();
+
+            var expectedBookModels = expectedBooks.Select(x => x.ToInfo()).ToList();
+
+            // Act.
+            var result = await _controller.GetBooksAsync(expectedPublisher.Id, AppId);
+
+            // Assert.
+            var response = Assert.IsAssignableFrom<Ok<List<BookInfoModel>>>(result);
+            Assert.NotNull(response.Value);
+            Assert.Equal(expectedBookCount, response.Value.Count);
+            Assert.Equivalent(expectedBookModels, response.Value);
+        }
+
+        [Fact]
+        public async Task DeletePublisher()
+        {
+            // Arrange.
+            var publishers = Fixture.CreateMany<Publisher>();
+            var expectedPublisher = publishers.Random();
+            await Context.Set<Publisher>().AddRangeAsync(publishers);
+            await Context.SaveChangesAsync();
+
+            // Act.
+            var result = await _controller.DeletePublisherAsync(expectedPublisher.Id, AppId);
+
+            // Assert.
+            Assert.IsAssignableFrom<Ok>(result);
+            Context.AssertDeleted(expectedPublisher.Account!);
+        }
+
+        [Fact]
+        public async Task GetBooksOfDeletedPublisher()
+        {
+            // Arrange.
+            var expectedBookCount = 10;
+            var expectedPublisher = Fixture.Create<Publisher>();
+            expectedPublisher.Account!.DeletedDate = DateTime.UtcNow;
+            var otherPublishers = Fixture.CreateMany<Publisher>(10);
+            var expectedBooks = Fixture.CreateMany<Book>(expectedBookCount).ToList();
+            expectedBooks.ForEach(b => b.Publisher = expectedPublisher);
+            var otherBooks = Fixture.CreateMany<Book>(expectedBookCount).ToList();
+            otherBooks.ForEach(b => b.Publisher = otherPublishers.Random());
+
+            await Context.Set<Publisher>().AddAsync(expectedPublisher);
+            await Context.Set<Publisher>().AddRangeAsync(otherPublishers);
+            await Context.Set<Book>().AddRangeAsync(expectedBooks);
+            await Context.Set<Book>().AddRangeAsync(otherBooks);
+            await Context.SaveChangesAsync();
+
+            var expectedBookModels = expectedBooks.Select(x => x.ToInfo()).ToList();
+
+            // Act.
+            var result = await _controller.GetBooksAsync(expectedPublisher.Id, AppId);
+
+            // Assert.
+            var response = Assert.IsAssignableFrom<Ok<List<BookInfoModel>>>(result);
+            Assert.NotNull(response.Value);
+            Assert.Equal(expectedBookCount, response.Value.Count);
+            Assert.Equivalent(expectedBookModels, response.Value);
+            Context.AssertDeleted(expectedPublisher.Account!);
         }
     }
 }

@@ -3,6 +3,7 @@ using AutoFixture;
 using NSubstitute;
 using NSubstitute.Extensions;
 using PubHub.API.Domain.Auth;
+using PubHub.API.Domain.Entities;
 using PubHub.API.UT.Utilities;
 
 namespace PubHub.API.UT.Controllers
@@ -12,6 +13,8 @@ namespace PubHub.API.UT.Controllers
         protected ControllerTests(DatabaseFixture databaseFixture, ApiDataGeneratorFixture apiDataGeneratorFixture)
         {
             DatabaseFixture = databaseFixture;
+            ApiDataGeneratorFixture = apiDataGeneratorFixture;
+            ApiDataGeneratorFixture.ContentTypeIdFunc = () => DatabaseFixture.GetRandomTypeId<ContentType>();
             Fixture = apiDataGeneratorFixture.Generator;
 
             AccessService = Substitute.For<IAccessService>();
@@ -32,13 +35,19 @@ namespace PubHub.API.UT.Controllers
         }
 
         protected DatabaseFixture DatabaseFixture { get; }
+        protected ApiDataGeneratorFixture ApiDataGeneratorFixture { get; }
         protected PubHubContext Context => DatabaseFixture.Context;
         protected Fixture Fixture { get; }
 
         protected string AppId { get; } = Guid.NewGuid().ToString();
         protected IAccessService AccessService { get; }
 
-        public Task InitializeAsync() => Task.CompletedTask;
+        public Task InitializeAsync()
+        {
+            ApiDataGeneratorFixture.RebuildGenerator();
+
+            return Task.CompletedTask;
+        }
 
         async Task IAsyncLifetime.DisposeAsync()
         {
