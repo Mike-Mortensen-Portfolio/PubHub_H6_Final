@@ -52,6 +52,8 @@ namespace PubHub.BookMobile.ViewModels
             {
                 await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                 IsBusy = false;
+
+                await NavigateToPage("Home");
                 return;
             }
 
@@ -60,7 +62,11 @@ namespace PubHub.BookMobile.ViewModels
             if (!result.IsSuccess || result.Instance == null)
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
                     await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
+
+                    await NavigateToPage("Home");
+                }
                 else
                     await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
                 IsBusy = false;

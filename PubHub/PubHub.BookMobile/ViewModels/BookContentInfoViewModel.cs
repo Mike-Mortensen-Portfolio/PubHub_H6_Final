@@ -12,7 +12,6 @@ namespace PubHub.BookMobile.ViewModels
     {
         public const string BOOK_LISTING_QUERY_NAME = "BookListing";
         private readonly IUserService _userService;
-        private readonly IEpubReaderService _readerService;
         [ObservableProperty]
         private BookListingViewModel _bookListing = null!;
         [ObservableProperty]
@@ -34,10 +33,9 @@ namespace PubHub.BookMobile.ViewModels
         [ObservableProperty]
         private string? _ProgressInProcent;
 
-        public BookContentInfoViewModel(IUserService userService, IEpubReaderService readerService)
+        public BookContentInfoViewModel(IUserService userService)
         {
             _userService = userService;
-            _readerService = readerService;
         }
 
         public async void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -139,7 +137,15 @@ namespace PubHub.BookMobile.ViewModels
         [RelayCommand]
         public async Task EngageContent()
         {
-
+            if (IsEBook)
+                await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo
+                {
+                    RouteName = "EBookView",
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { "Content", CurrentContent!.BookContent! }
+                    }
+                });
         }
 
         partial void OnIsEBookChanged(bool value)
