@@ -13,4 +13,11 @@ public partial class EBookView : ContentPage
 
         BindingContext = _viewModel;
     }
+
+    protected override void OnAppearing()
+    {
+        _viewModel.ScrollView = () => scrollView;
+
+        base.OnAppearing();
+    }
 }

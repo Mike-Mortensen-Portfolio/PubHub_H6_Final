@@ -3,12 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PubHub.BookMobile.Views.EBookView"
              xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
-             x:DataType="viewModels:EBookViewModel">
-    <StackLayout Orientation="Vertical"
-                 VerticalOptions="StartAndExpand"
-                 Spacing="10">
-
-        <ScrollView Orientation="Vertical"
+             x:DataType="viewModels:EBookViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="*, AUTO, AUTO"
+          Padding="0,0,0,10"
+          RowSpacing="10">
+        <ScrollView x:Name="scrollView"
+                    Grid.Row="0"
+                    Orientation="Vertical"
                     HeightRequest="550">
             <WebView>
                 <WebView.Source>
@@ -16,14 +18,24 @@
                 </WebView.Source>
             </WebView>
         </ScrollView>
-        <Line Stroke="{StaticResource Primary}"/>
-        <StackLayout Orientation="Horizontal"
+
+        <Line Grid.Row="1" 
+              Stroke="{StaticResource Primary}"
+              X2="{Binding Width, Source={RelativeSource Self}}"
+              VerticalOptions="Start"
+              HorizontalOptions="Fill"
+              StrokeThickness="3" />
+        <StackLayout Grid.Row="2"
+                     Orientation="Horizontal"
                      HorizontalOptions="Center"
+                     VerticalOptions="Center"
                      Spacing="10">
             <Button Text="&lt;"
                     Command="{Binding GoBackCommand}"/>
+            <Label Text="{Binding Chapter}"
+                   VerticalOptions="Center"/>
             <Button Text=">"
                     Command="{Binding GoNextCommand}"/>
         </StackLayout>
-    </StackLayout>
+    </Grid>
 </ContentPage>

@@ -8,7 +8,9 @@ namespace PubHub.BookMobile.ViewModels
 {
     public partial class EBookViewModel : NavigationObject, IQueryAttributable
     {
+        private const int START_OF_BOOK = 0;
         public const string CONTENT_QUERY_NAME = "Content";
+
         private readonly IEpubReaderService _reader;
         private EpubBook _ebook = null!;
 
@@ -17,14 +19,20 @@ namespace PubHub.BookMobile.ViewModels
         [ObservableProperty]
         private string? _chapter;
         [ObservableProperty]
-        private int _currentChapter = 0;
+        private int _currentChapter;
         [ObservableProperty]
         private string? _webContent;
+        [ObservableProperty]
+        private string? _title;
 
         public EBookViewModel(IEpubReaderService reader)
         {
             _reader = reader;
         }
+
+        public Func<ScrollView> ScrollView { get; set; } = null!;
+        public bool IsNotFirstChapter => CurrentChapter != START_OF_BOOK;
+        public bool IsNotLastChapter => CurrentChapter != (_ebook?.ReadingOrder?.Count ?? 0);
 
         public async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
@@ -49,6 +57,9 @@ namespace PubHub.BookMobile.ViewModels
             }
 
             _ebook = result.Instance;
+            Title = _ebook.Title;
+            CurrentChapter = START_OF_BOOK;
+            OnCurrentChapterChanged(CurrentChapter);
             var contentResult = _reader.GetChapter(CurrentChapter, _ebook);
             if (!contentResult.IsSuccess || contentResult.Instance is null)
             {
@@ -59,9 +70,12 @@ namespace PubHub.BookMobile.ViewModels
             IsBusy = false;
         }
 
-        [RelayCommand]
-        public void GoNext()
+        [RelayCommand(CanExecute = nameof(IsNotLastChapter))]
+        public async Task GoNext()
         {
+            if (ScrollView is null)
+                throw new NullReferenceException($"{nameof(ScrollView)} can't be null. Did you forget to set when loading the page?");
+
             IsBusy = true;
             CurrentChapter++;
 
@@ -72,12 +86,16 @@ namespace PubHub.BookMobile.ViewModels
             }
 
             WebContent = contentResult.Instance;
+            await ScrollView.Invoke().ScrollToAsync(0, 0, false);
             IsBusy = false;
         }
 
-        [RelayCommand]
-        public void GoBack()
+        [RelayCommand(CanExecute = nameof(IsNotFirstChapter))]
+        public async Task GoBack()
         {
+            if (ScrollView is null)
+                throw new NullReferenceException($"{nameof(ScrollView)} can't be null. Did you forget to set when loading the page?");
+
             IsBusy = true;
             CurrentChapter--;
 
@@ -88,7 +106,16 @@ namespace PubHub.BookMobile.ViewModels
             }
 
             WebContent = contentResult.Instance;
+            await ScrollView.Invoke().ScrollToAsync(0, 0, false);
             IsBusy = false;
+        }
+
+        partial void OnCurrentChapterChanged(int value)
+        {
+            //  TODO (MSM): Save current chapter progress
+            GoNextCommand.NotifyCanExecuteChanged();
+            GoBackCommand.NotifyCanExecuteChanged();
+            Chapter = $"Section {CurrentChapter + 1}";
         }
     }
 }
