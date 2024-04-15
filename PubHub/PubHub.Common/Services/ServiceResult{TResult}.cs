@@ -2,7 +2,7 @@
 {
     public class ServiceResult<TResult> : ServiceResult
     {
-        internal ServiceResult(TResult? instance, string? errorDescriptor) : base(errorDescriptor)
+        internal ServiceResult(TResult? instance, string? errorDescriptor = null) : base(errorDescriptor)
         {
             Instance = instance;
         }

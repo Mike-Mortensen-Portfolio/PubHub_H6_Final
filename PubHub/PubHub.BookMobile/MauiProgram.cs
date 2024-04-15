@@ -39,7 +39,7 @@ namespace PubHub.BookMobile
                     options.ConfigureForMobile = true;
                     options.TokenInfoAsync = async (provider) =>
                     {
-                        (bool IsSuccess, TokenInfo? tokens) = await User.TryGetCachedToken();
+                        (bool IsSuccess, TokenInfo? tokens) = await User.TryGetCachedTokenAsync();
                         if (!IsSuccess)
                             return new TokenInfo { RefreshToken = string.Empty, Token = string.Empty };
 

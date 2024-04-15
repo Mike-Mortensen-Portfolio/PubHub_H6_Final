@@ -2,7 +2,7 @@
 {
     public class ServiceResult
     {     
-        internal ServiceResult(string? errorDescriptor) 
+        internal ServiceResult(string? errorDescriptor = null) 
         {
             ErrorDescriptor = errorDescriptor;
         }

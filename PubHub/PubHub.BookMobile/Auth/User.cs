@@ -4,6 +4,7 @@ using PubHub.Common;
 using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
+using PubHub.Common.Services;
 
 namespace PubHub.BookMobile.Auth
 {
@@ -25,15 +26,15 @@ namespace PubHub.BookMobile.Auth
         /// </summary>
         /// <param name="tokens"></param>
         /// <exception cref="Exception"></exception>
-        internal static async Task Set(TokenResponseModel tokens)
+        internal static async Task SetAsync(TokenResponseModel tokens)
         {
-            _identity = await GetIdentity(tokens.Token) ?? throw new Exception($"Token validation failed: {tokens.Token}");
+            _identity = await GetIdentityAsync(tokens.Token) ?? throw new Exception($"Token validation failed: {tokens.Token}");
 
             await SecureStorage.Default.SetAsync(StorageConstants.TOKEN_KEY, tokens.Token);
             await SecureStorage.Default.SetAsync(StorageConstants.REFRESH_TOKEN_KEY, tokens.RefreshToken);
         }
 
-        private static async Task<ClaimsPrincipal?> GetIdentity(string token)
+        private static async Task<ClaimsPrincipal?> GetIdentityAsync(string token)
         {
             var handler = new JwtSecurityTokenHandler();
             if (!handler.CanReadToken(token))
@@ -59,15 +60,51 @@ namespace PubHub.BookMobile.Auth
         }
 
         /// <summary>
+        /// Checks the authentication state of the current user and if their claim is goint to expire in 10 minutes or less, tries to refresh their token pair
+        /// </summary>
+        /// <param name="authService"></param>
+        /// <returns>The <see cref="Task"/> that represents the <see langword="asynchronous"/> operation</returns>
+        internal static async Task CheckStateAndTryRefreshAsync(IAuthenticationService authService)
+        {
+            (bool isSuccess, TokenInfo? tokens) = await TryGetCachedTokenAsync();
+
+            if (isSuccess)
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(tokens?.Token);
+                var utcExpire = new DateTimeOffset(token.ValidTo);
+                var expireDate = utcExpire.DateTime;
+
+                if (expireDate < DateTime.UtcNow.AddMinutes(10))
+                {
+                    var result = await authService.RefreshTokenAsync();
+
+                    if (!result.IsSuccess || result.Instance is null)
+                    {
+                        if (result.StatusCode == HttpStatusCode.Unauthorized)
+                            await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
+                        else
+                            await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
+
+                        Unset();
+                        return;
+                    }
+
+                    await SetAsync(result.Instance);
+                }
+            }
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns>A <see cref="Tuple{T1, T2}"/> that contains a <see langword="bool"/> success state and the <see cref="TokenInfo"/> pair if the process was successful; otherwise, if not, <see langword="null"/></returns>
-        internal static async Task<Tuple<bool, TokenInfo?>> TryGetCachedToken()
+        internal static async Task<Tuple<bool, TokenInfo?>> TryGetCachedTokenAsync()
         {
             TokenInfo? tokens = null;
             try
             {
-                tokens = await GetChachedToken();
+                tokens = await GetChachedTokenAsync();
             }
             catch (Exception) { /*Save guard to avoid a crash. It's up to the consumer of this method to ensure the program acts accordingly when failing to retrieve tokens*/ }
 
@@ -79,7 +116,7 @@ namespace PubHub.BookMobile.Auth
         /// </summary>
         /// <returns>A new instance of type <see cref="TokenInfo"/> pair</returns>
         /// <exception cref="Exception"></exception>
-        internal static async Task<TokenInfo> GetChachedToken()
+        internal static async Task<TokenInfo> GetChachedTokenAsync()
         {
             return new TokenInfo
             {

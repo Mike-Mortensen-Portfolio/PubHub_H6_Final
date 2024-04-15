@@ -1,9 +1,7 @@
 ﻿using PubHub.BookMobile.Auth;
-using PubHub.BookMobile.Models;
 using PubHub.BookMobile.ViewModels;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Genres;
-using static Android.App.DownloadManager;
 
 namespace PubHub.BookMobile.Views;
 

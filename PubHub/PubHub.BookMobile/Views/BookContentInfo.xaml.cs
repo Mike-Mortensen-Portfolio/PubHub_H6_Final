@@ -4,15 +4,14 @@ using PubHub.Common.Services;
 
 namespace PubHub.BookMobile.Views;
 
-public partial class Home : ContentPage
+public partial class BookContentInfo : ContentPage
 {
-    private readonly HomeViewModel _viewModel;
+    private readonly BookContentInfoViewModel _viewModel;
     private readonly IAuthenticationService _authService;
 
-    public Home(HomeViewModel viewModel, IAuthenticationService authService)
+    public BookContentInfo(BookContentInfoViewModel viewModel, IAuthenticationService authService)
     {
         InitializeComponent();
-
         _viewModel = viewModel;
         _authService = authService;
         BindingContext = _viewModel;
