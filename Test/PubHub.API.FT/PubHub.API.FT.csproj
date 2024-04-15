@@ -17,6 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\PubHub\PubHub.Common\PubHub.Common.csproj" />
+    <ProjectReference Include="..\PubHub.TestUtils\PubHub.TestUtils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
