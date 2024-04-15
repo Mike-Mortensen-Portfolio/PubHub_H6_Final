@@ -1,4 +1,5 @@
 ﻿using Polly;
+using Polly.RateLimiting;
 using PubHub.Common.Models.Authentication;
 using System.Net.Mime;
 using System.Text;
@@ -27,16 +28,26 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            var context = StartRequest();
-            var response = await _resiliencePipeline.ExecuteAsync(async context =>
+            try
             {
-                await SetTokensAsync();
+                var context = StartRequest();
+                var response = await _resiliencePipeline.ExecuteAsync(async context =>
+                {
+                    await SetTokensAsync();
 
-                return await _client.GetAsync(uri, context.CancellationToken);
-            }, context);
-            EndRequest(context);
+                    return await _client.GetAsync(uri, context.CancellationToken);
+                }, context);
+                EndRequest(context);
 
-            return response;
+                return response;
+            }
+            catch (RateLimiterRejectedException)
+            {
+                return new HttpResponseMessage()
+                {
+                    StatusCode = System.Net.HttpStatusCode.TooManyRequests
+                };
+            }
         }
 
         /// <inheritdoc/>
@@ -44,16 +55,26 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            var context = StartRequest(content);
-            var response = await _resiliencePipeline.ExecuteAsync(async context =>
+            try
             {
-                await SetTokensAsync();
+                var context = StartRequest(content);
+                var response = await _resiliencePipeline.ExecuteAsync(async context =>
+                {
+                    await SetTokensAsync();
 
-                return await _client.PostAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
-            }, context);
-            EndRequest(context);
+                    return await _client.PostAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
+                }, context);
+                EndRequest(context);
 
-            return response;
+                return response;
+            }
+            catch (RateLimiterRejectedException)
+            {
+                return new HttpResponseMessage()
+                {
+                    StatusCode = System.Net.HttpStatusCode.TooManyRequests
+                };
+            }
         }
 
         /// <inheritdoc/>
@@ -61,16 +82,26 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            var context = StartRequest(content);
-            var response = await _resiliencePipeline.ExecuteAsync(async context =>
+            try
             {
-                await SetTokensAsync();
+                var context = StartRequest(content);
+                var response = await _resiliencePipeline.ExecuteAsync(async context =>
+                {
+                    await SetTokensAsync();
 
-                return await _client.PutAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
-            }, context);
-            EndRequest(context);
+                    return await _client.PutAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
+                }, context);
+                EndRequest(context);
 
-            return response;
+                return response;
+            }
+            catch (RateLimiterRejectedException)
+            {
+                return new HttpResponseMessage()
+                {
+                    StatusCode = System.Net.HttpStatusCode.TooManyRequests
+                };
+            }
         }
 
         /// <inheritdoc/>
@@ -78,16 +109,26 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            var context = StartRequest();
-            var response = await _resiliencePipeline.ExecuteAsync(async context =>
+            try
             {
-                await SetTokensAsync();
+                var context = StartRequest();
+                var response = await _resiliencePipeline.ExecuteAsync(async context =>
+                {
+                    await SetTokensAsync();
 
-                return await _client.DeleteAsync(uri, context.CancellationToken);
-            }, context);
-            EndRequest(context);
+                    return await _client.DeleteAsync(uri, context.CancellationToken);
+                }, context);
+                EndRequest(context);
 
-            return response;
+                return response;
+            }
+            catch (RateLimiterRejectedException)
+            {
+                return new HttpResponseMessage()
+                {
+                    StatusCode = System.Net.HttpStatusCode.TooManyRequests
+                };
+            }
         }
 
         /// <summary>

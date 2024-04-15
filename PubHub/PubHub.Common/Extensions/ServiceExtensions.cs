@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
+using System.Threading.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Simmy;
@@ -138,7 +139,16 @@ namespace PubHub.Common.Extensions
 
                             return ValueTask.FromResult(TimeSpan.FromSeconds(timeoutSeconds));
                         }
-                    });
+                    })
+                    .AddRateLimiter(new SlidingWindowRateLimiter(new SlidingWindowRateLimiterOptions
+                    {
+                        PermitLimit = 100,
+                        Window = TimeSpan.FromMinutes(1),
+                        AutoReplenishment = true,
+                        SegmentsPerWindow = 1,
+                        QueueLimit = 5,
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                    }));
 
                 // Configure Simmy.
                 var chaosService = context.ServiceProvider.GetRequiredService<IChaosService>();
