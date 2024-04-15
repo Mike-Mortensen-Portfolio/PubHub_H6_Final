@@ -8,12 +8,12 @@ namespace PubHub.API.Domain.Auth
     public static class AccessResultExtensions
     {
         /// <summary>
-        /// Verify if the given <see cref="AccessResult"/> will provides access.
+        /// Verify if the given <see cref="IAccessResult"/> will provides access.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to verify.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to verify.</param>
         /// <param name="problem">Null when returning true; otherwise problem from <see cref="UnauthorizedSpecification"/>.</param>
         /// <returns><see langword="true"/> if access can be provided; otherwise <see langword="false"/>.</returns>
-        public static bool TryVerify(this AccessResult accessResult, [NotNullWhen(false)] out IResult? problem)
+        public static bool TryVerify(this IAccessResult accessResult, [NotNullWhen(false)] out IResult? problem)
         {
             if (!accessResult.Success)
             {
@@ -30,11 +30,11 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// Check whether an application is allowed to access a given controller and endpoint.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <param name="controllerName">Name of the controller trying to be accessed.</param>
         /// <param name="methodName">Name of controller method trying to be accessed.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult CheckWhitelistEndpoint(this AccessResult accessResult, string controllerName, [CallerMemberName] string methodName = "")
+        public static IAccessResult CheckWhitelistEndpoint(this IAccessResult accessResult, string controllerName, [CallerMemberName] string methodName = "")
         {
             if (accessResult.Concluded)
                 return accessResult;
@@ -78,12 +78,12 @@ namespace PubHub.API.Domain.Auth
         }
 
         /// <summary>
-        /// Check if <see cref="AccessResult.SubjectName"/> is included in the <see cref="AccessResult.AppWhitelist"/>.
+        /// Check if <see cref="IAccessResult.SubjectName"/> is included in the <see cref="IAccessResult.AppWhitelist"/>.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
-        /// <param name="subjectNameFallback">Name of subject to use if <see cref="AccessResult.SubjectName"/> is null.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
+        /// <param name="subjectNameFallback">Name of subject to use if <see cref="IAccessResult.SubjectName"/> is null.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult CheckWhitelistSubject(this AccessResult accessResult, string? subjectNameFallback = null)
+        public static IAccessResult CheckWhitelistSubject(this IAccessResult accessResult, string? subjectNameFallback = null)
         {
             if (accessResult.Concluded)
                 return accessResult;
@@ -102,9 +102,9 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// For users: Allow any.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult AllowUser(this AccessResult accessResult)
+        public static IAccessResult AllowUser(this IAccessResult accessResult)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
@@ -118,10 +118,10 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// For users: Allow only user with <paramref name="userId"/>.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <param name="userId">ID of user to allow.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult AllowUser(this AccessResult accessResult, Guid userId)
+        public static IAccessResult AllowUser(this IAccessResult accessResult, Guid userId)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
@@ -138,11 +138,11 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// For users: Allow only user with access to specific book.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <param name="bookId">Id of the book.</param>
         /// <param name="context">The <see cref="PubHubContext"/> to query the database.</param>
         /// <returns></returns>
-        public static AccessResult AllowUserOnlyIfOwns(this AccessResult accessResult, Guid bookId, PubHubContext context)
+        public static IAccessResult AllowUserOnlyIfOwns(this IAccessResult accessResult, Guid bookId, PubHubContext context)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
@@ -164,9 +164,9 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// For publishers: Allow any.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult AllowPublisher(this AccessResult accessResult)
+        public static IAccessResult AllowPublisher(this IAccessResult accessResult)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
@@ -180,10 +180,10 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// For publishers: Allow only publisher with <paramref name="publisherId"/>.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <param name="publisherId">ID of publisher to allow.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult AllowPublisher(this AccessResult accessResult, Guid publisherId)
+        public static IAccessResult AllowPublisher(this IAccessResult accessResult, Guid publisherId)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
@@ -198,11 +198,11 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// For users: Allow only publisher with access to specific book.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <param name="bookId">Id of the book.</param>
         /// <param name="context">The <see cref="PubHubContext"/> to query the database.</param>
         /// <returns></returns>
-        public static AccessResult AllowPublisherOnlyIfOwns(this AccessResult accessResult, Guid bookId, PubHubContext context)
+        public static IAccessResult AllowPublisherOnlyIfOwns(this IAccessResult accessResult, Guid bookId, PubHubContext context)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
@@ -222,9 +222,9 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// For operators: Allow any.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult AllowOperator(this AccessResult accessResult)
+        public static IAccessResult AllowOperator(this IAccessResult accessResult)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
@@ -238,9 +238,9 @@ namespace PubHub.API.Domain.Auth
         /// <summary>
         /// Allow any subject, only superseded by the whitelist.
         /// </summary>
-        /// <param name="accessResult"><see cref="AccessResult"/> to extend.</param>
+        /// <param name="accessResult"><see cref="IAccessResult"/> to extend.</param>
         /// <returns><paramref name="accessResult"/></returns>
-        public static AccessResult AllowAny(this AccessResult accessResult)
+        public static IAccessResult AllowAny(this IAccessResult accessResult)
         {
             if (accessResult.Concluded || accessResult.Success)
                 return accessResult;
