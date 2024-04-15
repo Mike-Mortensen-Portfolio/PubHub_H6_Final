@@ -263,11 +263,20 @@ if (!app.Environment.IsDevelopment())
 ---
 
 # Standards
-- Our `Constants` follows the Screaming Snake Casing: THIS_IS_SCREAMING_SNAKE_CASING.
-- Branches will be named as followed: `[Initials]/[feature]` in all lowercase, with words seperated by dash.
-  - Example would be: **msm/my-feature**
-- We follow the **FBT**: Folder by type structure in our project.
-- The API will provide error responses that will be handled according to the [RFC9457](https://datatracker.ietf.org/doc/html/rfc9457) standard.
-- The API endpoint addresses are formed according to the URL standard; `https://pubhub.com/example-url/21`.
-- The mobile codebase must comply with the MVVM pattern, while both it and the web application must comply with DI patterns.
 
+- **Source Control**
+  - `Features` must be branched out and developed on an isolated branch and merged back into the `Developer` branch when done.
+  - Branches will be named as followed: `[Initials]/[feature]` in all lowercase, with words seperated by dash.
+    - Example would be: **msm/my-feature**
+      
+- **Code**
+  - `Namespaces` must be constructed as follows: PubHub.[ProjectName].[FolderName].[SubFolderName]
+    - We follow the `FBT`: Folder by type structure in our project.
+  - `Fields` must be *private* or *protected*.
+  - `Properties` must be *public*, *protected* or *internal*.
+  - Our `Constants` follows the Screaming Snake Casing: THIS_IS_SCREAMING_SNAKE_CASING.
+  - The API endpoint addresses are formed according to the URL standard; `https://pubhub.com/example-url/21`.
+  - The mobile codebase must comply with the MVVM pattern, while both it and the web application must comply with DI patterns.
+    
+- **Error Handling**
+  - The API will provide error responses that will be handled according to the [RFC9457](https://datatracker.ietf.org/doc/html/rfc9457) standard.
