@@ -166,7 +166,7 @@
     private async Task UpdateBook()
     {
         var result = await BookService.UpdateBookAsync(BookInfoModel.Id, bookUpdateform.UpdateBookModel());
-        if (result.StatusCode == ResponseCodeConstants.OK_CODE)
+        if (result.StatusCode == HttpStatusCode.OK)
         {
             NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
             await ModalOptions(false);

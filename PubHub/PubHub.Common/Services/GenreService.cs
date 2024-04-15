@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.ContentTypes;
 using PubHub.Common.Models.Genres;
 using static PubHub.Common.IntegrityConstants;
 
@@ -32,6 +33,9 @@ namespace PubHub.Common.Services
             {
                 HttpResponseMessage response = await Client.GetAsync($"genres");
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<IReadOnlyList<GenreInfoModel>>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -73,6 +77,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.GetAsync($"genres/{genreId}");
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<GenreInfoModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -113,6 +120,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.PostAsync("genres", genreModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<GenreCreateModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -147,6 +157,9 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.DeleteAsync($"genres/{genreId}");
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult(response.StatusCode, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {

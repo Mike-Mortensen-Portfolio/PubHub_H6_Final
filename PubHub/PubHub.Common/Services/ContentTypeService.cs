@@ -33,6 +33,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.GetAsync($"contentTypes");
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);

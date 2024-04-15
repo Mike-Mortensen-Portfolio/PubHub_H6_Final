@@ -1,10 +1,7 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using IntelliJ.Lang.Annotations;
-using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.Common;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
 using PubHub.Common.Services;

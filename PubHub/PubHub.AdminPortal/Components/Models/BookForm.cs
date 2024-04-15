@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using PubHub.Common;
 using PubHub.Common.Models.Books;
 
 namespace PubHub.AdminPortal.Components.Models
@@ -12,9 +13,11 @@ namespace PubHub.AdminPortal.Components.Models
         public Guid PublisherId { get; set; }
 
         [Required(ErrorMessage = "Please enter a title for the book.")]
+        [MaxLength(ValidationAnnotationConstants.MAX_TITLE_LENGTH)]
         public string? Title { get; set; }
         
         [Required(ErrorMessage = "Please enter a summary of the book.")]
+        [MaxLength(ValidationAnnotationConstants.MAX_SUMMARY_LENGTH)]
         public string? Summary { get; set; }
 
         [Required(ErrorMessage = "Please upload a cover image.")]

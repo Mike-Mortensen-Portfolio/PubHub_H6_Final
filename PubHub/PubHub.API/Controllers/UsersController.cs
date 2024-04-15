@@ -16,6 +16,7 @@ using PubHub.Common.Models.Genres;
 using PubHub.Common.Models.Users;
 using PubHub.Common.Extensions;
 using static PubHub.Common.IntegrityConstants;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace PubHub.API.Controllers
 {
@@ -23,6 +24,7 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
+    [EnableRateLimiting("concurrency")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class UsersController : Controller

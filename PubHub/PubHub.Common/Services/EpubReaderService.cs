@@ -43,7 +43,7 @@ namespace PubHub.Common.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error retrieving the current chapter: {ex.Message}");
-                return new ServiceResult<string>(string.Empty);
+                return new ServiceResult<string>(string.Empty, errorDescriptor: $"Error retrieving the current chapter: {ex.Message}.");
             }
         }
 

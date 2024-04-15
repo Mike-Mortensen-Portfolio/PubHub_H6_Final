@@ -1,5 +1,5 @@
 ﻿using PubHub.BookMobile.Auth;
-using PubHub.BookMobile.ErrorSpecifications;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.BookMobile.ViewModels;
 using PubHub.Common.Services;
 

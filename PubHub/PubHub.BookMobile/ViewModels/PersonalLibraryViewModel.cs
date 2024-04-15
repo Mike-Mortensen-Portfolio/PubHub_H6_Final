@@ -2,9 +2,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PubHub.BookMobile.Auth;
-using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.Models;
-using PubHub.Common;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Genres;
 using PubHub.Common.Services;
