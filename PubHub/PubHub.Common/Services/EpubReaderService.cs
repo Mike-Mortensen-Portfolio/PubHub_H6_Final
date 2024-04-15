@@ -53,7 +53,7 @@ namespace PubHub.Common.Services
         /// <param name="chapterIndex">The next chapter index.</param>
         /// <param name="epubBook">The <see cref="EpubBook"/> which needs to be read from.</param>
         /// <returns></returns>
-        public ServiceResult<string> GetNextChapter(int chapterIndex, EpubBook epubBook)
+        public ServiceResult<string> GetChapter(int chapterIndex, EpubBook epubBook)
         {
             try
             {

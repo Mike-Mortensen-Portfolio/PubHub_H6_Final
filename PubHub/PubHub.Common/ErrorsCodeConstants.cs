@@ -10,5 +10,6 @@
         public const string UNPROCESSABLE_ENTITY = "0x00006";
         public const string BAD_REQUEST = "0x00007";
         public const string CONFLICT = "0x00008";
+        public const string TOO_MANY_REQUEST = "0x00009";
     }
 }
