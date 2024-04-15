@@ -5,6 +5,7 @@ using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
+using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Users;
 
 namespace PubHub.Common.Services
@@ -39,6 +40,9 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.PostAsync("auth/user", userModelValues);
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<UserCreatedResponseModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -80,6 +84,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.PostAsync($"auth/token", loginInfoJson);
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<TokenResponseModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -116,6 +123,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.PostAsync($"auth/refresh");
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<TokenResponseModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -151,6 +161,9 @@ namespace PubHub.Common.Services
             {
                 HttpResponseMessage response = await Client.PostAsync($"auth/revoke");
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult(response.StatusCode, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {

@@ -5,6 +5,7 @@ using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
 using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
 using static PubHub.Common.IntegrityConstants;
 
@@ -36,6 +37,9 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.GetAsync($"books?{queryOptions.ToQuery(ignoreNull: true)}");
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<IReadOnlyList<BookInfoModel>>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -76,6 +80,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.GetAsync($"books/{bookId}");
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<BookInfoModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -115,6 +122,9 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.PostAsync("books", bookModelValues);
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<BookInfoModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -161,6 +171,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.PutAsync($"books/{bookId}", bookModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<BookInfoModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -200,6 +213,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.DeleteAsync($"books/{bookId}");
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult(response.StatusCode, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -237,6 +253,9 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.PostAsync($"books/{bookId}/purchase");
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult(response.StatusCode, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {

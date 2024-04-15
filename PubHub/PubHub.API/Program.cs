@@ -23,34 +23,14 @@ builder.Services.ConfigureSwagger(new OpenApiInfo { Title = "PubHub API v1", Ver
 
 builder.Services.AddRateLimiter(rateLimterOptions =>
 {
-    rateLimterOptions.AddFixedWindowLimiter("fixed", options =>
+    rateLimterOptions.AddConcurrencyLimiter("concurrency", options =>
     {
-        options.PermitLimit = 2;
-        options.Window = TimeSpan.FromSeconds(10);
+        options.PermitLimit = 5;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         options.QueueLimit = 1;
     });
 
-    rateLimterOptions.AddConcurrencyLimiter("concurrency", options =>
-    {
-        options.PermitLimit = 10;
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 5;
-    });
-
-    rateLimterOptions.OnRejected = (context, rateLimterOptions) =>
-    {
-        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-        {
-            context.HttpContext.Response.Headers.RetryAfter =
-                ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
-        }
-
-        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-        context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.");
-
-        return new ValueTask();
-    };
+    rateLimterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
 builder.Services.AddControllers()

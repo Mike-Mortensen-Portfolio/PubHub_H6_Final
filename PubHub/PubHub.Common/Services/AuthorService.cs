@@ -33,6 +33,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.GetAsync($"authors");
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<IReadOnlyList<AuthorInfoModel>>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -72,6 +75,9 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.GetAsync($"authors/{authorId}");
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<AuthorInfoModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -113,6 +119,9 @@ namespace PubHub.Common.Services
                 HttpResponseMessage response = await Client.PostAsync("authors", authorModelValues);
                 string content = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<AuthorInfoModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
@@ -151,6 +160,9 @@ namespace PubHub.Common.Services
 
                 HttpResponseMessage response = await Client.DeleteAsync($"authors/{authorId}");
                 string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult(response.StatusCode, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {

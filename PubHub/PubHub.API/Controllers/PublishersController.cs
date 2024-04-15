@@ -24,6 +24,7 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
+    [EnableRateLimiting("concurrency")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class PublishersController : Controller
@@ -212,7 +213,6 @@ namespace PubHub.API.Controllers
         /// <response code="200">Success. All books of the publisher was retreived.</response>
         /// <response code="404">The publisher wasn't found.</response>
         [HttpGet("{id}/books")]
-        [EnableRateLimiting("fixed")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<BookInfoModel>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> GetBooksAsync(Guid id, [FromHeader] string appId)

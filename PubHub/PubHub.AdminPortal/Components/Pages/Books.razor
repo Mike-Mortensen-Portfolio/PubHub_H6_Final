@@ -94,9 +94,8 @@
         {
             var response = (await PublisherService.GetAllPublisherBooksAsync(Publisher.Id));
 
-            if(!response.IsSuccess)
-                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = response.ErrorDescriptor, Detail = "Error", Duration = 5000 });
-
+            if(response.StatusCode == HttpStatusCode.TooManyRequests)
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = TooManyRequestError.ERROR_MESSAGE, Duration = 5000 });
 
             BookInfos = response.Instance ?? [];
         }
