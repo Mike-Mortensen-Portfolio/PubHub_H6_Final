@@ -2,8 +2,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Plugin.Maui.Audio;
+using PubHub.BookMobile.Auth;
 using PubHub.Common;
 using PubHub.Common.ErrorSpecifications;
+using PubHub.Common.Models.Users;
 using PubHub.Common.Services;
 
 namespace PubHub.BookMobile.ViewModels
@@ -11,38 +13,46 @@ namespace PubHub.BookMobile.ViewModels
     public partial class AudiobookViewModel : NavigationObject, IQueryAttributable
     {
         public const string BOOK_ID_QUERY_NAME = "BookId";
-        public const string CONTENT_QUERY_NAME = "Content";
+        public const string COVER_IMAGE_QUERY_NAME = "CoverImage";
 
         private readonly IAudioManager _audioManager;
         private readonly IBookService _bookService;
-
+        private readonly IUserService _userService;
+        private IAudioPlayer? _audioPlayer = null!;
         private Guid _bookId;
+        private bool _isPaused = false;
 
         [ObservableProperty]
         private bool _isBusy;
+        [ObservableProperty]
+        private byte[] coverImage = null!;
+        [ObservableProperty]
+        private string _totalTimeString = string.Empty;
+        [ObservableProperty]
+        private double _volume = 0f;
+        [ObservableProperty]
+        private double _totalDuration;
+        [ObservableProperty]
+        private double _currentPosition = 0f;
+        [ObservableProperty]
+        private string _timeLeft = string.Empty;
 
-        public AudiobookViewModel(IAudioManager audioManager, IBookService bookService)
+        public AudiobookViewModel(IAudioManager audioManager, IBookService bookService, IUserService userService)
         {
             _audioManager = audioManager;
             _bookService = bookService;
+            _userService = userService;
         }
 
-        [RelayCommand]
-        public async Task PlayAudio()
-        {
-            await Task.Run(async () =>
-            {
-                var audioPlayer = _audioManager.CreatePlayer((await _bookService.GetBookStreamAsync(_bookId)).Instance!);
-
-                audioPlayer.Play();
-            });
-        }
+        public bool CanPlay => _audioPlayer is null || !_audioPlayer.IsPlaying;
+        public bool CanPause => (_audioPlayer is not null) && _audioPlayer.IsPlaying && !_isPaused;
+        public bool CanStop => (_audioPlayer is not null) && (_audioPlayer.IsPlaying || _isPaused);
 
         public async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             IsBusy = true;
             Guid idResult = IntegrityConstants.INVALID_ENTITY_ID;
-            if ((query[CONTENT_QUERY_NAME] is not byte[] rawBytes || !rawBytes.GetType().IsArray) || (query[BOOK_ID_QUERY_NAME] is not null && !Guid.TryParse(query[BOOK_ID_QUERY_NAME].ToString(), out idResult)))
+            if ((query[COVER_IMAGE_QUERY_NAME] is not byte[] rawBytes || !rawBytes.GetType().IsArray) || query[BOOK_ID_QUERY_NAME] is not null && !Guid.TryParse(query[BOOK_ID_QUERY_NAME].ToString(), out idResult))
             {
                 await Shell.Current.CurrentPage.DisplayAlert(NotFoundError.TITLE, NotFoundError.ERROR_MESSAGE, NotFoundError.BUTTON_TEXT);
 
@@ -51,30 +61,108 @@ namespace PubHub.BookMobile.ViewModels
                 return;
             }
 
+            CoverImage = rawBytes;
             _bookId = idResult;
-
-            //var result = await _reader.GetEpubBookAsync(rawBytes);
-            //if (!result.IsSuccess || result.Instance is null)
-            //{
-            //    await Shell.Current.CurrentPage.DisplayAlert(NotFoundError.TITLE, NotFoundError.ERROR_MESSAGE, NotFoundError.BUTTON_TEXT);
-
-            //    await NavigateToPage("..");
-
-            //    return;
-            //}
-
-            //_ebook = result.Instance;
-            //Title = _ebook.Title;
-            //CurrentChapter = START_OF_BOOK;
-            //OnCurrentChapterChanged(CurrentChapter);
-            //var contentResult = _reader.GetChapter(CurrentChapter, _ebook);
-            //if (!contentResult.IsSuccess || contentResult.Instance is null)
-            //{
-            //    //  TODO (MSM): Handle erorr
-            //}
-
-            //WebContent = contentResult.Instance;
             IsBusy = false;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanPlay))]
+        public async Task PlayAudio()
+        {
+            if (_audioPlayer is null)
+                await Task.Run(async () =>
+                {
+                    _audioPlayer = _audioManager.CreatePlayer((await _bookService.GetBookStreamAsync(_bookId)).Instance!);
+                    Volume = _audioPlayer.Volume;
+                    TotalDuration = _audioPlayer.Duration;
+                    TotalTimeString = ((_audioPlayer is not null) ? ($"{_audioPlayer?.Duration:00:00}") : ("00:00"));
+                });
+
+            _audioPlayer!.Play();
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            Task.Run(() =>
+            {
+                while (_audioPlayer.IsPlaying)
+                {
+                    CurrentPosition = _audioPlayer.CurrentPosition;
+                }
+            });
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            _isPaused = false;
+            PlayAudioCommand.NotifyCanExecuteChanged();
+            PauseAudioCommand.NotifyCanExecuteChanged();
+            StopAudioCommand.NotifyCanExecuteChanged();
+        }
+
+        [RelayCommand(CanExecute = nameof(CanPause))]
+        public void PauseAudio()
+        {
+            if (_audioPlayer is null)
+                return;
+
+            _audioPlayer.Pause();
+            _isPaused = true;
+            PlayAudioCommand.NotifyCanExecuteChanged();
+            PauseAudioCommand.NotifyCanExecuteChanged();
+            StopAudioCommand.NotifyCanExecuteChanged();
+        }
+
+        [RelayCommand(CanExecute = nameof(CanStop))]
+        public void StopAudio()
+        {
+            if (_audioPlayer is null)
+                return;
+
+            _audioPlayer.Stop();
+
+            _isPaused = false;
+            PlayAudioCommand.NotifyCanExecuteChanged();
+            PauseAudioCommand.NotifyCanExecuteChanged();
+            StopAudioCommand.NotifyCanExecuteChanged();
+        }
+
+        public async Task UpdateProgress()
+        {
+            IsBusy = true;
+
+            if (_audioPlayer is null)
+                return;
+
+            var progressInProcentage = _audioPlayer.CurrentPosition / _audioPlayer.Duration * 100f;
+
+            var result = await _userService.UpdateBookProgressAsync(User.Id!.Value, new UserBookUpdateModel
+            {
+                bookId = _bookId,
+                ProgressInProcent = (float)progressInProcentage
+            });
+
+            if (!result.IsSuccess)
+            {
+                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
+                else
+                    await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
+            }
+
+            IsBusy = false;
+        }
+
+        partial void OnVolumeChanged(double value)
+        {
+            if (_audioPlayer is null)
+                return;
+
+            _audioPlayer!.Volume = value;
+        }
+
+        partial void OnCurrentPositionChanged(double value)
+        {
+            if (_audioPlayer is null)
+                return;
+
+            var timeLeft = _audioPlayer.Duration - _audioPlayer.CurrentPosition;
+            TimeLeft = $"{timeLeft:00:00}";
         }
     }
 }

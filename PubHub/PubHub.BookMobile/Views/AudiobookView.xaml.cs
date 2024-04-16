@@ -13,4 +13,11 @@ public partial class AudiobookView : ContentPage
 
         BindingContext = _viewModel;
     }
+
+    protected override async void OnDisappearing()
+    {
+        await _viewModel.UpdateProgress();
+
+        base.OnDisappearing();
+    }
 }

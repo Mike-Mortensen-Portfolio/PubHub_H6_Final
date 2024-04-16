@@ -153,7 +153,7 @@ namespace PubHub.BookMobile.ViewModels
                     RouteName = "AudiobookView",
                     Parameters = new Dictionary<string, object>
                     {
-                        { "Content", CurrentContent!.BookContent! },
+                        { "CoverImage", CurrentViewedItem.CoverImage! },
                         { "BookId", CurrentViewedItem.Id }
                     }
                 });

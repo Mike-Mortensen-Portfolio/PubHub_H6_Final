@@ -105,6 +105,14 @@ namespace PubHub.Common.Services
             }
         }
 
+        /// <summary>
+        /// Establish a <see cref="Stream"/> between the server and the client
+        /// <br/>
+        /// <br/>
+        /// <strong>Note:</strong> This is mainly intended for streaming audio. E-books are not directly supported
+        /// </summary>
+        /// <param name="bookId"></param>
+        /// <returns>The <see cref="Stream"/> that represents the book content</returns>
         public async Task<HttpServiceResult<Stream>> GetBookStreamAsync(Guid bookId)
         {
             try
