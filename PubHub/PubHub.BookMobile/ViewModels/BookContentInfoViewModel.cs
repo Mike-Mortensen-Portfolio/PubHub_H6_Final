@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PubHub.BookMobile.Auth;
-using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.Models;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Services;
 
@@ -141,6 +141,15 @@ namespace PubHub.BookMobile.ViewModels
                 await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo
                 {
                     RouteName = "EBookView",
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { "Content", CurrentContent!.BookContent! }
+                    }
+                });
+            if (IsAudioBook)
+                await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo
+                {
+                    RouteName = "AudiobookView",
                     Parameters = new Dictionary<string, object>
                     {
                         { "Content", CurrentContent!.BookContent! }

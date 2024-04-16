@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PubHub.BookMobile.ErrorSpecifications;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Services;
 using VersOne.Epub;
 
