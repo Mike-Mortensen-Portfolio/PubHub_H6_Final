@@ -11,8 +11,6 @@ namespace PubHub.API.UT.Auth
 {
     public class FluentAuthenticationApiTests : IClassFixture<DatabaseFixture>
     {
-        private const string UNRECOGNIZED = "Unrecognized";
-
         private const string PAPERS_CONTROLLER = "PapersController";
         private const string PEACHES_CONTROLLER = "PeachesController";
         private const string TRAINS_CONTROLLER = "TrainsController";
@@ -33,6 +31,9 @@ namespace PubHub.API.UT.Auth
         private static readonly string[] PAPERS_ENDPOINTS_TWO = [PAPERS_ENDPOINT_TEAR, PAPERS_ENDPOINT_FOLD, PAPERS_ENDPOINT_THROW];
         private static readonly string[] PEACHES_ENDPOINTS = [PEACHES_ENDPOINT_PLUCK, PEACHES_ENDPOINT_EAT];
         private static readonly string[] TRAINS_ENDPOINTS = [TRAINS_ENDPOINT_CHOO, TRAINS_ENDPOINT_CHUG, TRAINS_ENDPOINT_CHUFF];
+
+        private const string UNRECOGNIZED = "Unrecognized";
+        private readonly Guid UNRECOGNIZED_GUID = Guid.NewGuid();
 
         private readonly AccessService _accessService;
 
@@ -116,7 +117,7 @@ namespace PubHub.API.UT.Auth
         private void UserIsUser() =>
             Identity.AddClaim(new(TokenClaimConstants.ACCOUNT_TYPE, DatabaseFixture.GetTypeId(AccountTypeConstants.USER_ACCOUNT_TYPE).ToString()));
 
-        #region Without User
+        #region Whitelist App
         [Fact]
         public void CheckWhitelistControllerAndMethod()
         {
@@ -207,22 +208,215 @@ namespace PubHub.API.UT.Auth
         }
         #endregion
 
-        #region User and Application
+        #region Allow User
         [Fact]
-        public void CheckWhitelistUser()
+        public void AllowAnyOperator()
         {
             // Arrange.
             UserIsOperator();
 
             // Act.
             var result = _accessService.AccessFor(_appIdOne, User)
-                .CheckWhitelistEndpoint(PEACHES_CONTROLLER, PEACHES_ENDPOINT_EAT)
                 .AllowOperator()
                 .TryVerify(out IResult? problem);
 
             // Assert.
             Assert.True(result);
             Assert.Null(problem);
+        }
+
+        [Fact]
+        public void AllowAnyOperatorFailUserIsPublisher()
+        {
+            // Arrange.
+            UserIsPublisher();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowOperator()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.False(result);
+            Assert.NotNull(problem);
+        }
+
+        [Fact]
+        public void AllowAnyOperatorFailUserIsUser()
+        {
+            // Arrange.
+            UserIsUser();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowOperator()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.False(result);
+            Assert.NotNull(problem);
+        }
+
+        [Fact]
+        public void AllowAnyPublisher()
+        {
+            // Arrange.
+            UserIsPublisher();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowPublisher()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.True(result);
+            Assert.Null(problem);
+        }
+
+        [Fact]
+        public void AllowSinglePublisher()
+        {
+            // Arrange.
+            UserIsPublisher();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowPublisher(_subjectGuid)
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.True(result);
+            Assert.Null(problem);
+        }
+
+        [Fact]
+        public void AllowSinglePublisherFail()
+        {
+            // Arrange.
+            UserIsPublisher();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowPublisher(UNRECOGNIZED_GUID)
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.False(result);
+            Assert.NotNull(problem);
+        }
+
+        [Fact]
+        public void AllowAnyUser()
+        {
+            // Arrange.
+            UserIsUser();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowUser()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.True(result);
+            Assert.Null(problem);
+        }
+
+        [Fact]
+        public void AllowSingleUser()
+        {
+            // Arrange.
+            UserIsUser();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowUser(_subjectGuid)
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.True(result);
+            Assert.Null(problem);
+        }
+
+        [Fact]
+        public void AllowSingleUserFail()
+        {
+            // Arrange.
+            UserIsUser();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowUser(UNRECOGNIZED_GUID)
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.False(result);
+            Assert.NotNull(problem);
+        }
+
+        [Fact]
+        public void AllowAny()
+        {
+            // Arrange.
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne, User)
+                .AllowAny()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.True(result);
+            Assert.Null(problem);
+        }
+
+        [Fact]
+        public void AllowAnyFailNoUser()
+        {
+            // Arrange.
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdOne)
+                .AllowAny()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.False(result);
+            Assert.NotNull(problem);
+        }
+        #endregion
+
+        #region Whitelist User
+        [Fact]
+        public void CheckWhitelistUser()
+        {
+            // Arrange.
+            UserIsUser();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdTwo, User)
+                .CheckWhitelistSubject()
+                .AllowAny()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.True(result);
+            Assert.Null(problem);
+        }
+
+        [Fact]
+        public void CheckWhitelistUserFail()
+        {
+            // Arrange.
+            UserIsOperator();
+
+            // Act.
+            var result = _accessService.AccessFor(_appIdTwo, User)
+                .CheckWhitelistSubject()
+                .AllowAny()
+                .TryVerify(out IResult? problem);
+
+            // Assert.
+            Assert.False(result);
+            Assert.NotNull(problem);
         }
         #endregion
     }

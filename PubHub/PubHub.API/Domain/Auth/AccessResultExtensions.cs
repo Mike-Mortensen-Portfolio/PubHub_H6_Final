@@ -89,7 +89,7 @@ namespace PubHub.API.Domain.Auth
                 return accessResult;
 
             var subjectName = accessResult.SubjectName ?? subjectNameFallback;
-            if (!(subjectName != null && (accessResult.AppWhitelist?.Subjects.Contains(subjectName) ?? false)))
+            if (!(subjectName != null && (accessResult.AppWhitelist?.Subjects.Any(s => s.ToUpperInvariant() == subjectName.ToUpperInvariant()) ?? false)))
                 accessResult.Disallow();
 
             // Allow if not validating subject.
