@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -10,6 +11,7 @@ using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.Extensions;
 using PubHub.API.Domain.Services;
 using PubHub.Common;
+using PubHub.Common.Helpers;
 using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
@@ -70,7 +72,7 @@ namespace PubHub.API.Controllers
                         Id = book.ContentTypeId,
                         Name = book.ContentType!.Name
                     },
-                    CoverImage = book.CoverImage,
+                    CoverImage = book.CoverImageUri != null ? System.IO.File.ReadAllBytes(book.CoverImageUri) : null,
                     Id = book.Id,
                     Length = book.Length,
                     PublicationDate = book.PublicationDate,
@@ -136,7 +138,7 @@ namespace PubHub.API.Controllers
                     Id = entityBook.ContentTypeId,
                     Name = entityBook.ContentType!.Name
                 },
-                CoverImage = entityBook.CoverImage,
+                CoverImage = entityBook.CoverImageUri != null ? System.IO.File.ReadAllBytes(entityBook.CoverImageUri) : null,
                 Id = entityBook.Id,
                 Length = entityBook.Length,
                 PublicationDate = entityBook.PublicationDate,
@@ -253,7 +255,7 @@ namespace PubHub.API.Controllers
                     book.PublicationDate == createModel.PublicationDate &&
                     book.Title == createModel.Title &&
                     book.Summary == createModel.Summary &&
-                    book.BookContent.Equals(createModel.BookContent));
+                    book.BookContentUri.Equals(createModel.BookContent));
 
             if (existingBook is not null)
                 return Results.Problem(
@@ -280,9 +282,9 @@ namespace PubHub.API.Controllers
 
             var createdBook = new Book
             {
-                BookContent = createModel.BookContent,
+                BookContentUri = await new FileHandler().ByteArrayToFileAsync(createModel.BookContent, Path.Combine(Assembly.GetExecutingAssembly().Location, CONTENT_DIR)),
                 ContentTypeId = createModel.ContentTypeId,
-                CoverImage = createModel.CoverImage,
+                CoverImageUri = ((createModel.CoverImage != null) ? (await new FileHandler().ByteArrayToFileAsync(createModel.CoverImage, Path.Combine(Assembly.GetExecutingAssembly().Location, CONTENT_DIR))) : (null)),
                 IsHidden = createModel.IsHidden,
                 Length = createModel.Length,
                 PublicationDate = createModel.PublicationDate,
@@ -361,7 +363,7 @@ namespace PubHub.API.Controllers
                 book.PublicationDate == createdBook.PublicationDate &&
                 book.Title == createdBook.Title &&
                 book.Summary == createdBook.Summary &&
-                book.BookContent.Equals(createdBook.BookContent))
+                book.BookContentUri.Equals(createdBook.BookContentUri))
                 .Select(book => new BookInfoModel
                 {
                     ContentType = new ContentTypeInfoModel
@@ -369,7 +371,7 @@ namespace PubHub.API.Controllers
                         Id = book.ContentTypeId,
                         Name = book.ContentType!.Name
                     },
-                    CoverImage = book.CoverImage,
+                    CoverImage = book.CoverImageUri != null ? System.IO.File.ReadAllBytes(book.CoverImageUri) : null,
                     Id = book.Id,
                     Length = book.Length,
                     PublicationDate = book.PublicationDate,
@@ -440,9 +442,9 @@ namespace PubHub.API.Controllers
                         { "Id", updateModel.PublisherId }
                     });
 
-            existingBook.BookContent = updateModel.BookContent;
+            existingBook.BookContentUri = await new FileHandler().ByteArrayToFileAsync(updateModel.BookContent, Path.Combine(Assembly.GetExecutingAssembly().Location, CONTENT_DIR));
             existingBook.ContentTypeId = updateModel.ContentTypeId;
-            existingBook.CoverImage = updateModel.CoverImage;
+            existingBook.CoverImageUri = ((updateModel.CoverImage != null) ? (await new FileHandler().ByteArrayToFileAsync(updateModel.CoverImage, Path.Combine(Assembly.GetExecutingAssembly().Location, CONTENT_DIR))) : (null));
             existingBook.IsHidden = updateModel.IsHidden;
             existingBook.Length = updateModel.Length;
             existingBook.PublicationDate = updateModel.PublicationDate;
@@ -537,7 +539,7 @@ namespace PubHub.API.Controllers
                         Id = book.ContentTypeId,
                         Name = book.ContentType!.Name
                     },
-                    CoverImage = book.CoverImage,
+                    CoverImage = book.CoverImageUri != null ? System.IO.File.ReadAllBytes(book.CoverImageUri) : null,
                     Id = book.Id,
                     Length = book.Length,
                     PublicationDate = book.PublicationDate,

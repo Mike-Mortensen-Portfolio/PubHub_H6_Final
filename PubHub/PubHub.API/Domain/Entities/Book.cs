@@ -7,8 +7,8 @@
         public Guid PublisherId { get; set; }
         public required string Title { get; set; }
         public required string Summary { get; set; }
-        public byte[]? CoverImage { get; set; }
-        public required byte[] BookContent { get; set; }
+        public string? CoverImageUri { get; set; }
+        public required string BookContentUri { get; set; }
         public DateOnly PublicationDate { get; set; }
         public double Length { get; set; }
         public bool IsHidden { get; set; }

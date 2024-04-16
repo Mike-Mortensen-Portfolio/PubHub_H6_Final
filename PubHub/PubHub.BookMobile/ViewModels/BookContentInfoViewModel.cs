@@ -65,7 +65,7 @@ namespace PubHub.BookMobile.ViewModels
 
             CurrentContent = result.Instance;
             AquiredDate = CurrentContent!.AcquireDate.ToString("dd/MM/yyyy");
-            ProgressInProcent = $"{CurrentContent!.ProgressInProcent}%";
+            ProgressInProcent = $"{CurrentContent!.ProgressInProcent:00.00}%";
 
             ButtonText = ((IsEBook) ? ("Read now") : ("Listen now"));
             IsBusy = false;
@@ -143,7 +143,8 @@ namespace PubHub.BookMobile.ViewModels
                     RouteName = "EBookView",
                     Parameters = new Dictionary<string, object>
                     {
-                        { "Content", CurrentContent!.BookContent! }
+                        { "Content", CurrentContent!.BookContent! },
+                        { "BookId", CurrentViewedItem.Id }
                     }
                 });
             if (IsAudioBook)
