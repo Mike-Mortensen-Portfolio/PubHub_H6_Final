@@ -268,6 +268,64 @@ namespace PubHub.API.Controllers
             return Results.Ok(updatedUser);
         }
 
+        [HttpPut("{id}/books")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> UpdateUserBookAsync(Guid id, [FromBody] UserBookUpdateModel userBook, [FromHeader] string appId)
+        {
+            if (!_accessService.AccessFor(appId, User)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .AllowUser(id)
+                .AllowOperator()
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
+
+            // Get user book entity.
+            var userBookEntity = await _context.Set<UserBook>()
+                .FirstOrDefaultAsync(ub => ub.UserId == id && ub.BookId == userBook.bookId);
+            if (userBookEntity == null)
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "No book for the given user was found.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "UserId", id },
+                        { "BookId", userBook.bookId }
+                    });
+
+            // Update user book properties.
+            userBookEntity.ProgressInProcent = userBook.ProgressInProcent;
+
+            var updatedUserBook = new UserBookInfoModel
+            {
+                UserBookId = userBookEntity.UserBookId,
+                BookId = userBookEntity.BookId,
+                UserId = userBookEntity.UserId,
+                AccessTypeId = userBookEntity.AccessTypeId,
+                ProgressInProcent = userBookEntity.ProgressInProcent,
+                AcquireDate = userBookEntity.AcquireDate
+            };
+
+            // Save user book.
+            _context.Update(userBookEntity);
+            if (await _context.SaveChangesAsync() == NO_CHANGES)
+            {
+                _logger.LogError("Couldn't save changes to the database when updating user book: {UserBookId}", userBookEntity.UserBookId);
+
+                return Results.Problem(
+                    statusCode: InternalServerErrorSpecification.STATUS_CODE,
+                    title: InternalServerErrorSpecification.TITLE,
+                    detail: "Something went wrong and the user book couldn't be updated. Please try again.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "UserBook", updatedUserBook }
+                    });
+            }            
+
+            return Results.Ok(updatedUserBook);
+        }
+
         /// <summary>
         /// Terminate the account of a specific user.
         /// </summary>
