@@ -278,5 +278,42 @@ namespace PubHub.Common.Services
                 return new HttpServiceResult(HttpStatusCode.Unused, $"Failed to suspend the user: {ex.Message}.");
             }
         }
+
+        public async Task<HttpServiceResult<UserBookInfoModel>> UpdateBookProgressAsync(Guid userId, UserBookUpdateModel updateModel)
+        {
+            try
+            {
+                if (userId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The user Id wasn't a valid Id.");
+
+                var jsonString = JsonSerializer.Serialize<UserBookUpdateModel>(updateModel, _serializerOptions);
+
+                HttpResponseMessage response = await Client.PutAsync($"users/{userId}/books", jsonString);
+                string content = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    return new HttpServiceResult<UserBookInfoModel>(response.StatusCode, null, $"Too many requests. Try again later, status code: {(int)response.StatusCode}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content, _serializerOptions);
+                    if (errorResponse == null)
+                        return new HttpServiceResult<UserBookInfoModel>(response.StatusCode, null, $"Unable to handle the Error response, status code: {response.StatusCode}");
+
+                    return new HttpServiceResult<UserBookInfoModel>(response.StatusCode, null, $"Unable to retrieve information: {errorResponse.Title}{((errorResponse.Detail != null) ? ($" Details: {errorResponse.Detail}") : (string.Empty))}");
+                }
+
+                var userBook = JsonSerializer.Deserialize<UserBookInfoModel>(content, _serializerOptions);
+                if (userBook == null)
+                    return new HttpServiceResult<UserBookInfoModel>(response.StatusCode, null, $"Unable to map the request over to the client.");
+
+                return new HttpServiceResult<UserBookInfoModel>(response.StatusCode, userBook, "Successfully retrieved user's books!");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Unable to get user books: {userId}", ex.Message);
+                return new HttpServiceResult<UserBookInfoModel>(HttpStatusCode.Unused, null, $"Unable to update user's book: {ex.Message}.");
+            }
+        }
     }
 }

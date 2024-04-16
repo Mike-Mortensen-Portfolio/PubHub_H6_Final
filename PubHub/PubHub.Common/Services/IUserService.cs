@@ -9,6 +9,7 @@ namespace PubHub.Common.Services
         Task<HttpServiceResult<IReadOnlyList<BookInfoModel>>> GetUserBooksAsync(Guid userId, BookQuery? queryOptions = null);
         Task<HttpServiceResult<UserBookContentModel>> GetUserBookContentAsync(Guid userId, Guid bookId);
         Task<HttpServiceResult<UserInfoModel>> UpdateUserAsync(Guid userId, UserUpdateModel userUpdateModel);
+        Task<HttpServiceResult<UserBookInfoModel>> UpdateBookProgressAsync(Guid userId, UserBookUpdateModel updateModel);
         Task<HttpServiceResult> DeleteUserAsync(Guid userId);
         Task<HttpServiceResult> SuspendUserAsync(Guid userId);
     }

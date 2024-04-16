@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PubHub.BookMobile.Auth;
-using PubHub.BookMobile.ErrorSpecifications;
 using PubHub.BookMobile.Models;
+using PubHub.Common.ErrorSpecifications;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Services;
 
@@ -65,7 +65,7 @@ namespace PubHub.BookMobile.ViewModels
 
             CurrentContent = result.Instance;
             AquiredDate = CurrentContent!.AcquireDate.ToString("dd/MM/yyyy");
-            ProgressInProcent = $"{CurrentContent!.ProgressInProcent}%";
+            ProgressInProcent = $"{CurrentContent!.ProgressInProcent:00.00}%";
 
             ButtonText = ((IsEBook) ? ("Read now") : ("Listen now"));
             IsBusy = false;
@@ -143,7 +143,8 @@ namespace PubHub.BookMobile.ViewModels
                     RouteName = "EBookView",
                     Parameters = new Dictionary<string, object>
                     {
-                        { "Content", CurrentContent!.BookContent! }
+                        { "Content", CurrentContent!.BookContent! },
+                        { "BookId", CurrentViewedItem.Id }
                     }
                 });
         }
