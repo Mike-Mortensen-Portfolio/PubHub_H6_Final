@@ -21,6 +21,7 @@ namespace PubHub.BookMobile
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
+                .UseMauiCommunityToolkitMediaElement()
                 .LoadAppSettingsConfiguration(Assembly.GetExecutingAssembly())
                 .ConfigureFonts(fonts =>
                 {
