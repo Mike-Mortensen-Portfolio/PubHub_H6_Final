@@ -271,7 +271,7 @@ namespace PubHub.API.Controllers
         [HttpPut("{id}/books")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IResult> UpdateUserBookAsync(Guid id, UserBookUpdateModel userBook, [FromHeader] string appId)
+        public async Task<IResult> UpdateUserBookAsync(Guid id, [FromBody] UserBookUpdateModel userBook, [FromHeader] string appId)
         {
             if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
