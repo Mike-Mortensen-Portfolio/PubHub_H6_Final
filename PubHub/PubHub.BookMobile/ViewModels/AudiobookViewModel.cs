@@ -87,7 +87,7 @@ namespace PubHub.BookMobile.ViewModels
                 {
                     CurrentPosition = _audioPlayer.CurrentPosition;
                 }
-            });
+            }).ConfigureAwait(false);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             _isPaused = false;
             PlayAudioCommand.NotifyCanExecuteChanged();
@@ -115,6 +115,7 @@ namespace PubHub.BookMobile.ViewModels
                 return;
 
             _audioPlayer.Stop();
+            CurrentPosition = 0f;
 
             _isPaused = false;
             PlayAudioCommand.NotifyCanExecuteChanged();
@@ -129,7 +130,7 @@ namespace PubHub.BookMobile.ViewModels
             if (_audioPlayer is null)
                 return;
 
-            var progressInProcentage = _audioPlayer.CurrentPosition / _audioPlayer.Duration * 100f;
+            var progressInProcentage = CurrentPosition / TotalDuration * 100f;
 
             var result = await _userService.UpdateBookProgressAsync(User.Id!.Value, new UserBookUpdateModel
             {
