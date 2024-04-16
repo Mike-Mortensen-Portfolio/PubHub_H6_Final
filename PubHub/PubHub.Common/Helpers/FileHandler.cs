@@ -46,5 +46,22 @@ namespace PubHub.Common.Helpers
             var toBaseString = "data:image/png;base64," + Convert.ToBase64String(filesBytes);
             return toBaseString;
         }
+
+        /// <summary>
+        /// Create a new file with <paramref name="filename"/> and write <paramref name="bytes"/> to it.
+        /// </summary>
+        /// <param name="bytes">Bytes to write.</param>
+        /// <param name="absoluteDirectoryPath">Absolute path of file.</param>
+        /// <returns>Relative file of created file.</returns>
+        public async Task<string> ByteArrayToFileAsync(byte[] bytes, string absoluteDirectoryPath)
+        {
+            Directory.CreateDirectory(absoluteDirectoryPath);
+            var filename = Path.GetRandomFileName();
+            var path = Path.Combine(absoluteDirectoryPath, filename);
+            using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            await fileStream.WriteAsync(bytes);
+
+            return path;
+        }
     }
 }
