@@ -164,6 +164,35 @@ namespace PubHub.API.Controllers
             return Results.Ok(book);
         }
 
+        [HttpGet("{id}/stream")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<IResult> GetBookStreamAsync(Guid id, [FromHeader] string appId)
+        {
+            if (!_accessService.AccessFor(appId, User)
+                .CheckWhitelistEndpoint(GetType().Name)
+                .AllowUserOnlyIfOwns(id, _context)
+                .AllowPublisherOnlyIfOwns(id, _context)
+                .TryVerify(out IResult? accessProblem))
+                return accessProblem;
+
+            var contentPath = (await _context.Set<Book>()
+                .FirstOrDefaultAsync(b => b.Id == id))?.BookContentUri;
+            if (string.IsNullOrWhiteSpace(contentPath))
+                return Results.Problem(
+                    statusCode: NotFoundSpecification.STATUS_CODE,
+                    title: NotFoundSpecification.TITLE,
+                    detail: "We couldn't locate a book with the given ID.",
+                    extensions: new Dictionary<string, object?>
+                    {
+                        { "Id", id }
+                    });
+
+            var fs = System.IO.File.OpenRead(contentPath);
+
+            return Results.File(fs, contentType: "application/octet-stream", enableRangeProcessing: true);
+        }
+
         [HttpPost("{id}/purchase")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]

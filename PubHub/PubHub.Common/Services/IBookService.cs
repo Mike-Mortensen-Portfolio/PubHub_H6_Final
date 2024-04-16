@@ -7,6 +7,7 @@ namespace PubHub.Common.Services
     {
         Task<HttpServiceResult<IReadOnlyList<BookInfoModel>>> GetAllBooksAsync(BookQuery queryOptions);
         Task<HttpServiceResult<BookInfoModel>> GetBookAsync(Guid bookId);
+        Task<HttpServiceResult<Stream>> GetBookStreamAsync(Guid bookId);
         Task<HttpServiceResult<BookInfoModel>> AddBookAsync(BookCreateModel bookCreateModel);
         Task<HttpServiceResult<BookInfoModel>> UpdateBookAsync(Guid bookId, BookUpdateModel bookUpdateModel);
         Task<HttpServiceResult> DeleteBookAsync(Guid bookId);

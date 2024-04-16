@@ -147,6 +147,16 @@ namespace PubHub.BookMobile.ViewModels
                         { "BookId", CurrentViewedItem.Id }
                     }
                 });
+            if (IsAudioBook)
+                await NavigateToPageWithParemetersCommand.ExecuteAsync(new PageInfo
+                {
+                    RouteName = "AudiobookView",
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { "CoverImage", CurrentViewedItem.CoverImage! },
+                        { "BookId", CurrentViewedItem.Id }
+                    }
+                });
         }
 
         partial void OnIsEBookChanged(bool value)

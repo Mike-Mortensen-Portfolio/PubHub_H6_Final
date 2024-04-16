@@ -15,7 +15,6 @@ namespace PubHub.BookMobile.Extensions
         {
             services
                 .AddTransient<Home, HomeViewModel>()
-
                 .AddTransientWithShellRoute<Login, LoginViewModel>("Login")
                 .AddTransientWithShellRoute<Logout>("Logout")
                 .AddTransientWithShellRoute<Register, RegisterViewModel>("Register")
@@ -24,6 +23,7 @@ namespace PubHub.BookMobile.Extensions
                 .AddTransientWithShellRoute<BookInfo, BookInfoViewModel>("BookInfo")
                 .AddTransientWithShellRoute<BookContentInfo, BookContentInfoViewModel>("BookContentInfo")
                 .AddTransientWithShellRoute<EBookView, EBookViewModel>("EBookView")
+                .AddTransientWithShellRoute<AudiobookView, AudiobookViewModel>("AudiobookView")
                 .AddTransientWithShellRoute<Profile, ProfileViewModel>("Profile");
 
             return services;

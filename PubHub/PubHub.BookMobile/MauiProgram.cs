@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Plugin.Maui.Audio;
 using PubHub.BookMobile.Auth;
 using PubHub.BookMobile.Extensions;
 using PubHub.BookMobile.Services;
@@ -31,6 +32,7 @@ namespace PubHub.BookMobile
 
             services
                 .AddRoutes()
+                .AddSingleton(AudioManager.Current)
                 .AddPubHubServices(options =>
                 {
                     options.Address = builder.Configuration.GetSection("ApiSettings").GetValue<string>(ApiConstants.API_ENDPOINT) ?? throw new NullReferenceException("API base address couldn't be found.");

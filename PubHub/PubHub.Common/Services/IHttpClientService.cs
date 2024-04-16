@@ -9,6 +9,9 @@
         /// <returns>HTTP response.</returns>
         public Task<HttpResponseMessage> GetAsync(string uri);
 
+        /// <param name="uri">URI (must NOT start with '/').</param>
+        public Task<Stream> GetStreamAsync(string uri);
+
         /// <summary>
         /// Send a POST message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
