@@ -271,7 +271,7 @@ if (!app.Environment.IsDevelopment())
       
 - **Code**
   - `Namespaces` must be constructed as follows: PubHub.[ProjectName].[FolderName].[SubFolderName]
-    - We follow the `FBT`: Folder by type structure in our project.
+    - We follow the `FBF`: Folder by feature structure in our project.
   - `Fields` must be *private* or *protected*.
   - `Properties` must be *public*, *protected* or *internal*.
   - Our `Constants` follows the Screaming Snake Casing: THIS_IS_SCREAMING_SNAKE_CASING.
