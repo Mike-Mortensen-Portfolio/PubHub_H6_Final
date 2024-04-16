@@ -276,6 +276,7 @@ namespace PubHub.API.Controllers
             if (!_accessService.AccessFor(appId, User)
                 .CheckWhitelistEndpoint(GetType().Name)
                 .AllowUser(id)
+                .AllowOperator()
                 .TryVerify(out IResult? accessProblem))
                 return accessProblem;
 
