@@ -24,5 +24,6 @@
         public const string EXQUISITE_COVER_PATH = "Domain\\Seeding\\Files\\exquisite.jpeg";
         public const string SHADOWGAME_COVER_PATH = "Domain\\Seeding\\Files\\skyggespil.png";
         public const string SHADOWGAME_CONTENT_PATH = "Domain\\Seeding\\Files\\skyggespil.epub";
+        public const string PLACEBOEFFEKTEN_CONTENT_PATH = "Domain\\Seeding\\Files\\placeboeffekten.mp3";
     }
 }

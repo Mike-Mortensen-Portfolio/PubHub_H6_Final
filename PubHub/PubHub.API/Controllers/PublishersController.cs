@@ -254,7 +254,7 @@ namespace PubHub.API.Controllers
                         Id = b.ContentTypeId,
                         Name = b.ContentType!.Name
                     },
-                    CoverImage = b.CoverImage,
+                    CoverImage = b.CoverImageUri != null ? System.IO.File.ReadAllBytes(b.CoverImageUri) : null,
                     Id = b.Id,
                     Length = b.Length,
                     PublicationDate = b.PublicationDate,
@@ -321,7 +321,7 @@ namespace PubHub.API.Controllers
 
             var bookContent = new BookContentModel()
             {
-                BookContent = entityBook.BookContent
+                BookContent = System.IO.File.ReadAllBytes(entityBook.BookContentUri)
             };
 
             return Results.Ok(bookContent);
@@ -369,7 +369,7 @@ namespace PubHub.API.Controllers
             if (publisherUpdateModel.Account != null &&
                 publisher.Account != null)
             {
-                publisher.Account.Email = publisherUpdateModel.Account.Email;
+                publisher.Account.Email = publisherUpdateModel.Account.Email!;
             }
             publisher.Name = publisherUpdateModel.Name;
 

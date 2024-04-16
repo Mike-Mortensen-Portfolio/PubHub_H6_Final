@@ -124,7 +124,7 @@ namespace PubHub.API.Controllers
                         Id = ub.Book!.ContentTypeId,
                         Name = ub.Book.ContentType!.Name
                     },
-                    CoverImage = ub.Book.CoverImage,
+                    CoverImage = ub.Book.CoverImageUri != null ? System.IO.File.ReadAllBytes(ub.Book.CoverImageUri) : null,
                     Id = ub.Book.Id,
                     Length = ub.Book.Length,
                     PublicationDate = ub.Book.PublicationDate,
@@ -189,7 +189,7 @@ namespace PubHub.API.Controllers
                 AccessTypeId = entityUserBook.AccessTypeId,
                 ProgressInProcent = entityUserBook.ProgressInProcent,
                 AcquireDate = entityUserBook.AcquireDate,
-                BookContent = entityUserBook.Book!.BookContent
+                BookContent = System.IO.File.ReadAllBytes(entityUserBook.Book!.BookContentUri)
             };
 
             return Results.Ok(userBookContent);
@@ -235,7 +235,7 @@ namespace PubHub.API.Controllers
             }
 
             // Update entry with new data.
-            user.Account!.Email = userUpdateModel.Account.Email;
+            user.Account!.Email = userUpdateModel.Account.Email!;
             user.Name = userUpdateModel.Name;
             user.Surname = userUpdateModel.Surname;
             user.Birthday = userUpdateModel.Birthday;

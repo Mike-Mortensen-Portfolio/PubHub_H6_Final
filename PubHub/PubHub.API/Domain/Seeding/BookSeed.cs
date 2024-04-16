@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PubHub.API.Domain.Entities;
 using PubHub.API.Domain.UUID;
 using static PubHub.API.Domain.Seeding.SeedContants;
@@ -30,8 +29,8 @@ namespace PubHub.API.Domain.Seeding
             [
                 new Book {
                     Id = UuidValueGenerator.Next(),
-                    BookContent = [],
-                    CoverImage = File.ReadAllBytes(EXQUISITE_COVER_PATH),
+                    BookContentUri = PLACEBOEFFEKTEN_CONTENT_PATH,
+                    CoverImageUri = EXQUISITE_COVER_PATH,
                     ContentTypeId = _contentTypeSeed[AUDIO_CONTENT_TYPE].Id,
                     Length = TimeSpan.FromHours(1).TotalSeconds,
                     PublicationDate = new DateOnly (2018, 7, 1),
@@ -41,8 +40,8 @@ namespace PubHub.API.Domain.Seeding
                 },
                 new Book {
                     Id = UuidValueGenerator.Next(),
-                    BookContent = [],
-                    CoverImage = File.ReadAllBytes(HORSE_COVER_PATH),
+                    BookContentUri = SHADOWGAME_CONTENT_PATH,
+                    CoverImageUri = HORSE_COVER_PATH,
                     ContentTypeId = _contentTypeSeed[E_BOOK_CONTENT_TYPE].Id,
                     Length = 123,
                     PublicationDate = new DateOnly (2023, 4, 7),
@@ -53,8 +52,8 @@ namespace PubHub.API.Domain.Seeding
                 new Book
                 {
                     Id = UuidValueGenerator.Next(),
-                    BookContent = [],
-                    CoverImage = File.ReadAllBytes(HORSE_COVER_PATH),
+                    BookContentUri = PLACEBOEFFEKTEN_CONTENT_PATH,
+                    CoverImageUri = HORSE_COVER_PATH,
                     ContentTypeId = _contentTypeSeed[AUDIO_CONTENT_TYPE].Id,
                     Length = 123,
                     PublicationDate = new DateOnly(2023, 4, 7),
@@ -65,8 +64,8 @@ namespace PubHub.API.Domain.Seeding
                 new Book
                 {
                     Id = UuidValueGenerator.Next(),
-                    BookContent = File.ReadAllBytes(SHADOWGAME_CONTENT_PATH),
-                    CoverImage = File.ReadAllBytes(SHADOWGAME_COVER_PATH),
+                    BookContentUri = SHADOWGAME_CONTENT_PATH,
+                    CoverImageUri = SHADOWGAME_COVER_PATH,
                     ContentTypeId = _contentTypeSeed[E_BOOK_CONTENT_TYPE].Id,
                     Length = 344,
                     PublicationDate = new DateOnly(2021, 9, 28),
