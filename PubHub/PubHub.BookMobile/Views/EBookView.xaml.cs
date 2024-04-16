@@ -10,7 +10,6 @@ public partial class EBookView : ContentPage
     {
         InitializeComponent();
         _viewModel = viewModel;
-
         BindingContext = _viewModel;
     }
 
@@ -19,5 +18,11 @@ public partial class EBookView : ContentPage
         _viewModel.ScrollView = () => scrollView;
 
         base.OnAppearing();
+    }
+
+    protected override async void OnDisappearing()
+    {
+        await _viewModel.UpdateProgress();
+        base.OnDisappearing();
     }
 }

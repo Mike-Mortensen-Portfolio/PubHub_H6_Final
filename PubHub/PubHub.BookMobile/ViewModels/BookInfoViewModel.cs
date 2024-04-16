@@ -120,7 +120,7 @@ namespace PubHub.BookMobile.ViewModels
             }
 
             AlreadyOwnsBook = User.Id.HasValue && (result.Instance?.Any(book => book.Id == CurrentViewedItem.Id) ?? false);
-
+            ButtonText = ((AlreadyOwnsBook) ? ("Owned") : ("Buy"));
             IsBusy = false;
         }
 
