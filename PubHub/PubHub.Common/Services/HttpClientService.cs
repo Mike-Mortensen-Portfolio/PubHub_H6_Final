@@ -51,6 +51,16 @@ namespace PubHub.Common.Services
         }
 
         /// <inheritdoc/>
+        public async Task<Stream> GetStreamAsync(string uri)
+        {
+            CheckNetwork();
+
+            await SetTokensAsync();
+
+            return await _client.GetStreamAsync(uri);
+        }
+
+        /// <inheritdoc/>
         public async Task<HttpResponseMessage> PostAsync(string uri, string? content = null)
         {
             CheckNetwork();

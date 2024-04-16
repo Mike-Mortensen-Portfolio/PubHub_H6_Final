@@ -105,6 +105,24 @@ namespace PubHub.Common.Services
             }
         }
 
+        public async Task<HttpServiceResult<Stream>> GetBookStreamAsync(Guid bookId)
+        {
+            try
+            {
+                if (bookId == INVALID_ENTITY_ID)
+                    throw new NullReferenceException($"The book Id wasn't a valid Id.");
+
+                Stream stream = await Client.GetStreamAsync($"books/{bookId}/stream");
+
+                return new HttpServiceResult<Stream>(HttpStatusCode.OK, stream, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Get book stream failed:", ex.Message);
+                return new HttpServiceResult<Stream>(HttpStatusCode.Unused, null, $"Failed to stream book: {ex.Message}.");
+            }
+        }
+
         /// <summary>
         /// Calls the API endpoint for adding a <see cref="BookCreateModel"/> to the database.
         /// </summary>

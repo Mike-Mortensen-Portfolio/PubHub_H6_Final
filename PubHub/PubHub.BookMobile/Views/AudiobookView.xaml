@@ -4,9 +4,8 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="PubHub.BookMobile.Views.AudiobookView"
              Title="AudiobookView">
-    <StackLayout Orientation="Vertical">
-        <toolkit:MediaElement Source=""
-                              ShouldShowPlaybackControls="True"
-                              ShouldKeepScreenOn="True"/>
-    </StackLayout>
+    <Grid>
+        <Button Text="Play"
+                Command="{Binding PlayAudioCommand}" />
+    </Grid>
 </ContentPage>
