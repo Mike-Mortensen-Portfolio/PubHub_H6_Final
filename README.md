@@ -50,6 +50,15 @@ builder.Services.AddAuthorization(options =>
 ```
 ---
 
+## Tests
+Unit tests are placed in the '.UT' projects of the main solution, while function tests are placed in a separate 'PubHub.Tests' solution. *All* tests projects (and solution) is located under the 'Tests' directory. This way, the unit tests can be run in a CI build job on a cloud agent (using Azure DevOps or GitHub Actions). The function tests shouldn't be run in such jobs, as they should be executed from outside a running setup. These also require exstra configurtion, that may or may not be the same between test executions, thus not being suited for full automation in a build pipeline.
+
+The unit tests require the Docker daemon to be running on the executing system. Docker is used to create an MS SQL server in a container, that is used from the tests. A fixture ensures creation of the PubHub database in the container and clean up after each test with a generated delete script. 
+
+Docker is already conveniently installed on cloud machines from Azure DevOps and GitHub Actions. So no extra install tasks are required for each ran build job.
+
+To configure the function tests to run up against different deployments, the constants at the very top of the `ApiFixture` class can be used to set API address, user credentials etc.
+
 # PubHub Architecture
 
 ![image](https://github.com/Mike-Mortensen-Portfolio/PubHub_H6_Final/assets/61870713/789d6775-c4a0-40fb-ad80-d6d9c465cace)
