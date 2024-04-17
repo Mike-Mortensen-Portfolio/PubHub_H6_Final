@@ -36,9 +36,9 @@ namespace PubHub.API.Controllers
         private readonly PubHubContext _context;
         private readonly UserManager<Account> _userManager;
         private readonly AuthService _authService;
-        private readonly AccessService _accessService;
+        private readonly IAccessService _accessService;
 
-        public AuthController(ILogger<AuthController> logger, PubHubContext context, UserManager<Account> userManager, AuthService authService, AccessService accessService)
+        public AuthController(ILogger<AuthController> logger, PubHubContext context, UserManager<Account> userManager, AuthService authService, IAccessService accessService)
         {
             _logger = logger;
             _context = context;

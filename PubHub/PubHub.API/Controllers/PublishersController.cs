@@ -32,9 +32,9 @@ namespace PubHub.API.Controllers
         private readonly ILogger<PublishersController> _logger;
         private readonly PubHubContext _context;
         private readonly UserManager<Account> _userManager;
-        private readonly AccessService _accessService;
+        private readonly IAccessService _accessService;
 
-        public PublishersController(ILogger<PublishersController> logger, PubHubContext context, UserManager<Account> userManager, AccessService accessService)
+        public PublishersController(ILogger<PublishersController> logger, PubHubContext context, UserManager<Account> userManager, IAccessService accessService)
         {
             _logger = logger;
             _context = context;

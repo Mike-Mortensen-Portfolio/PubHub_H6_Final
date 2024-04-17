@@ -52,7 +52,7 @@ namespace PubHub.API
 
             services.Configure<WhitelistOptions>(configuration.GetSection("Whitelist"));
             services.Configure<AuthOptions>(configuration.GetSection("Jwt"));
-            services.AddScoped<AccessService>();
+            services.AddScoped<IAccessService, AccessService>();
             services.AddScoped<TypeLookupService>();
             services.AddScoped<AuthService>();
 
