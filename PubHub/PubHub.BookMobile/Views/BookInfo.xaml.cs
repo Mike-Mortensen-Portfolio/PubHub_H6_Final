@@ -23,9 +23,10 @@ public partial class BookInfo : ContentPage
 
     protected override async void OnAppearing()
     {
-        await User.CheckStateAndTryRefreshAsync(_authService);
-
         _viewModel.IsAuthenticated = User.IsAuthenticated;
+
+        if (!User.IsAuthenticated)
+            return;
 
         var result = await _userService.GetUserBooksAsync(User.Id!.Value);
 
