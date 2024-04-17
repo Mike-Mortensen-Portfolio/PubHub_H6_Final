@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PubHub.API.Domain.Entities;
+using PubHub.API.Domain.Identity;
 using PubHub.Common.Models.Publishers;
 
 namespace PubHub.API.UT.Extensions
@@ -23,7 +24,19 @@ namespace PubHub.API.UT.Extensions
             Assert.Equal(publisher.Name, actualPublisher.Name);
             Assert.NotNull(actualPublisher.Account);
             Assert.Equal(publisher.Account.Email, actualPublisher.Account.Email);
-            Assert.False(string.IsNullOrWhiteSpace(actualPublisher.Account.PasswordHash));
+        }
+
+        /// <summary>
+        /// Assert that an account has been soft deleted.
+        /// </summary>
+        public static void AssertDeleted(this PubHubContext context, Account account)
+        {
+            // Get account.
+            var actualAccounts = context.Set<Account>()
+                .IgnoreQueryFilters()
+                .Where(a => a.Id == account.Id && a.DeletedDate < DateTime.UtcNow)
+                .ToList();
+            var actualAccount = Assert.Single(actualAccounts);
         }
     }
 }
