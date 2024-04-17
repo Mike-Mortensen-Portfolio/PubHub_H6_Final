@@ -1,0 +1,104 @@
+@inject PubHub.Common.Services.IPublisherService PublisherService
+@inject Radzen.NotificationService NotificationService
+@attribute [Authorize(Policy = "Operator")]
+
+<div class="modal fade show" id="createPublisherModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create a new book</h4>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+            </div>
+            <EditForm Model="publisherCreateForm" OnValidSubmit="() => CreatePublisher()">
+                <DataAnnotationsValidator />
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="createPublisherName" class="form-label"><b>Publisher name:</b></label>
+                        <input @bind="publisherCreateForm.Name" type="text" id="createPublisherName" class="form-control" placeholder="Type in the publisher name..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.Name)" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createPublisherEmail" class="form-label"><b>Publisher email:</b></label>
+                        <input @bind="publisherCreateForm.Email" type="email" id="createPublisherEmail" class="form-control" placeholder="Type in the publisher email..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.Email)" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createPublisherPassword" class="form-label"><b>Publisher password:</b></label>
+                        <input @bind="publisherCreateForm.Password" type="password" id="createPublisherPassword" class="form-control" placeholder="Type in the publisher password..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.Password)" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="createPublisherPassword" class="form-label"><b>Confirm password:</b></label>
+                        <input @bind="publisherCreateForm.ConfirmPassword" type="password" id="createPublisherPassword" class="form-control" placeholder="Type in the publisher password again..." />
+                        <ValidationMessage For="@(() => publisherCreateForm.ConfirmPassword)" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Create</button>
+                        <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>            
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    public PublisherForm publisherCreateForm { get; set; } = new();
+
+    private async Task CreatePublisher()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(publisherCreateForm.Password) && string.IsNullOrWhiteSpace(publisherCreateForm.ConfirmPassword))
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to create login because the passwords were invalid.", Detail = "Error", Duration = 5000 });
+                return;
+            }
+
+            string savedPassword = string.Equals(publisherCreateForm.Password!, publisherCreateForm.ConfirmPassword!) ? publisherCreateForm.Password! : string.Empty;
+
+            if (string.IsNullOrWhiteSpace(savedPassword))
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "The two passwords weren't eqauls to one another.", Detail = "Error", Duration = 5000 });
+                return;
+            }
+
+            if (publisherCreateForm == null)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "The form isn't containing the right values or is missing values.", Detail = "Error", Duration = 5000 });
+                return;
+            }
+
+            var result = await PublisherService.AddPublisherAsync(publisherCreateForm.CreatePublisherModel());
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = BadRequestError.ERROR_MESSAGE, Detail = BadRequestError.TITLE, Duration = 5000 });
+
+            if (result.StatusCode == HttpStatusCode.Conflict)
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = ConflictError.ERROR_MESSAGE, Detail = ConflictError.TITLE, Duration = 5000 });
+
+            if (result.StatusCode == HttpStatusCode.UnprocessableContent)
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = UnprocessableEntityError.ERROR_MESSAGE, Detail = UnprocessableEntityError.TITLE, Duration = 5000 });
+
+            if (result.IsSuccess)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = "Successfully created the publisher!", Detail = "Success", Duration = 5000 });
+                await ModalOptions(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Unable to create publisher, ", ex.Message);
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = $"Unable to create the publisher, {NoConnectionError.ERROR_MESSAGE}", Detail = NoConnectionError.TITLE, Duration = 5000 });
+        }
+
+    }
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}

@@ -1,0 +1,23 @@
+﻿<InputText Value="@this.Value" ValueChanged="@this.ValueChanged" ValueExpression="this.ValueExpression" type="text" class="form-control mt-2" list="authorList" placeholder="Type in author name..." />
+<datalist id="authorList">
+    @foreach (var author in Authors)
+    {
+        <option>@author.Name</option>
+    }
+</datalist>
+
+@code {
+    [Parameter]
+    public required List<AuthorInfoModel> Authors { get; set; }
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter] public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    private async Task OnValueChanged(string? value)
+        => await this.ValueChanged.InvokeAsync(value);
+}

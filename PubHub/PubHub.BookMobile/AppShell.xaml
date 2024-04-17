@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="PubHub.BookMobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:root="clr-namespace:PubHub.BookMobile"
+    x:DataType="root:AppShell"
+    xmlns:views="clr-namespace:PubHub.BookMobile.Views">
+
+    <FlyoutItem Title="Home">
+        <FlyoutItem.FlyoutIcon>
+            <FontImageSource FontFamily="IcoFont"
+                             Glyph="{StaticResource Home}"/>
+        </FlyoutItem.FlyoutIcon>
+        <ShellContent ContentTemplate="{DataTemplate views:Home}"
+                          Route="Home"/>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Search book">
+        <FlyoutItem.FlyoutIcon>
+            <FontImageSource FontFamily="IcoFont"
+                             Glyph="{StaticResource Look}"/>
+        </FlyoutItem.FlyoutIcon>
+        <ShellContent ContentTemplate="{DataTemplate views:Library}"
+                          Route="Library"/>
+    </FlyoutItem>
+</Shell>

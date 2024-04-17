@@ -1,0 +1,72 @@
+﻿@inject PubHub.Common.Services.IPublisherService PublisherService
+@inject Radzen.NotificationService NotificationService
+@inject Radzen.DialogService DialogService
+
+<div class="modal fade show" id="removePublisherModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">You're about to remove: <b>@PublisherName</b></h4>
+                <button type="button" class="btn close" @onclick="() => ModalOptions(false)">x</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group mb-2">
+                    <label for="removePublisherNameInput" class="form-label">Are you sure you wish to delete this publisher: <b>@PublisherName</b>?</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" @onclick="() => RemovePublisher()">Remove</button>
+                <button type="button" class="btn btn-success" @onclick="() => ModalOptions(false)">Cancel</button>
+                @if (unsuccessfulResult)
+                {
+                    <label class="text-danger">Unable to remove the book.</label>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    [Parameter]
+    public Guid PublisherId { get; set; }
+
+    [Parameter]
+    public required string PublisherName { get; set; }
+
+    private bool unsuccessfulResult = false;
+
+    private async Task RemovePublisher()
+    {
+        try
+        {
+            var result = await PublisherService.DeletePublisherAsync(PublisherId);
+            if (result.StatusCode == HttpStatusCode.NotFound)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = NotFoundError.ERROR_MESSAGE, Detail = NotFoundError.TITLE, Duration = 5000 });
+                unsuccessfulResult = true;
+                StateHasChanged();
+            }
+            if(result.IsSuccess)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = $"Successfully removed the publisher: {PublisherName}.", Detail = "Success", Duration = 5000 });
+                await ModalOptions(false);
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Unable to remove publisher, ", ex.Message);
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = $"Unable to remove the publisher, {NoConnectionError.ERROR_MESSAGE}", Detail = NoConnectionError.TITLE, Duration = 5000 });
+        }
+
+    }
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}

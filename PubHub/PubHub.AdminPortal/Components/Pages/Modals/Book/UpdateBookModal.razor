@@ -1,0 +1,184 @@
+﻿@inject PubHub.Common.Services.IBookService BookService
+@inject PubHub.Common.Services.IContentTypeService ContentTypeService
+@inject PubHub.Common.Services.IGenreService GenreService
+@inject PubHub.Common.Services.IAuthorService AuthorService
+@inject Radzen.NotificationService NotificationService
+@inject Radzen.DialogService DialogService
+
+<div class="modal fade show" id="updateBookModal" style="display:block; background-color: rgba(10,10,10,.8);"
+     aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Updating: @BookInfoModel.Title</h4>
+                <button type="button" class="btn close" @onclick="@((args) => DialogService.Close(true))">x</button>
+            </div>
+            <EditForm Model="bookUpdateform" OnSubmit="() => UpdateBook()">
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label for="updateBookTitleInput" class="form-label"><b>Book title:</b></label>
+                        <input @bind-value="bookUpdateform.Title" id="updateBookTitleInput" class="form-control" placeholder="@BookInfoModel.Title" />
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="updateSelectContentType" class="form-label"><b>Content type:</b></label>
+                                <select @onchange="@(async value => { bookUpdateform.ContentTypeId = new Guid(value.Value!.ToString()!); })" id="updateSelectContentType" class="form-select">
+                                    @foreach (var contentType in contentTypes)
+                                    {
+                                        <option value="@contentType.Id">@contentType.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateBookContent" class="form-label"><b>Book content:</b></label>
+                                <InputFile id="updateBookContent" class="form-control">Content</InputFile>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="updateBookCoverImg" class="form-label"><b>Cover image:</b></label>
+                        <InputFile id="updateBookCoverImg" class="form-control">Cover image</InputFile>
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="updateBookLength" class="form-label"><b>Book length:</b></label>
+                                <input @bind-value="booklength" type="text" id="updateBookLength" class="form-control" placeholder="@booklength" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="updateIsBookHidden" class="form-label"><b>Accessability:</b></label>
+                                <div class="row">
+                                    <div class="col-md-8 mt-2">
+                                        <label class="form-label">Should the book be accessable?</label>
+                                    </div>
+                                    <div class="col-md-4 mt-2">
+                                        <input @bind-value="bookUpdateform.IsHidden" id="updateIsBookHidden" type="checkbox" class="form-check" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="updateBookGenres" class="form-label"><b>Genres:</b></label>
+                        <RadzenDropDown Data="@genres" TextProperty="Name" ValueProperty="Id" AllowFiltering="true" @bind-Value="bookGenres" Change="@GenreOnChange" Multiple="true" Placeholder="Select genres" Chips="true" AllowClear="true" Name="DropDownMultipleChips" Style="width: 100%; " />
+                    </div>
+                    <div class="form-group mb-2">
+                        <div class="form-group mb-2">
+                            <label for="updateBookAuthors" class="form-label"><b>Authors:</b></label>
+                            @{ int i = 0; }
+                            @foreach (var authorName in authorNames)
+                            {
+                                var index = i++;
+                                <InputText @bind-Value="@authorNames[index]" type="text" class="form-control mt-2" list="authorList" placeholder="Type in author name..." />
+                                <datalist id="authorList">
+                                    @foreach (var author in authors)
+                                    {
+                                        <option>@author.Name</option>
+                                    }
+                                </datalist>
+                            }
+                            <button type="button" class="btn btn-info mt-2" @onclick="AddMoreAuthors">Add another author</button>
+                        </div>
+                        <div class="form-group mb-2">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="updatePublisherInput" class="form-label"><b>Publisher:</b></label>
+                                    <input id="updatePublisherInput" class="form-control" disabled placeholder="@BookInfoModel.Publisher.Name" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="updatePublicationYear" class="form-label"><b>Publication year:</b></label>
+                                    <InputDate class="form-control" TValue="DateOnly" @bind-Value="@bookUpdateform.PublicationDate"></InputDate>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Update</button>
+                    <button type="button" class="btn btn-danger" @onclick="@((args) => DialogService.Close(true))">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public EventCallback<bool> OnClose { get; set; }
+
+    [Parameter]
+    public required BookInfoModel BookInfoModel { get; set; }
+
+    private BookForm bookUpdateform = new();
+    private IReadOnlyList<ContentTypeInfoModel> contentTypes = [];
+
+    private IReadOnlyList<AuthorInfoModel> authors = [];
+    List<string> authorNames = new();
+    string booklength = "";
+
+    IEnumerable<GenreInfoModel>? genres;
+    List<Guid> bookGenres = new();
+    List<string> bookAuthors = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        contentTypes = (await ContentTypeService.GetAllContentTypesAsync()).Instance ?? [];
+        genres = (await GenreService.GetAllGenresAsync()).Instance ?? [];
+        authors = (await AuthorService.GetAllAuthorsAsync()).Instance ?? [];
+
+        foreach (var author in BookInfoModel.Authors)
+        {
+            authorNames.Add(author.Name);
+        }
+
+        foreach (var genre in BookInfoModel.Genres)
+        {
+            bookGenres.Add(genre.Id);
+        }
+        if (BookInfoModel.ContentType.Name == "AudioBook")
+        {
+            booklength = TimeSpan.FromSeconds(BookInfoModel.Length).ToString();
+            booklength += " time.";
+        }
+        else if (BookInfoModel.ContentType.Name == "EBook")
+        {
+            booklength = BookInfoModel.Length.ToString();
+            booklength += " pages.";
+        }
+        bookUpdateform.PublicationDate = BookInfoModel.PublicationDate;
+        bookUpdateform.PublicationDate.ToShortDateString();
+    }
+
+    void GenreOnChange(object genre)
+    {
+        var genreId = genre is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)genre) : genre;
+
+        bookUpdateform.Genres = bookGenres.ToList();
+    }
+
+    async void AddMoreAuthors()
+    {
+        authorNames.Add(string.Empty);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task UpdateBook()
+    {
+        var result = await BookService.UpdateBookAsync(BookInfoModel.Id, bookUpdateform.UpdateBookModel());
+        if (result.StatusCode == HttpStatusCode.OK)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Summary = result.ErrorDescriptor, Detail = "Success", Duration = 5000 });
+            await ModalOptions(false);
+        }
+        else
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = result.ErrorDescriptor, Detail = "Error", Duration = 5000 });
+        }
+    }
+
+    Task ModalOptions(bool IsClosing)
+    {
+        return OnClose.InvokeAsync(IsClosing);
+    }
+}

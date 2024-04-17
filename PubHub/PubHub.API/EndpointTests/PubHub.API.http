@@ -1,0 +1,5 @@
+@PubHub.API_HostAddress = https://localhost:7097
+
+GET {{PubHub.API_HostAddress}}/Books
+Accept: application/json
+###

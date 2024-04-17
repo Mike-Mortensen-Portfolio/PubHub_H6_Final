@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
+             x:Class="PubHub.BookMobile.Views.AudiobookView"
+            x:DataType="viewModels:AudiobookViewModel"
+             Title="AudiobookView">
+    <Grid RowDefinitions="AUTO, 1*, 1*, 1*"
+          VerticalOptions="CenterAndExpand"
+          RowSpacing="25"
+          Padding="25">
+        <Border Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                StrokeShape="RoundRectangle 10,10"
+                HeightRequest="340"
+                WidthRequest="295">
+            <Image Source="{Binding CoverImage, Converter={StaticResource ByteArrayToImageSourceConverter}, Mode=OneWay}"
+                   Aspect="Fill"/>
+        </Border>
+        <Grid Grid.Row="1"
+              ColumnDefinitions="1*, 4*, 1*">
+            <Label Grid.Column="0"
+                   Text="{Binding TimeLeft}"
+                   FontSize="{StaticResource Small}"/>
+            <Slider Grid.Column="1"
+                    
+                    Minimum="0"
+                    Maximum="{Binding TotalDuration}"
+                    Value="{Binding CurrentPosition}"
+                    HorizontalOptions="FillAndExpand"/>
+            <Label Grid.Column="2"
+                   Text="{Binding TotalTimeString}"
+                   HorizontalTextAlignment="End"
+                   FontSize="{StaticResource Small}"/>
+        </Grid>
+        <StackLayout Grid.Row="2"
+                     Orientation="Horizontal"
+                     HorizontalOptions="Center"
+                     Spacing="15">
+            <Button Text="{StaticResource Play}"
+                    FontFamily="IcoFont"
+                    Command="{Binding PlayAudioCommand}" />
+            <Button Text="{StaticResource Pause}"
+                    FontFamily="IcoFont"
+                    Command="{Binding PauseAudioCommand}" />
+            <Button Text="{StaticResource Stop}"
+                    FontFamily="IcoFont"
+                    Command="{Binding StopAudioCommand}" />
+        </StackLayout>
+
+        <Grid Grid.Row="3"
+              ColumnDefinitions="1*, 2*"
+              HorizontalOptions="CenterAndExpand">
+            <Label Grid.Row="0"
+                   Grid.Column="0"
+                   Text="Volume"
+                   FontSize="{StaticResource Small}"/>
+            <Slider Grid.Row="0"
+                    Grid.Column="1"
+                    Minimum="0"
+                    Maximum="1"
+                    WidthRequest="200"
+                    Value="{Binding Volume}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

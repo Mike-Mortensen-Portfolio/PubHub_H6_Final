@@ -1,0 +1,43 @@
+﻿@inject ILocalStorageService LocalStorage;
+@inject CustomAuthStateProvider CustomAuthProvider
+@inject NavigationManager NavigationManager
+@inject Radzen.NotificationService NotificationService
+@inject PubHub.Common.Services.IAuthenticationService AuthenticationService
+
+<AuthorizeView>
+    <Authorized>
+        <NavLink class="nav-link text-dark" href="login">
+            <button type="button" class="btn btn-primary" @onclick="SignOut">Sign out</button>
+        </NavLink>
+    </Authorized>
+    <NotAuthorized>
+        <NavLink class="nav-link text-dark" href="login">
+            <button type="button" class="btn btn-primary" @onclick="SignIn">Sign in</button>
+        </NavLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    void SignIn()
+    {
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+
+    async Task SignOut()
+    {
+        var result = await AuthenticationService.RevokeTokenAsync();
+
+        if (!result.IsSuccess)
+        {
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = $"Had trouble logging you out. Try again or contact PubHub support. Error: {ErrorsCodeConstants.NO_CONNECTION}", Duration = 5000 });
+            return;
+        }
+
+        await LocalStorage.RemoveItemAsync("token");
+        await LocalStorage.RemoveItemAsync("refreshToken");
+        await CustomAuthProvider.GetAuthenticationStateAsync();
+
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+}

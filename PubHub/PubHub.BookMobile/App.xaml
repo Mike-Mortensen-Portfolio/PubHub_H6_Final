@@ -1,0 +1,27 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:PubHub.BookMobile"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:converters="clr-namespace:PubHub.BookMobile.Converters"
+             x:Class="PubHub.BookMobile.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+                <ResourceDictionary Source="Resources/Styles/FontSizes.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converts -->
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
+            <toolkit:IsNotNullConverter x:Key="IsNotNullConverter"/>
+            <converters:IsAudiobookConverter x:Key="IsAudiobookConverter"/>
+            <converters:IsEbookConverter x:Key="IsEbookConverter"/>
+            <converters:IsEmptyCollectionConverter x:Key="IsEmptyCollectionConverter"/>
+            <converters:IsNotEmptyCollectionConverter x:Key="IsNotEmptyCollectionConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

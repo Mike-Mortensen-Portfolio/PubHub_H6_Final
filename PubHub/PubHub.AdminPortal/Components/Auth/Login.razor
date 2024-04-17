@@ -1,0 +1,75 @@
+@page "/login"
+@inject PubHub.Common.Services.IAuthenticationService AuthService
+@inject Radzen.NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject CustomAuthStateProvider CustomAuthProvider
+@inject IJSRuntime Js
+@inject ILocalStorageService LocalStorage;
+
+<PageTitle>Login</PageTitle>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Sign in</h5>
+        <EditForm Model="loginForm" OnValidSubmit="() => LoginAsync()">
+            <DataAnnotationsValidator />
+            <div class="form-group m-2">
+                <label class="form-label" for="email">Email:</label>
+                <input @bind-value="loginForm.Email" id="email" class="card-text form-control" placeholder="Enter your email address..." />
+                <ValidationMessage For="@(() => loginForm.Email)" />
+            </div>
+            <div class="form-group m-2">
+                <label class="form-label" for="password">Password:</label>
+                <input type="password" @bind-value="loginForm.Password" id="password" class="card-text form-control" placeholder="Enter your password..." />
+                <ValidationMessage For="@(() => loginForm.Password)" />
+            </div>
+            <div class="form-group m-2">
+                <button type="submit" class="btn btn-primary">Sign in</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    private LoginForm loginForm { get; set; } = new();
+
+    public async Task LoginAsync()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(loginForm.Email))
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Email is required.", Duration = 5000 });
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(loginForm.Password))
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Password is required.", Duration = 5000 });
+                return;
+            }
+
+            var result = await AuthService.LoginAsync(loginForm.CreateLoginInfo());
+
+            if (result.Instance == null)
+            {
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = $"Unable to login in, check your credentials or contact PubHub support. Error: {ErrorsCodeConstants.NO_CONNECTION}", Duration = 5000 });
+                return;
+            }
+
+            await LocalStorage.SetItemAsync<string>("token", result.Instance.Token);
+            await LocalStorage.SetItemAsync<string>("refreshToken", result.Instance.RefreshToken);
+
+            CustomAuthProvider.UpdateAuhenticationState(result.Instance.Token);
+
+            NavigationManager.NavigateTo("/", forceLoad: true);
+
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Unable to login, ", ex.Message);
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = "Unable to login. Check your values.", Duration = 5000 });
+        }
+    }
+}

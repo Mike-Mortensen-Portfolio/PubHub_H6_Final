@@ -1,0 +1,29 @@
+﻿namespace PubHub.API.Domain.Seeding
+{
+    public static class SeedContants
+    {
+        public const string USER_EMAIL = "User@Test.com";
+        public const string PUBLISHER_EMAIL = "Publisher@Test.com";
+        public const string PUBLISHER2_EMAIL = "Publisher2@Test.com";
+        public const string OPERATOR_EMAIL = "Operator@Test.com";
+
+        public const string USER_ACCOUNT_TYPE = "User";
+        public const string PUBLISHER_ACCOUNT_TYPE = "Publisher";
+        public const string OPERATOR_ACCOUNT_TYPE = "Operator";
+        public const string SUSPENDED_ACCOUNT_TYPE = "Suspended";
+
+        public const string AUDIO_CONTENT_TYPE = "AudioBook";
+        public const string E_BOOK_CONTENT_TYPE = "EBook";
+
+        public const string OWNER_ACCESS_TYPE = "Owner";
+        public const string SUBSCIBER_ACCESS_TYPE = "Subscriber";
+        public const string BORROWER_ACCESS_TYPE = "Borrower";
+        public const string EXPIRED_ACCESS_TYPE = "Expired";
+
+        public const string HORSE_COVER_PATH = "Domain\\Seeding\\Files\\horse.jpg";
+        public const string EXQUISITE_COVER_PATH = "Domain\\Seeding\\Files\\exquisite.jpeg";
+        public const string SHADOWGAME_COVER_PATH = "Domain\\Seeding\\Files\\skyggespil.png";
+        public const string SHADOWGAME_CONTENT_PATH = "Domain\\Seeding\\Files\\skyggespil.epub";
+        public const string PLACEBOEFFEKTEN_CONTENT_PATH = "Domain\\Seeding\\Files\\placeboeffekten.mp3";
+    }
+}

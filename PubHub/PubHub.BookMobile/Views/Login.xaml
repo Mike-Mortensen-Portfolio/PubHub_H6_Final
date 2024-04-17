@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PubHub.BookMobile.Views.Login"
+             xmlns:pages="clr-namespace:PubHub.BookMobile.Views"
+             xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
+             x:DataType="viewModels:LoginViewModel"
+             Title="Login">
+    <StackLayout Padding="10">
+        <ActivityIndicator IsRunning="{Binding IsBusy}"/>
+        <Image Source="https://raw.githubusercontent.com/Mike-Mortensen-Portfolio/PubHub_H6_Final/developer/Images/PubHub.png"
+               WidthRequest="256"
+               HeightRequest="256"/>
+        <Border Margin="0,10,0,10"
+                Padding="10"
+                StrokeShape="RoundRectangle 10,10"
+                Stroke="{StaticResource Primary}">
+            <StackLayout Orientation="Vertical"
+                         HorizontalOptions="Center">
+                <StackLayout Orientation="Horizontal"
+                             HeightRequest="40">
+                    <Label Text="Email"
+                           VerticalOptions="Center"
+                           FontAttributes="Bold"
+                           WidthRequest="80"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            HeightRequest="30"
+                            Stroke="Transparent">
+                        <Entry WidthRequest="200"
+                               Keyboard="Email"
+                               MaxLength="{x:Static viewModels:RegisterViewModel.MAX_NAME_LENGTH}"
+                               Text="{Binding Email}"/>
+                    </Border>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal"
+                             HeightRequest="40">
+                    <Label Text="Password"
+                           VerticalOptions="Center"
+                           FontAttributes="Bold"
+                           WidthRequest="80"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            HeightRequest="30"
+                            Stroke="Transparent">
+                        <Entry WidthRequest="200"
+                               IsPassword="True"
+                               MaxLength="{x:Static viewModels:RegisterViewModel.MAX_PASSWORD_LENGTH}"
+                               Text="{Binding Password}"/>
+                    </Border>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal"
+                             HorizontalOptions="StartAndExpand">
+                    <Button Text="Register"
+                            Padding="0"
+                            HeightRequest="25"
+                            BackgroundColor="Transparent"
+                            TextColor="DeepSkyBlue"
+                            Command="{Binding NavigateToPageCommand}"
+                            CommandParameter="Register"/>
+                </StackLayout>
+                <Button Margin="0,20,0,0"
+                        Text="Sign in"
+                        Command="{Binding SignInCommand}"/>
+            </StackLayout>
+        </Border>
+    </StackLayout>
+</ContentPage>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:PubHub.BookMobile.ViewModels"
+             xmlns:models="clr-namespace:PubHub.BookMobile.Models"
+             xmlns:booksModels="clr-namespace:PubHub.Common.Models.Books;assembly=PubHub.Common"
+             xmlns:authorModels="clr-namespace:PubHub.Common.Models.Authors;assembly=PubHub.Common"
+             xmlns:genreModels="clr-namespace:PubHub.Common.Models.Genres;assembly=PubHub.Common"
+             x:Class="PubHub.BookMobile.Views.BookInfo"
+             x:DataType="viewModels:BookInfoViewModel"
+             Title="{Binding BookListing.Title}">
+    <ScrollView IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+        <StackLayout Orientation="Vertical"
+                     Padding="10,20,10,20"
+                     Spacing="20">
+            <Grid RowDefinitions="AUTO, 1*, 1*, 1*, AUTO, 1*, 1*, 1*, 1*"
+                  Padding="20,0,20,0"
+                  ColumnDefinitions="1*, 1*"
+                  ColumnSpacing="10"
+                  RowSpacing="10">
+                <Border Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        StrokeShape="RoundRectangle 10,10"
+                        HeightRequest="340"
+                        WidthRequest="295">
+                    <Image Source="{Binding CurrentViewedItem.CoverImage, Converter={StaticResource ByteArrayToImageSourceConverter}, Mode=OneWay}"
+                           Aspect="Fill"/>
+                </Border>
+
+                <StackLayout Grid.Row="1"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="2"
+                             Orientation="Horizontal"
+                             HorizontalOptions="CenterAndExpand"
+                             Spacing="10">
+                    <Button FontFamily="IcoFont"
+                            FontAttributes="Bold"
+                            HorizontalOptions="End"
+                            Text="{Binding Source={x:StaticResource Ebook}, StringFormat='{0} E-book'}"
+                            IsVisible="{Binding BookListing.EBookInStock}"
+                            WidthRequest="140"
+                            Command="{Binding ShowEbookBookCommand}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{x:StaticResource Gray200}"/>
+                                            <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{x:StaticResource Primary}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+                    </Button>
+                    <Button FontFamily="IcoFont"
+                            FontAttributes="Bold"
+                            HorizontalOptions="Start"
+                            Text="{Binding Source={x:StaticResource Audio}, StringFormat='{0} Audiobook'}"
+                            IsVisible="{Binding BookListing.AudiobookInStock}"
+                            WidthRequest="140"
+                            Command="{Binding ShowAudiobookCommand}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{x:StaticResource Gray200}"/>
+                                            <Setter Property="TextColor" Value="{x:StaticResource PrimaryDarkText}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{x:StaticResource Primary}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+                    </Button>
+                </StackLayout>
+
+                <CollectionView Grid.Row="2"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                ItemsSource="{Binding CurrentViewedItem.Genres}"
+                                HorizontalOptions="CenterAndExpand">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal"
+                                           ItemSpacing="5"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:DataType="authorModels:AuthorInfoModel"
+                                    StrokeShape="RoundRectangle 10,10"
+                                    Stroke="Gray"
+                                    Padding="10,0,10,0">
+                                <Label FontAttributes="Bold"
+                                       FontSize="{StaticResource Small}"
+                                       Text="{Binding Name}"/>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Grid.Row="3"
+                       Grid.Column="0"
+                       Text="Summary"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Start"
+                       FontSize="{StaticResource Subheader}"/>
+                <Editor Grid.Row="4"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        IsReadOnly="True"
+                        Text="{Binding CurrentViewedItem.Summary}"/>
+
+                <StackLayout Grid.Row="5"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="2"
+                             Orientation="Horizontal"
+                             Spacing="10">
+                    <Label Text="By"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Start"
+                           VerticalTextAlignment="Center"
+                           FontSize="{StaticResource Normal}"/>
+                    <CollectionView ItemsSource="{Binding CurrentViewedItem.Authors}"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="FillAndExpand">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal"
+                                               ItemSpacing="5"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:DataType="authorModels:AuthorInfoModel"
+                                        StrokeShape="RoundRectangle 10,10"
+                                        Stroke="Gray"
+                                        Padding="10,0,10,0">
+                                    <Label FontAttributes="Bold"
+                                           FontSize="{StaticResource Small}"
+                                           Text="{Binding Name}"/>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+                <StackLayout Grid.Row="6"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="2"
+                             Orientation="Horizontal"
+                             Spacing="10">
+                    <Label Text="Published by"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Start"
+                           VerticalTextAlignment="Center"
+                           FontSize="{StaticResource Normal}"/>
+                    <Border StrokeShape="RoundRectangle 10,10"
+                            Stroke="Gray"
+                            Padding="10,0,10,0">
+                        <Label FontAttributes="Bold"
+                               FontSize="{StaticResource Small}"
+                               Text="{Binding CurrentViewedItem.Publisher.Name}"/>
+                    </Border>
+                </StackLayout>
+            </Grid>
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"/>
+            <Button IsEnabled="{Binding IsAuthenticated}"
+                    IsVisible="{Binding IsAuthenticated}"
+                    BackgroundColor="Green"
+                    Text="{Binding ButtonText}"
+                    Command="{Binding BuyBookCommand}"/>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

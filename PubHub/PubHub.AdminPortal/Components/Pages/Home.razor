@@ -1,0 +1,19 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<AuthorizeView Policy="Operator">
+    <Authorized>
+        <ManagePublishers />
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="Publisher">
+    <Authorized>
+        <Books />
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView>
+    <NotAuthorized>
+        <Login />
+    </NotAuthorized>
+</AuthorizeView>
