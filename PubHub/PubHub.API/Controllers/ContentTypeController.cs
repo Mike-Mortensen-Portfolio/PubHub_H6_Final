@@ -19,9 +19,9 @@ namespace PubHub.API.Controllers
     public class ContentTypesController : ControllerBase
     {
         private readonly PubHubContext _context;
-        private readonly AccessService _accessService;
+        private readonly IAccessService _accessService;
 
-        public ContentTypesController(PubHubContext context, AccessService accessService)
+        public ContentTypesController(PubHubContext context, IAccessService accessService)
         {
             _context = context;
             _accessService = accessService;

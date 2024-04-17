@@ -22,10 +22,10 @@ namespace PubHub.API.Controllers
     public class GenresController : ControllerBase
     {
         private readonly PubHubContext _context;
-        private readonly AccessService _accessService;
+        private readonly IAccessService _accessService;
         private readonly ILogger<GenresController> _logger;
 
-        public GenresController(ILogger<GenresController> logger, PubHubContext context, AccessService accessService)
+        public GenresController(ILogger<GenresController> logger, PubHubContext context, IAccessService accessService)
         {
             _context = context;
             _accessService = accessService;

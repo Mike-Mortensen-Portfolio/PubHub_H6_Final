@@ -23,9 +23,9 @@ namespace PubHub.API.Controllers
     {
         private readonly ILogger<AuthorsController> _logger;
         private readonly PubHubContext _context;
-        private readonly AccessService _accessService;
+        private readonly IAccessService _accessService;
 
-        public AuthorsController(ILogger<AuthorsController> logger, PubHubContext context, AccessService accessService)
+        public AuthorsController(ILogger<AuthorsController> logger, PubHubContext context, IAccessService accessService)
         {
             _logger = logger;
             _context = context;

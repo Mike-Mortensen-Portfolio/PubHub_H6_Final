@@ -31,10 +31,10 @@ namespace PubHub.API.Controllers
     {
         private readonly ILogger<BooksController> _logger;
         private readonly PubHubContext _context;
-        private readonly AccessService _accessService;
+        private readonly IAccessService _accessService;
         private readonly TypeLookupService _accessTypeLookupService;
 
-        public BooksController(ILogger<BooksController> logger, PubHubContext context, AccessService accessService, TypeLookupService accessTypeLookupService)
+        public BooksController(ILogger<BooksController> logger, PubHubContext context, IAccessService accessService, TypeLookupService accessTypeLookupService)
         {
             _logger = logger;
             _context = context;

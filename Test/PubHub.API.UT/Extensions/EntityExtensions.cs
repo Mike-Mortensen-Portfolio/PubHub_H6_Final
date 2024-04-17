@@ -28,7 +28,7 @@ namespace PubHub.API.UT.Extensions
             Publisher = new() { Id = book.Publisher!.Id, Name = book.Publisher.Name },
             Title = book.Title,
             Summary = book.Summary,
-            CoverImage = book.CoverImage,
+            CoverImage = book.CoverImageUri != null ? File.ReadAllBytes(book.CoverImageUri) : null,
             ContentType = book.ContentType!.ToInfo(),
             PublicationDate = book.PublicationDate,
             Length = book.Length,
