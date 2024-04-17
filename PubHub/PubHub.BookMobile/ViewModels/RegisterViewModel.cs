@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Configuration;
@@ -49,7 +50,7 @@ namespace PubHub.BookMobile.ViewModels
 #pragma warning restore CA1822 // Mark members as static
         public bool IsValidName => !string.IsNullOrWhiteSpace(Name) && Name.Length <= MAX_NAME_LENGTH;
         public bool IsValidSurname => !string.IsNullOrWhiteSpace(Surname) && Surname.Length <= MAX_NAME_LENGTH;
-        public bool IsValidBirthday => Birthday.Date >= DateTime.Parse(AtMostHundredAndTwenty) && Birthday.Date <= DateTime.Parse(AtLeastTwelve);
+        public bool IsValidBirthday => Birthday.Date >= DateTime.Parse(AtMostHundredAndTwenty, new CultureInfo("da-DK")) && Birthday.Date <= DateTime.Parse(AtLeastTwelve, new CultureInfo("da-DK"));
         public bool IsValidEmail => !string.IsNullOrWhiteSpace(Email) && _emailRegex.Match(Email).Success && Email.Length <= MAX_EMAIL_LENGTH;
         public bool IsValidPassword => !string.IsNullOrWhiteSpace(Password) && Password.Length <= MAX_PASSWORD_LENGTH && !string.IsNullOrWhiteSpace(PasswordConfirm) && Password.Equals(PasswordConfirm);
         public bool CanRequestRegistration => IsValidName && IsValidSurname && IsValidBirthday && IsValidEmail && IsValidPassword;

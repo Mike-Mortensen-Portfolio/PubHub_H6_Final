@@ -75,6 +75,12 @@ namespace PubHub.BookMobile.ViewModels
             IsEBook = true;
             IsAudioBook = false;
 
+            if (!User.IsAuthenticated)
+            {
+                IsBusy = false;
+                return;
+            }
+
             var result = await _userService.GetUserBooksAsync(User.Id!.Value);
 
             if (!result.IsSuccess)
@@ -107,6 +113,12 @@ namespace PubHub.BookMobile.ViewModels
             CurrentViewedItem = BookListing.AudioBook;
             IsEBook = false;
             IsAudioBook = true;
+
+            if (!User.IsAuthenticated)
+            {
+                IsBusy = false;
+                return;
+            }
 
             var result = await _userService.GetUserBooksAsync(User.Id!.Value);
 
