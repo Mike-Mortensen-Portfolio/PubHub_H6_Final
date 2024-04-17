@@ -154,6 +154,15 @@ Addtionally the `MauiProgram.cs` will need the corresponding values for the conn
 ```
 
 ## API
+The connection string for the server and database in SSMS will be located in the `appSettings.json` and will also be required to be changed to suit the one that will be set up on-site.
+
+```json
+"ConnectionStrings": {
+    "Local": "<YourDBConnectionString>"
+  },
+
+```
+
 We have a few setup requirements for the API to work properly, first we have our `JWT` which have some values which needs to be set up in the `appSettings.json` file so that our tokens can be signed with a key.
 
 ```json
