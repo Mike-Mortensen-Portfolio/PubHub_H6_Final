@@ -39,13 +39,21 @@ namespace PubHub.BookMobile
                     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
                     options.AppId = builder.Configuration.GetSection("ApiSettings").GetValue<string>(ApiConstants.APP_ID) ?? throw new NullReferenceException("Application ID couldn't be found.");
                     options.ConfigureForMobile = true;
-                    options.TokenInfoAsync = async (provider) =>
+                    options.GetTokenInfoAsync = async (provider) =>
                     {
                         (bool IsSuccess, TokenInfo? tokens) = await User.TryGetCachedTokenAsync();
                         if (!IsSuccess)
                             return new TokenInfo { RefreshToken = string.Empty, Token = string.Empty };
 
                         return tokens!;
+                    };
+                    options.SetTokenInfo = async (provider, tokenInfo) =>
+                    {
+                        await User.SetAsync(new Common.Models.Accounts.TokenResponseModel(tokenInfo.Token, tokenInfo.RefreshToken));
+                    };
+                    options.RemoveTokenInfo = (provider) =>
+                    {
+                        User.Unset();
                     };
                 });
 

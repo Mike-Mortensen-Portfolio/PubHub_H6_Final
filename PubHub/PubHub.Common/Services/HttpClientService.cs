@@ -1,8 +1,7 @@
-﻿using Polly;
-using Polly.RateLimiting;
-using PubHub.Common.Models.Authentication;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using System.Text;
+using Polly;
+using Polly.RateLimiting;
 
 namespace PubHub.Common.Services
 {
@@ -12,29 +11,38 @@ namespace PubHub.Common.Services
 
         private readonly HttpClient _client;
         private readonly ResiliencePipeline<HttpResponseMessage> _resiliencePipeline;
-        private readonly Func<Task<TokenInfo>> _tokenInfoAsync;
 
-        public HttpClientService(HttpClient client, ResiliencePipeline<HttpResponseMessage> resiliencePipeline, Func<Task<TokenInfo>> tokenInfoAsync)
+        public HttpClientService(HttpClient client, ResiliencePipeline<HttpResponseMessage> resiliencePipeline)
         {
             _client = client;
-            _client.DefaultRequestHeaders.Add("refreshToken", string.Empty);
             _client.Timeout = TimeSpan.Parse("24.20:31:23.6470000"); // Polly will take care of timeout.
             _resiliencePipeline = resiliencePipeline;
-            _tokenInfoAsync = tokenInfoAsync;
+        }
+
+        protected Dictionary<string, string> Headers { get; set; } = [];
+
+        public void AddBearer(string bearer)
+        {
+            _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, bearer);
+        }
+
+        public void AddOrReplaceHeader(string key, string value)
+        {
+            if (!Headers.TryAdd(key, value))
+                Headers[key] = value;
         }
 
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> GetAsync(string uri)
         {
             CheckNetwork();
+            SetHeaders();
 
             try
             {
                 var context = StartRequest();
                 var response = await _resiliencePipeline.ExecuteAsync(async context =>
                 {
-                    await SetTokensAsync();
-
                     return await _client.GetAsync(uri, context.CancellationToken);
                 }, context);
                 EndRequest(context);
@@ -55,8 +63,6 @@ namespace PubHub.Common.Services
         {
             CheckNetwork();
 
-            await SetTokensAsync();
-
             return await _client.GetStreamAsync(uri);
         }
 
@@ -64,14 +70,13 @@ namespace PubHub.Common.Services
         public async Task<HttpResponseMessage> PostAsync(string uri, string? content = null)
         {
             CheckNetwork();
+            SetHeaders();
 
             try
             {
                 var context = StartRequest(content);
                 var response = await _resiliencePipeline.ExecuteAsync(async context =>
                 {
-                    await SetTokensAsync();
-
                     return await _client.PostAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
                 }, context);
                 EndRequest(context);
@@ -91,14 +96,13 @@ namespace PubHub.Common.Services
         public async Task<HttpResponseMessage> PutAsync(string uri, string? content = null)
         {
             CheckNetwork();
+            SetHeaders();
 
             try
             {
                 var context = StartRequest(content);
                 var response = await _resiliencePipeline.ExecuteAsync(async context =>
                 {
-                    await SetTokensAsync();
-
                     return await _client.PutAsync(uri, new StringContent(content ?? string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
                 }, context);
                 EndRequest(context);
@@ -118,14 +122,13 @@ namespace PubHub.Common.Services
         public async Task<HttpResponseMessage> DeleteAsync(string uri)
         {
             CheckNetwork();
+            SetHeaders();
 
             try
             {
                 var context = StartRequest();
                 var response = await _resiliencePipeline.ExecuteAsync(async context =>
                 {
-                    await SetTokensAsync();
-
                     return await _client.DeleteAsync(uri, context.CancellationToken);
                 }, context);
                 EndRequest(context);
@@ -185,14 +188,16 @@ namespace PubHub.Common.Services
         }
 
         /// <summary>
-        /// Set access and refresh tokens on the current <see cref="_client"/>.
+        /// Set headers from <see cref="Headers"/> on the current <see cref="_client"/>.
         /// </summary>
-        private async Task SetTokensAsync()
+        private void SetHeaders()
         {
-            var tokenInfo = await _tokenInfoAsync.Invoke();
-            _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(BEARER_KEY, tokenInfo.Token);
-            _client.DefaultRequestHeaders.Remove("refreshToken");
-            _client.DefaultRequestHeaders.Add("refreshToken", tokenInfo.RefreshToken);
+            foreach (var header in Headers)
+            {
+                if (_client.DefaultRequestHeaders.Contains(header.Key))
+                    _client.DefaultRequestHeaders.Remove(header.Key);
+                _client.DefaultRequestHeaders.Add(header.Key, header.Value);
+            }
         }
     }
 }

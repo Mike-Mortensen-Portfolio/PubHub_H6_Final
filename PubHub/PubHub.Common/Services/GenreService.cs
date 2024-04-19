@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
-using PubHub.Common.Models.Accounts;
-using PubHub.Common.Models.ContentTypes;
+using PubHub.Common.Models.Authentication;
 using PubHub.Common.Models.Genres;
 using static PubHub.Common.IntegrityConstants;
 
@@ -14,7 +12,10 @@ namespace PubHub.Common.Services
     {
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public GenreService(IHttpClientService clientService) : base(clientService)
+        public GenreService(IHttpClientService clientService,
+            Func<Task<TokenInfo>> getTokenInfoAsync,
+            Action<TokenInfo> setTokenInfoAsync,
+            Action removeTokenInfoAsync) : base(clientService, getTokenInfoAsync, setTokenInfoAsync, removeTokenInfoAsync)
         {
             _serializerOptions = new JsonSerializerOptions
             {
@@ -29,6 +30,9 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="GenreInfoModel"/></returns>
         public async Task<HttpServiceResult<IReadOnlyList<GenreInfoModel>>> GetAllGenresAsync()
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 HttpResponseMessage response = await Client.GetAsync($"genres");
@@ -69,6 +73,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<GenreInfoModel>> GetGenreAsync(Guid genreId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (genreId == INVALID_ENTITY_ID)
@@ -111,6 +118,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<GenreCreateModel>> AddGenreAsync(GenreCreateModel genreCreateModel)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 ArgumentNullException.ThrowIfNull(genreCreateModel);
@@ -150,6 +160,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult> DeleteGenreAsync(Guid genreId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (genreId == INVALID_ENTITY_ID)

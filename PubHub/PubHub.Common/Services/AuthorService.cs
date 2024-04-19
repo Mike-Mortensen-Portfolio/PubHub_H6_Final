@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
-using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.Authentication;
 using PubHub.Common.Models.Authors;
 using static PubHub.Common.IntegrityConstants;
 
@@ -13,7 +12,10 @@ namespace PubHub.Common.Services
     {
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public AuthorService(IHttpClientService clientService) : base(clientService)
+        public AuthorService(IHttpClientService clientService,
+            Func<Task<TokenInfo>> getTokenInfoAsync,
+            Action<TokenInfo> setTokenInfoAsync,
+            Action removeTokenInfoAsync) : base(clientService, getTokenInfoAsync, setTokenInfoAsync, removeTokenInfoAsync)
         {
             _serializerOptions = new JsonSerializerOptions
             {
@@ -28,6 +30,9 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="AuthorInfoModel"/></returns>
         public async Task<HttpServiceResult<IReadOnlyList<AuthorInfoModel>>> GetAllAuthorsAsync()
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 HttpResponseMessage response = await Client.GetAsync($"authors");
@@ -68,6 +73,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<AuthorInfoModel>> GetAuthorAsync(Guid authorId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (authorId == INVALID_ENTITY_ID)
@@ -110,6 +118,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<AuthorInfoModel>> AddAuthorAsync(AuthorCreateModel authorCreateModel)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 ArgumentNullException.ThrowIfNull(authorCreateModel);
@@ -153,6 +164,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult> DeleteAuthorAsync(Guid authorId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (authorId == INVALID_ENTITY_ID)

@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
-using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.Authentication;
 using PubHub.Common.Models.Books;
-using PubHub.Common.Models.Genres;
 using PubHub.Common.Models.Publishers;
 using static PubHub.Common.IntegrityConstants;
 
@@ -16,7 +14,10 @@ namespace PubHub.Common.Services
     {
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public PublisherService(IHttpClientService clientService) : base(clientService)
+        public PublisherService(IHttpClientService clientService,
+            Func<Task<TokenInfo>> getTokenInfoAsync,
+            Action<TokenInfo> setTokenInfoAsync,
+            Action removeTokenInfoAsync) : base(clientService, getTokenInfoAsync, setTokenInfoAsync, removeTokenInfoAsync)
         {
             _serializerOptions = new JsonSerializerOptions
             {
@@ -32,6 +33,9 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="PublisherInfoModel"/></returns>
         public async Task<HttpServiceResult<IReadOnlyList<PublisherInfoModel>>> GetAllPublishersAsync(PublisherQuery queryOptions)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 ArgumentNullException.ThrowIfNull(queryOptions);
@@ -74,6 +78,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<PublisherInfoModel>> AddPublisherAsync(PublisherCreateModel publisherCreateModel)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 ArgumentNullException.ThrowIfNull(publisherCreateModel);
@@ -117,6 +124,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<IReadOnlyList<BookInfoModel>>> GetAllPublisherBooksAsync(Guid publisherId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
@@ -159,6 +169,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<BookContentModel>> GetPublisherBookContentAsync(Guid publisherId, Guid bookId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
@@ -204,6 +217,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<PublisherInfoModel>> GetPublisherInfoAsync(Guid publisherId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
@@ -248,6 +264,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<PublisherInfoModel>> UpdatePublisherAsync(Guid publisherId, PublisherUpdateModel publisherUpdateModel)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)
@@ -294,6 +313,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult> DeletePublisherAsync(Guid publisherId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (publisherId == INVALID_ENTITY_ID)

@@ -3,6 +3,19 @@
     public interface IHttpClientService
     {
         /// <summary>
+        /// Add bearer authenticatoin to the wrapped <see cref="HttpClient"/>.
+        /// </summary>
+        /// <param name="bearer">BEARER key.</param>
+        public void AddBearer(string bearer);
+
+        /// <summary>
+        /// Add a header to the wrapped <see cref="HttpClient"/>. If they header already exists, the header value will be replaced.
+        /// </summary>
+        /// <param name="key">Header key.</param>
+        /// <param name="value">Header value.</param>
+        public void AddOrReplaceHeader(string key, string value);
+
+        /// <summary>
         /// Send a GET message using the base address of the wrapped <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="uri">URI (must NOT start with '/').</param>

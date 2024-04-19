@@ -31,7 +31,9 @@ namespace PubHub.Common.Extensions
             if (apiOptions == null)
                 throw new ArgumentNullException(nameof(services), "Options cannot be empty.");
 
-            services.AddScoped<Func<Task<TokenInfo>>>((sp) => () => apiOptions.TokenInfoAsync.Invoke(sp));
+            services.AddScoped<Func<Task<TokenInfo>>>((sp) => () => apiOptions.GetTokenInfoAsync.Invoke(sp));
+            services.AddScoped<Action<TokenInfo>>((sp) => (tokenInfo) => apiOptions.SetTokenInfo.Invoke(sp, tokenInfo));
+            services.AddScoped<Action>((sp) => () => apiOptions.RemoveTokenInfo.Invoke(sp));
 
             // Add HttpClient for specified platform.
             var uri = new Uri(apiOptions.Address);
@@ -41,8 +43,7 @@ namespace PubHub.Common.Extensions
                 httpClient.DefaultRequestHeaders.Add(ApiConstants.APP_ID, apiOptions.AppId);
                 services.AddSingleton<IHttpClientService>(sp => new HttpClientService(
                     httpClient,
-                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE),
-                    sp.GetRequiredService<Func<Task<TokenInfo>>>()
+                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)
                     ));
             }
             else
@@ -50,8 +51,7 @@ namespace PubHub.Common.Extensions
                 var clientName = apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME;
                 services.AddScoped<IHttpClientService>(sp => new HttpClientService(
                     sp.GetRequiredService<IHttpClientFactory>().CreateClient(clientName),
-                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE),
-                    sp.GetRequiredService<Func<Task<TokenInfo>>>()
+                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)
                     ));
                 services.AddHttpClient(clientName, options =>
                 {
