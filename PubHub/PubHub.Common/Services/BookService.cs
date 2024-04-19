@@ -5,6 +5,7 @@ using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Extensions;
 using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.Authentication;
 using PubHub.Common.Models.Authors;
 using PubHub.Common.Models.Books;
 using static PubHub.Common.IntegrityConstants;
@@ -15,7 +16,10 @@ namespace PubHub.Common.Services
     {
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public BookService(IHttpClientService clientService) : base(clientService)
+        public BookService(IHttpClientService clientService,
+            Func<Task<TokenInfo>> getTokenInfoAsync,
+            Action<TokenInfo> setTokenInfoAsync,
+            Action removeTokenInfoAsync) : base(clientService, getTokenInfoAsync, setTokenInfoAsync, removeTokenInfoAsync)
         {
             _serializerOptions = new JsonSerializerOptions
             {
@@ -31,6 +35,9 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="BookInfoModel"/></returns>
         public async Task<HttpServiceResult<IReadOnlyList<BookInfoModel>>> GetAllBooksAsync(BookQuery queryOptions)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 ArgumentNullException.ThrowIfNull(queryOptions);
@@ -72,6 +79,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<BookInfoModel>> GetBookAsync(Guid bookId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (bookId == INVALID_ENTITY_ID)
@@ -115,6 +125,9 @@ namespace PubHub.Common.Services
         /// <returns>The <see cref="Stream"/> that represents the book content</returns>
         public async Task<HttpServiceResult<Stream>> GetBookStreamAsync(Guid bookId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (bookId == INVALID_ENTITY_ID)
@@ -140,6 +153,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<BookInfoModel>> AddBookAsync(BookCreateModel bookCreateModel)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 ArgumentNullException.ThrowIfNull(bookCreateModel);
@@ -185,6 +201,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult<BookInfoModel>> UpdateBookAsync(Guid bookId, BookUpdateModel bookUpdateModel)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (bookId == INVALID_ENTITY_ID)
@@ -231,6 +250,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult> DeleteBookAsync(Guid bookId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (bookId == INVALID_ENTITY_ID)
@@ -272,6 +294,9 @@ namespace PubHub.Common.Services
         /// <exception cref="NullReferenceException"></exception>
         public async Task<HttpServiceResult> PurchaseBookAsync(Guid bookId)
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 if (bookId == INVALID_ENTITY_ID)

@@ -23,6 +23,14 @@ namespace PubHub.Common.ApiService
         /// <summary>
         /// Get the current access and refresh token.
         /// </summary>
-        public Func<IServiceProvider, Task<TokenInfo>> TokenInfoAsync { get; set; } = null!;
+        public Func<IServiceProvider, Task<TokenInfo>> GetTokenInfoAsync { get; set; } = null!;
+        /// <summary>
+        /// Set the current access and refresh token.
+        /// </summary>
+        public Action<IServiceProvider, TokenInfo> SetTokenInfo { get; set; } = null!;
+        /// <summary>
+        /// Remove the current access and refresh token.
+        /// </summary>
+        public Action<IServiceProvider> RemoveTokenInfo { get; set; } = null!;
     }
 }

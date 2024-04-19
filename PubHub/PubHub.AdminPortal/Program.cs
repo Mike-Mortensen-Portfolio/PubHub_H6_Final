@@ -26,7 +26,7 @@ builder.Services.AddPubHubServices(options =>
     options.Address = builder.Configuration.GetValue<string>(ApiConstants.API_ENDPOINT) ?? throw new NullReferenceException("API base address couldn't be found.");
     options.HttpClientName = ApiConstants.HTTPCLIENT_NAME;
     options.AppId = builder.Configuration.GetValue<string>(ApiConstants.APP_ID) ?? throw new NullReferenceException("Application ID couldn't be found.");
-    options.TokenInfoAsync = async (sp) =>
+    options.GetTokenInfoAsync = async (sp) =>
     {
         var localStorageService = sp.GetRequiredService<ILocalStorageService>();
         return new TokenInfo()
@@ -34,6 +34,18 @@ builder.Services.AddPubHubServices(options =>
             Token = await localStorageService.GetItemAsync<string>("token") ?? string.Empty,
             RefreshToken = await localStorageService.GetItemAsync<string>("refreshToken") ?? string.Empty
         };
+    };
+    options.SetTokenInfo = async (sp, tokenInfo) =>
+    {
+        var localStorageService = sp.GetRequiredService<ILocalStorageService>();
+        await localStorageService.SetItemAsync("token", tokenInfo.Token);
+        await localStorageService.SetItemAsync("refreshToken", tokenInfo.RefreshToken);
+    };
+    options.RemoveTokenInfo = async (sp) =>
+    {
+        var localStorageService = sp.GetRequiredService<ILocalStorageService>();
+        await localStorageService.RemoveItemAsync("token");
+        await localStorageService.RemoveItemAsync("refreshToken");
     };
 });
 

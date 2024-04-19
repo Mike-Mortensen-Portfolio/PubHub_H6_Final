@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Accounts;
+using PubHub.Common.Models.Authentication;
 using PubHub.Common.Models.Books;
 using PubHub.Common.Models.ContentTypes;
 
@@ -12,7 +13,10 @@ namespace PubHub.Common.Services
     {
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public ContentTypeService(IHttpClientService clientService) : base(clientService)
+        public ContentTypeService(IHttpClientService clientService,
+            Func<Task<TokenInfo>> getTokenInfoAsync,
+            Action<TokenInfo> setTokenInfoAsync,
+            Action removeTokenInfoAsync) : base(clientService, getTokenInfoAsync, setTokenInfoAsync, removeTokenInfoAsync)
         {
             _serializerOptions = new JsonSerializerOptions
             {
@@ -28,6 +32,9 @@ namespace PubHub.Common.Services
         /// <returns>A list of <see cref="ContentTypeInfoModel"/></returns>
         public async Task<HttpServiceResult<IReadOnlyList<ContentTypeInfoModel>>> GetAllContentTypesAsync()
         {
+            await SetTokensAsync();
+            await TryRefreshTokenAsync();
+
             try
             {
                 HttpResponseMessage response = await Client.GetAsync($"contentTypes");

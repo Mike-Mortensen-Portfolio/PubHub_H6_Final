@@ -1,11 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Accounts;
 using PubHub.Common.Models.Authentication;
-using PubHub.Common.Models.Books;
 using PubHub.Common.Models.Users;
 
 namespace PubHub.Common.Services
@@ -14,7 +12,10 @@ namespace PubHub.Common.Services
     {
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public AuthenticationService(IHttpClientService clientService) : base(clientService)
+        public AuthenticationService(IHttpClientService clientService,
+            Func<Task<TokenInfo>> getTokenInfoAsync,
+            Action<TokenInfo> setTokenInfoAsync,
+            Action removeTokenInfoAsync) : base(clientService, getTokenInfoAsync, setTokenInfoAsync, removeTokenInfoAsync)
         {
             _serializerOptions = new JsonSerializerOptions
             {
