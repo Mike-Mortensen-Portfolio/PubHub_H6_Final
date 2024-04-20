@@ -20,8 +20,6 @@ public partial class Home : ContentPage
 
     protected override async void OnAppearing()
     {
-        await User.CheckStateAndTryRefreshAsync(_authService);
-
         _viewModel.IsAuthenticated = User.IsAuthenticated;
 
         base.OnAppearing();

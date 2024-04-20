@@ -35,7 +35,7 @@ namespace PubHub.BookMobile.ViewModels
         [ObservableProperty]
         private double _currentPosition = 0f;
         [ObservableProperty]
-        private string _timeLeft = string.Empty;
+        private string _currentPositionString = string.Empty;
 
         public AudiobookViewModel(IAudioManager audioManager, IBookService bookService, IUserService userService)
         {
@@ -75,7 +75,8 @@ namespace PubHub.BookMobile.ViewModels
                     _audioPlayer = _audioManager.CreatePlayer((await _bookService.GetBookStreamAsync(_bookId)).Instance!);
                     Volume = _audioPlayer.Volume;
                     TotalDuration = _audioPlayer.Duration;
-                    TotalTimeString = ((_audioPlayer is not null) ? ($"{_audioPlayer?.Duration:00:00}") : ("00:00"));
+                    var span = TimeSpan.FromSeconds(_audioPlayer.Duration);
+                    TotalTimeString = ((_audioPlayer is not null) ? ($"{span.Hours:00}:{span.Minutes:00}:{span.Seconds:00}") : ("00:00:00"));
                 });
 
             _audioPlayer!.Play();
@@ -116,6 +117,9 @@ namespace PubHub.BookMobile.ViewModels
 
             _audioPlayer.Stop();
             CurrentPosition = 0f;
+            CurrentPositionString = "00:00:00";
+            var span = TimeSpan.FromSeconds(_audioPlayer.Duration);
+            TotalTimeString = ((_audioPlayer is not null) ? ($"{span.Hours:00}:{span.Minutes:00}:{span.Seconds:00}") : ("00:00:00"));
 
             _isPaused = false;
             PlayAudioCommand.NotifyCanExecuteChanged();
@@ -162,8 +166,11 @@ namespace PubHub.BookMobile.ViewModels
             if (_audioPlayer is null)
                 return;
 
-            var timeLeft = _audioPlayer.Duration - _audioPlayer.CurrentPosition;
-            TimeLeft = $"{timeLeft:00:00}";
+            var posSpan = TimeSpan.FromSeconds(CurrentPosition);
+
+            CurrentPositionString = $"{posSpan.Hours:00}:{posSpan.Minutes:00}:{posSpan.Seconds:00}";
+            if (CurrentPosition - TotalDuration == 0)
+                StopAudioCommand.Execute(null);
         }
     }
 }

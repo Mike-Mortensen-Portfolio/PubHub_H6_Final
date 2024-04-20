@@ -28,7 +28,7 @@ namespace PubHub.BookMobile.ViewModels
         private bool _alreadyOwnsBook;
         private bool CanBuyBook => IsAuthenticated && !AlreadyOwnsBook;
         [ObservableProperty]
-        private string? _buttonText;
+        private string? _buttonText = "Buy";
         [ObservableProperty]
         private bool _isBusy;
 

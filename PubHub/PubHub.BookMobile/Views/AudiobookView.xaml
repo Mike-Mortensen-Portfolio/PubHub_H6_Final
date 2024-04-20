@@ -22,10 +22,9 @@
         <Grid Grid.Row="1"
               ColumnDefinitions="1*, 4*, 1*">
             <Label Grid.Column="0"
-                   Text="{Binding TimeLeft}"
+                   Text="{Binding CurrentPositionString}"
                    FontSize="{StaticResource Small}"/>
             <Slider Grid.Column="1"
-                    
                     Minimum="0"
                     Maximum="{Binding TotalDuration}"
                     Value="{Binding CurrentPosition}"
