@@ -43,7 +43,8 @@ namespace PubHub.Common.Extensions
                 httpClient.DefaultRequestHeaders.Add(ApiConstants.APP_ID, apiOptions.AppId);
                 services.AddSingleton<IHttpClientService>(sp => new HttpClientService(
                     httpClient,
-                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)
+                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE),
+                    sp.GetRequiredService<PollyInfoService>()
                     ));
             }
             else
@@ -51,7 +52,8 @@ namespace PubHub.Common.Extensions
                 var clientName = apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME;
                 services.AddScoped<IHttpClientService>(sp => new HttpClientService(
                     sp.GetRequiredService<IHttpClientFactory>().CreateClient(clientName),
-                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)
+                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE),
+                    sp.GetRequiredService<PollyInfoService>()
                     ));
                 services.AddHttpClient(clientName, options =>
                 {
@@ -69,6 +71,7 @@ namespace PubHub.Common.Extensions
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<IContentTypeService, ContentTypeService>()
                 .AddScoped<IEpubReaderService, EpubReaderService>()
+                .AddSingleton<PollyInfoService>()
                 .AddSingleton<IChaosService>(new ChaosService())
                 .AddPolly();
         }
@@ -94,6 +97,8 @@ namespace PubHub.Common.Extensions
                     {
                         ShouldHandle = static args =>
                         {
+                            var infoService = args.Context.Properties.GetValue<PollyInfoService?>(new(ResilienceConstants.INFO_SERVICE_KEY), null);
+                            infoService?.SetRetryIndicator(args.AttemptNumber, ResilienceConstants.MAX_RETRY_ATTEMPTS);
                             var response = args.Outcome.Result;
                             if (response == null ||
                                 response.StatusCode == HttpStatusCode.InternalServerError ||
@@ -106,7 +111,7 @@ namespace PubHub.Common.Extensions
                             // Request succeeded.
                             return new ValueTask<bool>(false);
                         },
-                        MaxRetryAttempts = 5,
+                        MaxRetryAttempts = ResilienceConstants.MAX_RETRY_ATTEMPTS,
                         DelayGenerator = static args =>
                         {
                             var delay = args.AttemptNumber switch
@@ -135,6 +140,11 @@ namespace PubHub.Common.Extensions
                             {
                                 // Content is more than 2 MB; use 5 min. timeout.
                                 timeoutSeconds = 300;
+
+                                // Inform user.
+                                var infoService = args.Context.Properties.GetValue<PollyInfoService?>(new(ResilienceConstants.INFO_SERVICE_KEY), null);
+                                if (infoService != null)
+                                    infoService.Detail = "Large content. This may take a bit.";
                             }
 
                             return ValueTask.FromResult(TimeSpan.FromSeconds(timeoutSeconds));

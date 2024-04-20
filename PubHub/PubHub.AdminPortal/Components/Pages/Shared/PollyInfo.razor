@@ -1,0 +1,52 @@
+﻿@using PubHub.Common.Services
+@using Radzen
+@using System.ComponentModel
+@inject PollyInfoService pollyInfoService
+
+<div style="display: inline-flex;">
+    @if (pollyInfoService.CurrentActionType != PollyInfoService.ActionType.NONE)
+    {
+        <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium">
+            <Template><b>@pollyInfoService.RetryString</b></Template>
+        </RadzenProgressBarCircular>
+        <div style="@_textDivStyle">
+            <span>
+                @pollyInfoService.Message
+            </span>
+            @if (!string.IsNullOrEmpty(pollyInfoService.Detail))
+            {
+                <br />
+                <small style="font-size: small;">@pollyInfoService.Detail</small>
+            }
+            @if (!string.IsNullOrEmpty(pollyInfoService.ErrorText))
+            {
+                <br />
+                <small style="color: red;"><i>@pollyInfoService.ErrorText</i></small>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(pollyInfoService.ErrorText))
+    {
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Danger" Mode="ProgressBarMode.Determinate" Value="1" Min="0" Max="1" Size="ProgressBarCircularSize.Medium">
+            <Template><b>@pollyInfoService.RetryString</b></Template>
+        </RadzenProgressBarCircular>
+        <div style="@_textDivStyle">
+            <small style="color: red;"><i>@pollyInfoService.ErrorText</i></small>
+        </div>
+    }
+</div>
+
+@code {
+    const string _textDivStyle = "margin-left: 0.5rem; align-self: center;";
+
+    protected override void OnInitialized()
+    {
+        pollyInfoService.Reset();
+        pollyInfoService.PropertyChanged += pollyInfoService_PropertyChanged;
+
+        base.OnInitialized();
+    }
+
+    void pollyInfoService_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
+        InvokeAsync(() => StateHasChanged());
+}
