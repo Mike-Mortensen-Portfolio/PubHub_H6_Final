@@ -25,7 +25,7 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [EnableRateLimiting("concurrency")]
+    [EnableRateLimiting("limit-by-app-id")]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]

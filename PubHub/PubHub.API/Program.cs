@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using PubHub.API;
 using PubHub.API.Controllers.Problems;
+using PubHub.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,11 +25,30 @@ builder.Services.ConfigureSwagger(new OpenApiInfo { Title = "PubHub API v1", Ver
 
 builder.Services.AddRateLimiter(rateLimterOptions =>
 {
-    rateLimterOptions.AddConcurrencyLimiter("concurrency", options =>
+    rateLimterOptions.AddPolicy("limit-by-app-id", context =>
     {
-        options.PermitLimit = 5;
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 1;
+        var appId = context.Request.Headers["appId"].ToString();
+        return RateLimitPartition.GetTokenBucketLimiter(appId, factory: _ => new TokenBucketRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            ReplenishmentPeriod = TimeSpan.FromSeconds(10),
+            TokenLimit = 1,
+            TokensPerPeriod = 1
+        });
+    });
+
+    rateLimterOptions.AddPolicy("limit-by-consumer-id", context =>
+    {
+        var consumerId = (context.User.Identity?.Name) ?? throw new Exception("No identity found");
+        return RateLimitPartition.GetConcurrencyLimiter(consumerId,
+            factory: _ => new ConcurrencyLimiterOptions
+            {
+                PermitLimit = 5,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 1
+            });
     });
 
     rateLimterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -73,8 +94,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts(); // Enable HSTS middleware for non-development environments
 }
 
-app.UseRateLimiter();
-
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
@@ -85,6 +104,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 
