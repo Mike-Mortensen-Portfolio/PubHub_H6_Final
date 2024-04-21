@@ -1,10 +1,7 @@
-﻿using System.Globalization;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using PubHub.API;
 using PubHub.API.Controllers.Problems;
@@ -28,20 +25,45 @@ builder.Services.AddRateLimiter(rateLimterOptions =>
     rateLimterOptions.AddPolicy("limit-by-app-id", context =>
     {
         var appId = context.Request.Headers["appId"].ToString();
-        return RateLimitPartition.GetTokenBucketLimiter(appId, factory: _ => new TokenBucketRateLimiterOptions
+
+        if (appId is null)
+            return RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress!.ToString(), factory: _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                AutoReplenishment = true,
+                Window = TimeSpan.FromSeconds(10),
+                QueueLimit = 0
+            });
+
+        return RateLimitPartition.GetTokenBucketLimiter(appId, factory: _ =>
         {
-            AutoReplenishment = true,
-            QueueLimit = 0,
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-            ReplenishmentPeriod = TimeSpan.FromSeconds(10),
-            TokenLimit = 1,
-            TokensPerPeriod = 1
+            return new TokenBucketRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                QueueLimit = 0,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                ReplenishmentPeriod = TimeSpan.FromSeconds(10),
+                TokenLimit = 10,
+                TokensPerPeriod = 10
+            };
         });
     });
 
     rateLimterOptions.AddPolicy("limit-by-consumer-id", context =>
     {
-        var consumerId = (context.User.Identity?.Name) ?? throw new Exception("No identity found");
+        var consumerId = (context.User.FindFirstValue(TokenClaimConstants.ID));
+
+        if (consumerId is null)
+            return RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress!.ToString(), factory: _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                AutoReplenishment = true,
+                Window = TimeSpan.FromSeconds(10),
+                QueueLimit = 0
+            });
+
         return RateLimitPartition.GetConcurrencyLimiter(consumerId,
             factory: _ => new ConcurrencyLimiterOptions
             {

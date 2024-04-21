@@ -13,10 +13,10 @@ using static PubHub.Common.IntegrityConstants;
 namespace PubHub.API.Controllers
 {
     [Authorize]
+    [EnableRateLimiting("limit-by-app-id")]
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [EnableRateLimiting("limit-by-consumer-id")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class GenresController : ControllerBase
@@ -86,6 +86,7 @@ namespace PubHub.API.Controllers
         }
 
         [HttpPost()]
+        //[EnableRateLimiting("limit-by-consumer-id")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenreInfoModel))]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenreInfoModel))]
         public async Task<IResult> AddGenreAsync([FromBody] GenreCreateModel genreModel, [FromHeader] string appId)
@@ -137,6 +138,7 @@ namespace PubHub.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        //[EnableRateLimiting("limit-by-consumer-id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IResult> DeleteGenreAsync(Guid id, [FromHeader] string appId)

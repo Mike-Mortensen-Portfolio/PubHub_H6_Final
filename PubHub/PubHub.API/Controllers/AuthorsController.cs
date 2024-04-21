@@ -16,7 +16,6 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [EnableRateLimiting("limit-by-consumer-id")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class AuthorsController : ControllerBase
@@ -32,6 +31,8 @@ namespace PubHub.API.Controllers
             _accessService = accessService;
         }
 
+        [AllowAnonymous]
+        [EnableRateLimiting("limit-by-app-id")]
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<AuthorInfoModel>))]
         public async Task<IResult> GetAuthorsAsync([FromHeader] string appId)
@@ -52,6 +53,8 @@ namespace PubHub.API.Controllers
             return Results.Ok(authors);
         }
 
+        [AllowAnonymous]
+        [EnableRateLimiting("limit-by-app-id")]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthorInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
@@ -83,6 +86,7 @@ namespace PubHub.API.Controllers
             return Results.Ok(author);
         }
 
+        [EnableRateLimiting("limit-by-consumer-id")]
         [HttpPost()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthorInfoModel))]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AuthorInfoModel))]
@@ -136,6 +140,7 @@ namespace PubHub.API.Controllers
             });
         }
 
+        [EnableRateLimiting("limit-by-consumer-id")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
