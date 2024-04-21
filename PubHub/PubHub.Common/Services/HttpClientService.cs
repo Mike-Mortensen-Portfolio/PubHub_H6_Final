@@ -1,4 +1,5 @@
-﻿using System.Net.Mime;
+﻿using System;
+using System.Net.Mime;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -9,12 +10,12 @@ namespace PubHub.Common.Services
     public class HttpClientService : IHttpClientService
     {
         private const string BEARER_KEY = "Bearer";
-        private readonly Logger<HttpClientService> _logger;
+        private readonly ILogger<HttpClientService> _logger;
         private readonly HttpClient _client;
         private readonly ResiliencePipeline<HttpResponseMessage> _resiliencePipeline;
         private readonly PollyInfoService _pollyInfoService;
 
-        public HttpClientService(Logger<HttpClientService> logger, HttpClient client, ResiliencePipeline<HttpResponseMessage> resiliencePipeline, PollyInfoService pollyInfoService)
+        public HttpClientService(ILogger<HttpClientService> logger, HttpClient client, ResiliencePipeline<HttpResponseMessage> resiliencePipeline, PollyInfoService pollyInfoService)
         {
             _logger = logger;
             _client = client;
