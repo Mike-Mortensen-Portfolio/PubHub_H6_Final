@@ -13,7 +13,7 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [EnableRateLimiting("concurrency")]
+    [EnableRateLimiting("limit-by-consumer-id")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public class ContentTypesController : ControllerBase

@@ -24,7 +24,6 @@ namespace PubHub.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [EnableRateLimiting("concurrency")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public sealed class BooksController : ControllerBase
@@ -47,6 +46,7 @@ namespace PubHub.API.Controllers
         /// </summary>
         /// <param name="BookQuery">Filtering options</param>
         [AllowAnonymous]
+        [EnableRateLimiting("limit-by-app-id")]
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<BookInfoModel>))]
         public async Task<IResult> GetBooksAsync([FromQuery] BookQuery queryOptions, [FromHeader] string appId)
@@ -100,6 +100,7 @@ namespace PubHub.API.Controllers
         }
 
         [AllowAnonymous]
+        [EnableRateLimiting("limit-by-app-id")]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
@@ -164,6 +165,7 @@ namespace PubHub.API.Controllers
             return Results.Ok(book);
         }
 
+        [EnableRateLimiting("limit-by-consumer-id")]
         [HttpGet("{id}/stream")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
@@ -193,6 +195,7 @@ namespace PubHub.API.Controllers
             return Results.File(fs, contentType: "application/octet-stream", enableRangeProcessing: true);
         }
 
+        [EnableRateLimiting("limit-by-consumer-id")]
         [HttpPost("{id}/purchase")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
@@ -261,7 +264,7 @@ namespace PubHub.API.Controllers
             return Results.Ok();
         }
 
-        [DisableRequestSizeLimit]
+        [EnableRateLimiting("limit-by-consumer-id")]
         [HttpPost()]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity, Type = typeof(ProblemDetails))]
@@ -426,7 +429,7 @@ namespace PubHub.API.Controllers
             return Results.Created($"books/{bookInfo!.Id}", bookInfo);
         }
 
-        [DisableRequestSizeLimit]
+        [EnableRateLimiting("limit-by-consumer-id")]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BookInfoModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
@@ -594,6 +597,7 @@ namespace PubHub.API.Controllers
             return Results.Ok(bookInfo);
         }
 
+        [EnableRateLimiting("limit-by-consumer-id")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]

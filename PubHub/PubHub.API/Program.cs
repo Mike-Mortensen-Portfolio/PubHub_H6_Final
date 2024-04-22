@@ -1,12 +1,11 @@
-﻿using System.Globalization;
+﻿using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using PubHub.API;
 using PubHub.API.Controllers.Problems;
+using PubHub.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,11 +22,55 @@ builder.Services.ConfigureSwagger(new OpenApiInfo { Title = "PubHub API v1", Ver
 
 builder.Services.AddRateLimiter(rateLimterOptions =>
 {
-    rateLimterOptions.AddConcurrencyLimiter("concurrency", options =>
+    rateLimterOptions.AddPolicy("limit-by-app-id", context =>
     {
-        options.PermitLimit = 5;
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 1;
+        var appId = context.Request.Headers["appId"].ToString();
+
+        if (appId is null)
+            return RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress!.ToString(), factory: _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                AutoReplenishment = true,
+                Window = TimeSpan.FromSeconds(10),
+                QueueLimit = 0
+            });
+
+        return RateLimitPartition.GetTokenBucketLimiter(appId, factory: _ =>
+        {
+            return new TokenBucketRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                QueueLimit = 0,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                ReplenishmentPeriod = TimeSpan.FromSeconds(10),
+                TokenLimit = 10,
+                TokensPerPeriod = 10
+            };
+        });
+    });
+
+    rateLimterOptions.AddPolicy("limit-by-consumer-id", context =>
+    {
+        var consumerId = (context.User.FindFirstValue(TokenClaimConstants.ID));
+
+        if (consumerId is null)
+            return RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress!.ToString(), factory: _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                AutoReplenishment = true,
+                Window = TimeSpan.FromSeconds(10),
+                QueueLimit = 0
+            });
+
+        return RateLimitPartition.GetConcurrencyLimiter(consumerId,
+            factory: _ => new ConcurrencyLimiterOptions
+            {
+                PermitLimit = 5,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 1
+            });
     });
 
     rateLimterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -73,8 +116,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts(); // Enable HSTS middleware for non-development environments
 }
 
-app.UseRateLimiter();
-
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
@@ -85,6 +126,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

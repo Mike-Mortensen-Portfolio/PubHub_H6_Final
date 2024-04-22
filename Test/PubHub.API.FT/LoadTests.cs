@@ -20,26 +20,29 @@ namespace PubHub.API.FT
 
         public class ClientEntry
         {
-            public ClientEntry(HttpClient client, uint requestCount, uint tooManyRequestsResponseCount)
+            public ClientEntry(HttpClient client, int index = 0)
             {
                 Client = client;
-                RequestCount = requestCount;
-                TooManyRequestsResponseCount = tooManyRequestsResponseCount;
+                Index = index;
             }
 
+            public int Index { get; set; }
             public HttpClient Client { get; set; } = null!;
-            public uint RequestCount { get; set; }
-            public uint TooManyRequestsResponseCount { get; set; }
+            public uint RequestCount { get; set; } = 0;
+            public uint TooManyRequestsResponseCount { get; set; } = 0;
         }
 
         [Fact]
         public async Task TriggerRateLimiterAsync()
         {
             // Arrange - Endpoint to call.
+            uint requestTotalCount = 0;
+            uint tooManyRequestsResponseTotalCount = 0;
             List<GenreInfoModel>? genres = null;
-            using (var client = await _apiFixture.GetAuthenticatedClientAsync())
+            using (var client = await _apiFixture.GetAuthenticatedClientAsync(ApiFixture.OPERATOR_EMAIL, ApiFixture.OPERATOR_PASSWORD))
             {
                 var response = await client.GetAsync("genres");
+                requestTotalCount++;
                 Assert.True(response.IsSuccessStatusCode);
                 var content = await response.Content.ReadAsStringAsync();
                 genres = JsonSerializer.Deserialize<List<GenreInfoModel>>(content, _apiFixture.SerializerOptions);
@@ -50,9 +53,13 @@ namespace PubHub.API.FT
             // Arrange - Clients.
             var clientCount = 10;
             List<ClientEntry> clientEntries = [];
+
             for (int i = 0; i < clientCount; i++)
             {
-                clientEntries.Add(new(await _apiFixture.GetAuthenticatedClientCopyAsync(), 0, 0));
+                //if (i == 0)
+                //    clientEntries.Add(new(await _apiFixture.GetAuthenticatedClientCopyAsync(ApiFixture.PUBLISHER_EMAIL, ApiFixture.PUBLISHER_PASSWORD), i));
+                //else
+                clientEntries.Add(new(await _apiFixture.GetAuthenticatedClientCopyAsync(ApiFixture.OPERATOR_EMAIL, ApiFixture.OPERATOR_PASSWORD), i));
             }
 
             CancellationTokenSource source = new();
@@ -74,22 +81,23 @@ namespace PubHub.API.FT
                         if (response.StatusCode == HttpStatusCode.TooManyRequests)
                             clientEntry.TooManyRequestsResponseCount += 1;
                         clientEntry.RequestCount += 1;
+
+                        await Task.Delay(TimeSpan.FromSeconds(10), token);
                     }
                 });
-                source.CancelAfter(10000);
+                source.CancelAfter(TimeSpan.FromSeconds(10));
                 await parallelLoop;
             }
             catch (Exception)
             { }
 
             // Assert.
-            uint requestTotalCount = 0;
-            uint tooManyRequestsResponseTotalCount = 0;
             for (int i = 0; i < clientEntries.Count; i++)
             {
                 requestTotalCount += clientEntries[i].RequestCount;
                 tooManyRequestsResponseTotalCount += clientEntries[i].TooManyRequestsResponseCount;
-                _testOutputHelper.WriteLine($"Client {i}: Sent {clientEntries[i].RequestCount} - Rejected {clientEntries[i].TooManyRequestsResponseCount}");
+                var successRate = (float)clientEntries[i].TooManyRequestsResponseCount / clientEntries[i].RequestCount * 100f;
+                _testOutputHelper.WriteLine($"Client {i}: Sent {clientEntries[i].RequestCount} - Rejected {clientEntries[i].TooManyRequestsResponseCount} > Failure Rate: {successRate:00.00}%");
 
             }
 
@@ -104,7 +112,7 @@ namespace PubHub.API.FT
         {
             // Arrange - Endpoint to call.
             List<GenreInfoModel>? genres = null;
-            using (var client = await _apiFixture.GetAuthenticatedClientAsync())
+            using (var client = await _apiFixture.GetAuthenticatedClientAsync(ApiFixture.OPERATOR_EMAIL, ApiFixture.OPERATOR_PASSWORD))
             {
                 var response = await client.GetAsync("genres");
                 Assert.True(response.IsSuccessStatusCode);
@@ -119,7 +127,7 @@ namespace PubHub.API.FT
             List<ClientEntry> clientEntries = [];
             for (int i = 0; i < clientCount; i++)
             {
-                clientEntries.Add(new(await _apiFixture.GetAuthenticatedClientCopyAsync(), 0, 0));
+                clientEntries.Add(new(await _apiFixture.GetAuthenticatedClientCopyAsync(ApiFixture.OPERATOR_EMAIL, ApiFixture.OPERATOR_PASSWORD), i));
             }
 
             CancellationTokenSource source = new();
@@ -141,9 +149,11 @@ namespace PubHub.API.FT
                         if (response.StatusCode == HttpStatusCode.TooManyRequests)
                             clientEntry.TooManyRequestsResponseCount += 1;
                         clientEntry.RequestCount += 1;
+
+                        await Task.Delay(TimeSpan.FromSeconds(5), token);
                     }
                 });
-                source.CancelAfter(10000);
+                source.CancelAfter(TimeSpan.FromSeconds(10));
                 await parallelLoop;
             }
             catch (Exception)
@@ -156,8 +166,8 @@ namespace PubHub.API.FT
             {
                 requestTotalCount += clientEntries[i].RequestCount;
                 tooManyRequestsResponseTotalCount += clientEntries[i].TooManyRequestsResponseCount;
-                _testOutputHelper.WriteLine($"Client {i}: Sent {clientEntries[i].RequestCount} - Rejected {clientEntries[i].TooManyRequestsResponseCount}");
-
+                var successRate = (float)tooManyRequestsResponseTotalCount / requestTotalCount * 100f;
+                _testOutputHelper.WriteLine($"Client {i}: Sent {clientEntries[i].RequestCount} - Rejected {clientEntries[i].TooManyRequestsResponseCount} > Failure Rate: {successRate:00.00}%");
             }
 
             _testOutputHelper.WriteLine($"Total number of requests made: {requestTotalCount}");
