@@ -113,9 +113,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Create</button>
-                    <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                <div class="modal-footer" style="justify-content: space-between;">
+                    <PollyInfo />
+                    <div>
+                        <button type="submit" class="btn btn-success">Create</button>
+                        <button type="button" class="btn btn-danger" @onclick="() => ModalOptions(false)">Cancel</button>
+                    </div>
                 </div>
             </EditForm>
         </div>

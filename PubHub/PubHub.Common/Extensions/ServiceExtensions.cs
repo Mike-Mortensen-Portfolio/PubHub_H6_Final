@@ -2,8 +2,11 @@
 using System.Net;
 using System.Threading.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Polly;
+using Polly.Retry;
 using Polly.Simmy;
+using Polly.Simmy.Fault;
 using Polly.Timeout;
 using PubHub.Common.ApiService;
 using PubHub.Common.Models.Authentication;
@@ -13,7 +16,11 @@ namespace PubHub.Common.Extensions
 {
     public static class ServiceExtensions
     {
-        private const string POLLY_PIPELINE = "polly-pipeline";
+        private static readonly List<HttpStatusCode> _dontRetryStatusCodes =
+        [
+            HttpStatusCode.Unauthorized,
+            HttpStatusCode.TooManyRequests
+        ];
 
         public static IServiceCollection AddPubHubServices(this IServiceCollection services, Action<ApiOptions> apiOptions)
         {
@@ -42,16 +49,20 @@ namespace PubHub.Common.Extensions
                 HttpClient httpClient = new() { BaseAddress = uri };
                 httpClient.DefaultRequestHeaders.Add(ApiConstants.APP_ID, apiOptions.AppId);
                 services.AddSingleton<IHttpClientService>(sp => new HttpClientService(
+                    sp.GetRequiredService<ILogger<HttpClientService>>(),
                     httpClient,
-                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)
+                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(ResilienceConstants.HTTP_PIPELINE),
+                    sp.GetRequiredService<PollyInfoService>()
                     ));
             }
             else
             {
                 var clientName = apiOptions.HttpClientName ?? ApiConstants.HTTPCLIENT_NAME;
                 services.AddScoped<IHttpClientService>(sp => new HttpClientService(
+                    sp.GetRequiredService<ILogger<HttpClientService>>(),
                     sp.GetRequiredService<IHttpClientFactory>().CreateClient(clientName),
-                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(POLLY_PIPELINE)
+                    sp.GetRequiredKeyedService<ResiliencePipeline<HttpResponseMessage>>(ResilienceConstants.HTTP_PIPELINE),
+                    sp.GetRequiredService<PollyInfoService>()
                     ));
                 services.AddHttpClient(clientName, options =>
                 {
@@ -69,6 +80,7 @@ namespace PubHub.Common.Extensions
                 .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddScoped<IContentTypeService, ContentTypeService>()
                 .AddScoped<IEpubReaderService, EpubReaderService>()
+                .AddSingleton<PollyInfoService>()
                 .AddSingleton<IChaosService>(new ChaosService())
                 .AddPolly();
         }
@@ -86,44 +98,52 @@ namespace PubHub.Common.Extensions
 
         private static IServiceCollection AddPolly(this IServiceCollection services)
         {
-            services.AddResiliencePipeline<string, HttpResponseMessage>(POLLY_PIPELINE, (builder, context) =>
+            services.AddResiliencePipeline<string, HttpResponseMessage>(ResilienceConstants.HTTP_PIPELINE, (builder, context) =>
             {
+                static ValueTask<bool> RetryShouldHandle(RetryPredicateArguments<HttpResponseMessage> args)
+                {
+                    var infoService = args.Context.Properties.GetValue<PollyInfoService?>(new(ResilienceConstants.INFO_SERVICE_KEY), null);
+                    infoService?.SetRetryIndicator(args.AttemptNumber, ResilienceConstants.MAX_RETRY_ATTEMPTS);
+                    var response = args.Outcome.Result;
+                    if (response == null ||
+                        ((int)response.StatusCode >= 400 && !_dontRetryStatusCodes.Contains(response.StatusCode)))
+                    {
+                        // Request failed.
+                        return new ValueTask<bool>(true);
+                    }
+
+                    // Request succeeded.
+                    return new ValueTask<bool>(false);
+                }
+
+                static ValueTask OnRetry(OnRetryArguments<HttpResponseMessage> args)
+                {
+                    Debug.WriteLine($"Polly: Retrying in {args.RetryDelay} ...");
+
+                    return default;
+                }
+
                 // Configure Polly.
                 builder
                     .AddRetry(new()
                     {
-                        ShouldHandle = static args =>
-                        {
-                            var response = args.Outcome.Result;
-                            if (response == null ||
-                                response.StatusCode == HttpStatusCode.InternalServerError ||
-                                response.StatusCode == HttpStatusCode.NotFound)
-                            {
-                                // Request failed.
-                                return new ValueTask<bool>(true);
-                            }
-
-                            // Request succeeded.
-                            return new ValueTask<bool>(false);
-                        },
-                        MaxRetryAttempts = 5,
-                        DelayGenerator = static args =>
-                        {
-                            var delay = args.AttemptNumber switch
-                            {
-                                0 => TimeSpan.Zero,
-                                1 => TimeSpan.FromSeconds(0.2),
-                                _ => TimeSpan.FromSeconds(0.2 * Math.Pow(2, args.AttemptNumber))
-                            };
-
-                            return new ValueTask<TimeSpan?>(delay);
-                        },
-                        OnRetry = static args =>
-                        {
-                            Debug.WriteLine($"Polly: Retrying in {args.RetryDelay} ...");
-
-                            return default;
-                        }
+                        ShouldHandle = RetryShouldHandle,
+                        MaxRetryAttempts = ResilienceConstants.MAX_RETRY_ATTEMPTS,
+                        Delay = TimeSpan.FromSeconds(0.1),
+                        BackoffType = DelayBackoffType.Exponential,
+                        UseJitter = true,
+                        //DelayGenerator = static args =>
+                        //{
+                        //    var delay = args.AttemptNumber switch
+                        //    {
+                        //        0 => TimeSpan.Zero,
+                        //        1 => TimeSpan.FromSeconds(0.2),
+                        //        _ => TimeSpan.FromSeconds(0.2 * Math.Pow(2, args.AttemptNumber))
+                        //    };
+                        //
+                        //    return new ValueTask<TimeSpan?>(delay);
+                        //},
+                        OnRetry = OnRetry
                     })
                     .AddTimeout(new TimeoutStrategyOptions()
                     {
@@ -135,6 +155,11 @@ namespace PubHub.Common.Extensions
                             {
                                 // Content is more than 2 MB; use 5 min. timeout.
                                 timeoutSeconds = 300;
+
+                                // Inform user.
+                                var infoService = args.Context.Properties.GetValue<PollyInfoService?>(new(ResilienceConstants.INFO_SERVICE_KEY), null);
+                                if (infoService != null)
+                                    infoService.Detail = "Large content. This may take a bit.";
                             }
 
                             return ValueTask.FromResult(TimeSpan.FromSeconds(timeoutSeconds));
