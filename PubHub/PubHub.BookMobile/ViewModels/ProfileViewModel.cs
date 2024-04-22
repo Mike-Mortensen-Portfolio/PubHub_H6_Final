@@ -66,6 +66,8 @@ namespace PubHub.BookMobile.ViewModels
 
                     await NavigateToPage("Home");
                 }
+                else if (result.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                    await Shell.Current.CurrentPage.DisplayAlert(TooManyRequestError.TITLE, TooManyRequestError.ERROR_MESSAGE, TooManyRequestError.BUTTON_TEXT);
                 else
                     await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
                 IsBusy = false;
@@ -102,6 +104,8 @@ namespace PubHub.BookMobile.ViewModels
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
+                else if (result.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                    await Shell.Current.CurrentPage.DisplayAlert(TooManyRequestError.TITLE, TooManyRequestError.ERROR_MESSAGE, TooManyRequestError.BUTTON_TEXT);
                 else
                     await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 

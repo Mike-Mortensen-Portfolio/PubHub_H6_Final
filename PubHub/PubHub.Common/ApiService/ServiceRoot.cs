@@ -56,19 +56,23 @@ namespace PubHub.Common.ApiService
         public async Task TryRefreshTokenAsync()
         {
             var tokenInfo = await _tokenInfoAsync.Invoke();
+
+            if (!tokenInfo.IsValid)
+                return;
+
             var claimsPrincipal = GetClaims(tokenInfo.Token);
 
             // Check if token is about to expire.
             var expireClaim = claimsPrincipal.FindFirst("exp");
             if (expireClaim == null)
                 return;
-                
+
             var expireUnixTime = long.Parse(expireClaim.Value);
             var expireDateTime = DateTimeOffset.FromUnixTimeSeconds(expireUnixTime).UtcDateTime;
             // If the token expires in 5 minutes, then we want to refresh the token and update the existing token and refresh token in our local storage.
             if (expireDateTime > DateTime.UtcNow.AddMinutes(5))
                 return;
-            
+
             var response = await Client.PostAsync($"auth/refresh");
             if (!response.IsSuccessStatusCode)
             {
