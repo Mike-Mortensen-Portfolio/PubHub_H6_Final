@@ -17,10 +17,8 @@ public partial class BookContentInfo : ContentPage
         BindingContext = _viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
-        await User.CheckStateAndTryRefreshAsync(_authService);
-
         _viewModel.IsAuthenticated = User.IsAuthenticated;
 
         base.OnAppearing();

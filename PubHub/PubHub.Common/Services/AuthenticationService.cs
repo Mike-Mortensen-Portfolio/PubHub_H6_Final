@@ -121,6 +121,7 @@ namespace PubHub.Common.Services
         {
             try
             {
+                await SetTokensAsync();
                 HttpResponseMessage response = await Client.PostAsync($"auth/refresh");
                 string content = await response.Content.ReadAsStringAsync();
 

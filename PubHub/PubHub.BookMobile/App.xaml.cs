@@ -63,7 +63,7 @@ namespace PubHub.BookMobile
             }
 
             await User.SetAsync(response.Instance);
-            MainPage = new AuthorizedShell(); MainPage = new AppShell();
+            MainPage = new AuthorizedShell();
         }
     }
 }
