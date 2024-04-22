@@ -64,7 +64,7 @@ namespace PubHub.Common.Services
             return await DoRequestAsync(async context =>
             {
                 return await _client.PostAsync(uri, new StringContent(content ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
-            });
+            }, content);
         }
 
         /// <inheritdoc/>
@@ -75,7 +75,7 @@ namespace PubHub.Common.Services
             return await DoRequestAsync(async context =>
             {
                 return await _client.PutAsync(uri, new StringContent(content ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json), context.CancellationToken);
-            });
+            }, content);
         }
 
         /// <inheritdoc/>
@@ -106,14 +106,14 @@ namespace PubHub.Common.Services
 #endif
         }
 
-        private async Task<HttpResponseMessage> DoRequestAsync(Func<ResilienceContext, ValueTask<HttpResponseMessage>> func)
+        private async Task<HttpResponseMessage> DoRequestAsync(Func<ResilienceContext, ValueTask<HttpResponseMessage>> func, string? content = null)
         {
             const string UNFULFILLED_REQUESTS_MESSAGE = "Unfulfilled requests. Please reload to try again.";
             const string RATE_LIMIT_MESSAGE = "Internal rate limiter was triggered.";
 
             CheckNetwork();
 
-            var context = StartRequest();
+            var context = StartRequest(content);
 
             try
             {

@@ -67,7 +67,7 @@ builder.Services.AddRateLimiter(rateLimterOptions =>
         return RateLimitPartition.GetConcurrencyLimiter(consumerId,
             factory: _ => new ConcurrencyLimiterOptions
             {
-                PermitLimit = 5,
+                PermitLimit = 3,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 1
             });
