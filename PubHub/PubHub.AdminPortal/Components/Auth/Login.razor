@@ -30,6 +30,7 @@
     </div>
 </div>
 
+<PollyInfo/>
 
 @code {
     private LoginForm loginForm { get; set; } = new();
@@ -51,6 +52,9 @@
             }
 
             var result = await AuthService.LoginAsync(loginForm.CreateLoginInfo());
+
+            if (result.StatusCode == HttpStatusCode.TooManyRequests)
+                NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = TooManyRequestError.ERROR_MESSAGE, Duration = 5000 });
 
             if (result.Instance == null)
             {
