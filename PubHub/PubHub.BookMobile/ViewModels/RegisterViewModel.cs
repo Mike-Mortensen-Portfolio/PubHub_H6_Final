@@ -81,6 +81,9 @@ namespace PubHub.BookMobile.ViewModels
                     case System.Net.HttpStatusCode.Unauthorized:
                         await Shell.Current.CurrentPage.DisplayAlert(UnauthorizedError.TITLE, UnauthorizedError.ERROR_MESSAGE, UnauthorizedError.BUTTON_TEXT);
                         break;
+                    case System.Net.HttpStatusCode.TooManyRequests:
+                        await Shell.Current.CurrentPage.DisplayAlert(TooManyRequestError.TITLE, TooManyRequestError.ERROR_MESSAGE, TooManyRequestError.BUTTON_TEXT);
+                        break;
                     case System.Net.HttpStatusCode.UnprocessableEntity:
                         await Shell.Current.CurrentPage.DisplayAlert(UnprocessableEntityError.TITLE, UnprocessableEntityError.ERROR_MESSAGE, UnprocessableEntityError.BUTTON_TEXT);
                         break;

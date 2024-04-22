@@ -47,6 +47,8 @@ namespace PubHub.BookMobile.ViewModels
             {
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     await Shell.Current.CurrentPage.DisplayAlert("Validation Error", $"Email or password wasn't correct. Try again.", "OK");
+                else if (result.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                    await Shell.Current.CurrentPage.DisplayAlert(TooManyRequestError.TITLE, TooManyRequestError.ERROR_MESSAGE, TooManyRequestError.BUTTON_TEXT);
                 else
                     await Shell.Current.CurrentPage.DisplayAlert(NoConnectionError.TITLE, NoConnectionError.ERROR_MESSAGE, NoConnectionError.BUTTON_TEXT);
 
