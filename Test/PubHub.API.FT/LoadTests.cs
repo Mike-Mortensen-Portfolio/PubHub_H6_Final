@@ -38,17 +38,18 @@ namespace PubHub.API.FT
             // Arrange - Endpoint to call.
             uint requestTotalCount = 0;
             uint tooManyRequestsResponseTotalCount = 0;
-            List<GenreInfoModel>? genres = null;
-            using (var client = await _apiFixture.GetAuthenticatedClientAsync(ApiFixture.OPERATOR_EMAIL, ApiFixture.OPERATOR_PASSWORD))
-            {
-                var response = await client.GetAsync("genres");
-                requestTotalCount++;
-                Assert.True(response.IsSuccessStatusCode);
-                var content = await response.Content.ReadAsStringAsync();
-                genres = JsonSerializer.Deserialize<List<GenreInfoModel>>(content, _apiFixture.SerializerOptions);
-                Assert.NotNull(genres);
-            }
-            var testEndpoint = $"genres/{genres.Random()}";
+            //List<GenreInfoModel>? genres = null;
+            //using (var client = await _apiFixture.GetAuthenticatedClientAsync(ApiFixture.OPERATOR_EMAIL, ApiFixture.OPERATOR_PASSWORD))
+            //{
+            //    var response = await client.GetAsync("genres");
+            //    requestTotalCount++;
+            //    Assert.True(response.IsSuccessStatusCode);
+            //    var content = await response.Content.ReadAsStringAsync();
+            //    genres = JsonSerializer.Deserialize<List<GenreInfoModel>>(content, _apiFixture.SerializerOptions);
+            //    Assert.NotNull(genres);
+            //}
+            //var testEndpoint = $"genres/{genres.Random()}";
+            var testEndpoint = $"publishers";
 
             // Arrange - Clients.
             var clientCount = 10;
@@ -82,7 +83,7 @@ namespace PubHub.API.FT
                             clientEntry.TooManyRequestsResponseCount += 1;
                         clientEntry.RequestCount += 1;
 
-                        await Task.Delay(TimeSpan.FromSeconds(10), token);
+                        //await Task.Delay(TimeSpan.FromSeconds(10), token);
                     }
                 });
                 source.CancelAfter(TimeSpan.FromSeconds(10));
