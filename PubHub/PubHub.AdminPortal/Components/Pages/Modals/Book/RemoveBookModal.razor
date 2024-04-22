@@ -16,12 +16,15 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" @onclick="() => RemoveBook()">Remove</button>
-                <button type="button" class="btn btn-success" @onclick="() => ModalOptions(false)">Cancel</button>
-                @if (unsuccessfulResult)
-                {
-                    <label class="text-danger">Unable to remove the book.</label>
-                }
+                <PollyInfo />
+                <div>
+                    <button type="button" class="btn btn-danger" @onclick="() => RemoveBook()">Remove</button>
+                    <button type="button" class="btn btn-success" @onclick="() => ModalOptions(false)">Cancel</button>
+                    @if (unsuccessfulResult)
+                    {
+                        <label class="text-danger">Unable to remove the book.</label>
+                    }
+                </div>                
             </div>
         </div>
     </div>

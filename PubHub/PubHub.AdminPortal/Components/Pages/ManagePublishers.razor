@@ -63,6 +63,8 @@
     </NotAuthorized>
 </AuthorizeView>
 
+<PollyInfo/>
+
 @code {
     bool showCreateModal;
     bool showRemoveModal;
@@ -77,6 +79,10 @@
     protected async override Task OnInitializedAsync()
     {
         var resultPub = await PublisherService.GetAllPublishersAsync(publisherQuery);
+
+        if (resultPub.StatusCode == HttpStatusCode.TooManyRequests)
+            NotificationService.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Summary = TooManyRequestError.ERROR_MESSAGE, Duration = 5000 });
+
         if (resultPub != null && resultPub.Instance != null)
         {
             Publishers = resultPub.Instance.ToList();
